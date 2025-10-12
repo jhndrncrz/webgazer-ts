@@ -167,7 +167,17 @@ export { WebGazerState } from './core/WebGazer';
  * Export utility classes that users might need.
  */
 export { KalmanFilter } from './utils/filters/KalmanFilter';
+export { KalmanFilter4D } from './utils/filters/KalmanFilter4D';
 export { Matrix } from './utils/math/Matrix';
+
+/**
+ * Export filter types
+ */
+export type { 
+  KalmanFilterConfig, 
+  KalmanFilter4DConfig, 
+  KalmanFilter4DState 
+} from './utils/filters/types';
 
 // ============================================================================
 // Browser Compatibility Check

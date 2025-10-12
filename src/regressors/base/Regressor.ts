@@ -5,7 +5,7 @@
 
 import type { IRegressor } from '../../core/types';
 import type { EyeFeatures, GazePrediction } from '../../types/index';
-import type { KalmanFilter } from '../../utils/filters/KalmanFilter';
+import type { IKalmanFilter } from '../../utils/filters/types';
 import {
   RegressorState,
   type RegressorConfiguration,
@@ -37,8 +37,8 @@ export abstract class Regressor implements IRegressor {
   protected dataClicks: DataWindow<TrainingDataPoint>;
   protected dataTrail: DataWindow<TrainingDataPoint>;
 
-  // Kalman filter for smoothing
-  protected kalmanFilter: KalmanFilter | null = null;
+  // Kalman filter for smoothing (supports both 1D and 4D filters)
+  protected kalmanFilter: IKalmanFilter | null = null;
 
   /**
    * Create a new Regressor instance
@@ -244,9 +244,9 @@ export abstract class Regressor implements IRegressor {
 
   /**
    * Set Kalman filter for prediction smoothing
-   * @param kalmanFilter - Kalman filter instance
+   * @param kalmanFilter - Kalman filter instance (supports both 1D and 4D)
    */
-  protected setKalmanFilter(kalmanFilter: KalmanFilter): void {
+  protected setKalmanFilter(kalmanFilter: IKalmanFilter): void {
     this.kalmanFilter = kalmanFilter;
   }
 

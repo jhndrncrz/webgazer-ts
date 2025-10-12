@@ -7,7 +7,7 @@ import { Regressor } from './base/Regressor';
 import { RegressorState } from './base/types';
 import type { EyeFeatures, GazePrediction } from '../types/index';
 import { Matrix } from '../utils/math/Matrix';
-import { KalmanFilter } from '../utils/filters/KalmanFilter';
+import { KalmanFilter4D } from '../utils/filters/KalmanFilter4D';
 import { EyeExtractor } from '../utils/image/EyeExtractor';
 
 /**
@@ -44,11 +44,12 @@ export class RidgeRegressor extends Regressor {
    * Sets up Kalman filter and prepares for training
    */
   public initialize(): void {
-    // Initialize Kalman filter for prediction smoothing
-    const kalmanFilter = new KalmanFilter({
-      processNoise: 0.1,
-      measurementNoise: 47,
-      errorCovariance: 0.0001,
+    // Initialize 4D Kalman filter for prediction smoothing (matches original WebGazer.js)
+    const kalmanFilter = new KalmanFilter4D({
+      processNoise: 1.0,
+      measurementNoise: 25.0,
+      initialErrorCovariance: 100.0,
+      deltaTime: 1.0,
     });
 
     this.setKalmanFilter(kalmanFilter);

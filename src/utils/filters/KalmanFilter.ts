@@ -3,19 +3,7 @@
  * Reduces jitter and noise in eye tracking data
  */
 
-/**
- * Configuration options for Kalman Filter
- */
-export interface KalmanFilterConfig {
-  /** Process noise covariance (how much we expect the true value to change) */
-  processNoise?: number;
-  
-  /** Measurement noise covariance (how much we trust measurements) */
-  measurementNoise?: number;
-  
-  /** Initial error covariance */
-  errorCovariance?: number;
-}
+import type { IKalmanFilter, KalmanFilterConfig } from './types';
 
 /**
  * Kalman Filter state for 2D point tracking
@@ -38,7 +26,7 @@ export interface KalmanFilterState {
  * KalmanFilter - Implements 1D Kalman filter for each coordinate
  * Provides optimal estimation of gaze point by combining predictions and measurements
  */
-export class KalmanFilter {
+export class KalmanFilter implements IKalmanFilter {
   private xState: SingleDimensionKalmanFilter;
   private yState: SingleDimensionKalmanFilter;
 
@@ -120,6 +108,13 @@ export class KalmanFilter {
         errorCovariance: this.yState.getErrorCovariance()
       }
     };
+  }
+  
+  /**
+   * Check if filter is initialized
+   */
+  isInitialized(): boolean {
+    return this.xState['isInitialized'] && this.yState['isInitialized'];
   }
 }
 
