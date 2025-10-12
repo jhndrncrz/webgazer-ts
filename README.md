@@ -1,166 +1,228 @@
-# WebGazer (TypeScript)
+# WebGazer-TS
 
-This is a TypeScript rewrite of the WebGazer core in this workspace. It provides a browser-compatible module that uses TensorFlow.js Face Landmarks (MediaPipe) and ridge regression to estimate gaze, with an optional Kalman filter.
+> A modern TypeScript rewrite of [WebGazer.js](https://webgazer.cs.brown.edu) for academic research purposes.
 
-## Dev
+[![Original Project](https://img.shields.io/badge/Original-WebGazer.js-blue)](https://github.com/brownhci/WebGazer)
+[![License](https://img.shields.io/badge/License-GPL--3.0-green.svg)](LICENSE.md)
 
-- Dev server
+---
 
-```sh
-npm install
-npm run dev
+## ⚠️ Academic Research Project
+
+**This is developed primarily for our thesis project and NOT for production use.**
+
+This TypeScript port was created to support modern development workflows and type-safe integration for our thesis project. **For production applications, use the official [WebGazer.js](https://github.com/brownhci/WebGazer) library.**
+
+---
+
+## About
+
+WebGazer-TS is a webcam-based eye tracking library that predicts where users are looking on a web page in real-time. It self-calibrates by learning from user interactions without requiring special hardware.
+
+**Key Features:**
+- Real-time gaze prediction using webcam
+- Self-calibration from clicks and cursor movements
+- No video data sent to servers (runs entirely in browser)
+- Full TypeScript type safety
+- 100% API compatible with original WebGazer.js
+
+---
+
+## Quick Start
+
+### Installation
+
+```bash
+npm install webgazer-ts
 ```
 
-- Build
+Or with yarn:
+```bash
+yarn add webgazer-ts
+```
 
-```sh
+Or with pnpm:
+```bash
+pnpm add webgazer-ts
+```
+
+### Basic Usage
+
+#### ES Modules (Recommended)
+
+```typescript
+import webgazer from 'webgazer-ts';
+
+// Initialize
+await webgazer
+  .setTracker('TFFacemesh')
+  .setRegression('ridge')
+  .begin();
+
+// Enable calibration from mouse movements
+webgazer.addMouseEventListeners();
+
+// Get gaze predictions
+webgazer.setGazeListener((data, timestamp) => {
+  if (data) {
+    console.log(`Gaze at (${data.x}, ${data.y})`);
+  }
+});
+```
+
+#### CommonJS
+
+```javascript
+const webgazer = require('webgazer-ts').default;
+
+// Same API as above
+```
+
+#### Browser (UMD)
+
+```html
+<script src="node_modules/webgazer-ts/dist/webgazer-ts.umd.cjs"></script>
+<script>
+  // Available as global 'webgazer'
+  webgazer.begin();
+</script>
+```
+
+### TypeScript Support
+
+Full TypeScript definitions are included:
+
+```typescript
+import webgazer, { 
+  GazePrediction, 
+  CalibrationResult,
+  Point2D 
+} from 'webgazer-ts';
+
+// All types are available
+webgazer.setGazeListener((data: GazePrediction | null, timestamp: number) => {
+  if (data) {
+    const point: Point2D = { x: data.x, y: data.y };
+    console.log(point);
+  }
+});
+```
+
+### Development
+
+For local development:
+
+```bash
+# Clone the repository
+git clone <your-repo-url>
+cd webgazer-ts
+
+# Install dependencies
+npm install
+
+# Run dev server
+npm run dev
+
+# Build for production
 npm run build
 ```
 
-Then open the dev URL and allow the camera.
-
-## Notes
-- Requires https or localhost for getUserMedia.
-- Tested on modern Chromium/Firefox/Safari.
-- The worker is bundled as a module worker.# [WebGazer.js](https://webgazer.cs.brown.edu)
-
-WebGazer.js is an eye tracking library that uses common webcams to infer the eye-gaze locations of web visitors on a page in real time. The eye tracking model it contains self-calibrates by watching web visitors interact with the web page and trains a mapping between the features of the eye and positions on the screen. WebGazer.js is written entirely in JavaScript and with only a few lines of code can be integrated in any website that wishes to better understand their visitors and transform their user experience. WebGazer.js runs entirely in the client browser, so no video data needs to be sent to a server. WebGazer.js can run only if the user consents in giving access to their webcam.
-
-* [Official website](https://webgazer.cs.brown.edu)
-* [API Docs](https://github.com/brownhci/WebGazer/wiki/Top-Level-API)
-
-## Features
-
-* Real time gaze prediction on most major browsers
-* No special hardware; WebGazer.js uses your webcam
-* Self-calibration from clicks and cursor movements
-* Easy to integrate with a few lines of JavaScript
-* Swappable components for eye detection
-* Multiple gaze prediction models
-* Useful video feedback to user
-
-## Build the repository
-
-If you want to build the repository from source follow these instructions:
-
-    # Ensure Node is downloaded: https://nodejs.org/en/download/ (tested on v16 and v18)
-    git clone https://github.com/brownhci/WebGazer.git
-    cd WebGazer
-    #install the dependencies
-    npm install
-    #build the project
-    npm run build
-
-<!-- To use the webgazer script in the head of an HTML file add the `async` tag to ensure the clmtrackr does not collapse to a slower version -->
-
-## Examples
-
-Examples of how WebGazer.js works can be found [here](https://webgazer.cs.brown.edu/#examples).
-
-### to use on any website
-
-```
-<script src="webgazer.js" type="text/javascript" >
-```
-
-### to use in any modern framework
-
-````
-const webgazer = require('webgazer'); // npm package 'webgazer' is sync with this repository
-````
-
-or you can you do
-
-````
-import webgazer from 'webgazer'
-````
-
-### How to run the Example HTML files
-
-Within the /www directory there are two example HTML files:
-
-  * `calibration.html`: This example includes additional user feedback, such as a 9-point calibration sequence, accuracy measurements and an informative help module.
-  * `collision.html`: This example contains a game where the user can move an orange ball with their eyes, which in turn collides with blue balls.
-
-To run the example files as a server:
-
-	# Clone the repository and download NodeJS using the steps listed above
-	# Move into the www directory and download the additional dependencies
-	cd www
-	npm install
-	# Run the webpage index.html as a server
-	npm run serve
+---
 
 ## Browser Support
 
-The following browsers support WebGazer.js:
+**Requirements:**
+- HTTPS or localhost (required for camera access)
+- Modern browser with WebRTC support
+- User permission for webcam access
 
-  * Google Chrome
-  * Microsoft Edge
-  * Mozilla Firefox
-  * Opera
-  * Safari
+**Tested on:**
+- Google Chrome (recommended)
+- Microsoft Edge
+- Mozilla Firefox
+- Safari
+- Opera
+
+---
+
+## Examples
+
+The `/examples` directory contains:
+- `minimal-example.html` - Basic setup
+- `calibration-demo.html` - Interactive calibration
+- `index.html` - Full-featured demo
+
+---
+
+## Project Structure
+
+```
+src/
+├── core/              # Core WebGazer class
+├── trackers/          # Face/eye tracking
+├── regressors/        # Gaze prediction
+├── rendering/         # Video and overlay rendering
+├── calibration/       # Calibration system
+├── events/            # Event handling
+├── utils/             # Utilities
+└── types/             # TypeScript definitions
+```
+
+---
+
+## Credits
+
+**This project is built upon the groundbreaking work of the WebGazer.js team at Brown University.**
+
+### Original WebGazer.js
+- **Website:** https://webgazer.cs.brown.edu
+- **Repository:** https://github.com/brownhci/WebGazer
+- **License:** GPL-3.0 (with LGPL-3.0 option for startups)
+
+### Original Authors
+- Alexandra Papoutsaki (creator)
+- Aaron Gokaslan
+- Jeff Huang (maintainer)
+- James Tompkin
+- And the entire [Brown HCI team](https://webgazer.cs.brown.edu)
+
+**All credit for the core methodology and algorithms belongs to the original team.**
+
+---
 
 ## Publications
 
-  _**Note:** The current iteration of WebGazer no longer corresponds with the WebGazer described in the following publications and which can be found [here](https://github.com/brownhci/WebGazer/tree/2a4a70cb49b2d568a09362e1b52fd3bd025cd38d)._
+Please cite the original WebGazer.js publications:
 
-	@inproceedings{papoutsaki2016webgazer,
-	author     = {Alexandra Papoutsaki and Patsorn Sangkloy and James Laskey and Nediyana Daskalova and Jeff Huang and James Hays},
-	title      = {{WebGazer}: Scalable Webcam Eye Tracking Using User Interactions},
-    booktitle  = {Proceedings of the 25th International Joint Conference on Artificial Intelligence (IJCAI-16)},
-    pages      = {3839--3845},
-	year       = {2016},
-	organization={AAAI}
-	}
+```bibtex
+@inproceedings{papoutsaki2016webgazer,
+  author     = {Alexandra Papoutsaki and Patsorn Sangkloy and James Laskey and Nediyana Daskalova and Jeff Huang and James Hays},
+  title      = {{WebGazer}: Scalable Webcam Eye Tracking Using User Interactions},
+  booktitle  = {Proceedings of the 25th International Joint Conference on Artificial Intelligence (IJCAI)},
+  pages      = {3839--3845},
+  year       = {2016}
+}
+```
 
-	@inproceedings{papoutsaki2017searchgazer,
-	author     = {Alexandra Papoutsaki and James Laskey and Jeff Huang},
-    title      = {SearchGazer: Webcam Eye Tracking for Remote Studies of Web Search},
-    booktitle  = {Proceedings of the ACM SIGIR Conference on Human Information Interaction \& Retrieval (CHIIR)},
-    year       = {2017},
-    organization={ACM}
-    }
+Full publication list: https://webgazer.cs.brown.edu/#publications
 
-    @inproceedings{papoutsaki2018eye,
-    author={Papoutsaki, Alexandra and Gokaslan, Aaron and Tompkin, James and He, Yuze and Huang, Jeff},
-    title={The eye of the typer: a benchmark and analysis of gaze behavior during typing.},
-    booktitle={Proceedings of the 2018 ACM Symposium on Eye Tracking Research \& Applications (ETRA)},
-    pages={16--1},
-    year={2018},
-    organization={ACM}
-    }
-
-
-
-## Who We Are
-
-  * Alexandra Papoutsaki
-  * Aaron Gokaslan
-  * Ida De Smet
-  * Xander Koo
-  * James Tompkin
-  * Jeff Huang
-
-## Other Collaborators
-
-  * Nediyana Daskalova
-  * James Hays
-  * Yuze He
-  * James Laskey
-  * Patsorn Sangkloy
-  * Elizabeth Stevenson
-  * Preston Tunnell Wilson
-  * Jack Wong
-
-### Acknowledgements
-
-Webgazer is developed based on the research that is done by Brown University, with recent work at Pomona College as well. The current maintainer is [Jeff Huang](https://jeffhuang.com/). The calibration example file was developed in the context of a course project with the aim to improve the feedback of WebGazer, proposed by Dr. Gerald Weber and his team Dr. Clemens Zeidler and Kai-Cheung Leung.
-
-This research is supported by NSF grants IIS-1464061, IIS-1552663, and the Brown University Salomon Award.
+---
 
 ## License
 
-Copyright (C) 2016 [Brown WebGazer Team](https://webgazer.cs.brown.edu)
+**WebGazer-TS:** GPL-3.0-or-later  
+**Original WebGazer.js:** GPL-3.0 (LGPL-3.0 for companies valued under $1M)
 
-Licensed under GPLv3. Companies have the option to license WebGazer.js under LGPLv3 while their valuation is under $1,000,000. For other licensing options, please contact webgazer@lists.cs.brown.edu
+For commercial licensing of the original WebGazer.js: webgazer@lists.cs.brown.edu
+
+---
+
+## Disclaimer
+
+This is an academic research project. While the regression mathematics have been verified against the original implementation, this code has not undergone the same testing as the production WebGazer.js library.
+
+**Use at your own risk. For production use, choose the official [WebGazer.js](https://github.com/brownhci/WebGazer).**
+
+---
+
+**Built with respect for the original [WebGazer.js](https://webgazer.cs.brown.edu) team** ❤️

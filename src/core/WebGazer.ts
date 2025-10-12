@@ -415,14 +415,18 @@ export class WebGazer {
       return;
     }
 
-    // Use actual video dimensions, not CSS dimensions
+    // Use actual video dimensions for canvas width/height (actual pixels)
     const videoWidth = this.videoElement.videoWidth;
     const videoHeight = this.videoElement.videoHeight;
+    
+    // Use video viewer dimensions for CSS styling (display size)
+    const viewerWidth = this.config.videoViewerWidth;
+    const viewerHeight = this.config.videoViewerHeight;
 
     this.overlayRenderer = new OverlayRenderer({
       containerId: this.config.videoContainerId,
       canvasId: this.config.faceOverlayId,
-      width: videoWidth,
+      width: videoWidth,  // Canvas pixel dimensions
       height: videoHeight,
       zIndex: 998,
       showLandmarks: true,
@@ -438,10 +442,15 @@ export class WebGazer {
 
     this.overlayRenderer.initialize();
     
+    // Set CSS dimensions to match video viewer size (scaling)
+    this.overlayRenderer.setStyleDimensions(viewerWidth, viewerHeight);
+    
     // Set initial visibility based on config
     this.overlayRenderer.setVisible(this.config.showFaceOverlay);
     
-    console.log('Overlay renderer initialized with dimensions:', videoWidth, 'x', videoHeight);
+    console.log('✅ Overlay renderer initialized:');
+    console.log('   Canvas dimensions:', videoWidth, 'x', videoHeight, '(actual pixels)');
+    console.log('   CSS dimensions:', viewerWidth, 'x', viewerHeight, '(display size)');
   }
 
   /**
@@ -480,15 +489,16 @@ export class WebGazer {
         boxId: this.config.faceFeedbackBoxId,
         ratio: this.config.faceFeedbackBoxRatio,
         colors: {
-          valid: '#00ff00',
-          invalid: '#ff0000',
-          warning: '#ffff00'
+          valid: '#00ff00',      // Green when face is properly positioned
+          invalid: '#ff0000',    // Red when face not detected or badly positioned
+          warning: '#ffff00'     // Yellow when face needs adjustment
         },
-        showInstructions: false,
-        instructionText: ''
+        showInstructions: true,
+        instructionText: 'Position your face inside the box'
       });
 
       this.validationBox.initialize();
+      console.log('✅ Face feedback box initialized (ratio:', this.config.faceFeedbackBoxRatio, ')');
     }
 
     console.log('Calibration system initialized');
@@ -554,21 +564,24 @@ export class WebGazer {
           if (this.validationBox && this.config.showFaceFeedbackBox && this.tracker) {
             const positions = this.tracker.getPositions();
             if (positions && positions.length > 0) {
-              // Calculate center of face for validation
+              // Calculate face bounding box from landmarks
               const xs = positions.map(p => p[0]);
               const ys = positions.map(p => p[1]);
-              const centerX = (Math.min(...xs) + Math.max(...xs)) / 2;
-              const centerY = (Math.min(...ys) + Math.max(...ys)) / 2;
+              const minX = Math.min(...xs);
+              const maxX = Math.max(...xs);
+              const minY = Math.min(...ys);
+              const maxY = Math.max(...ys);
               
-              // Simple validation: check if face is roughly centered in video
-              const videoWidth = this.canvasElement?.width || 320;
-              const videoHeight = this.canvasElement?.height || 240;
-              const isValid = 
-                centerX > videoWidth * 0.2 && centerX < videoWidth * 0.8 &&
-                centerY > videoHeight * 0.2 && centerY < videoHeight * 0.8;
-              
-              // Update validation box (you may need to implement this method)
-              // this.validationBox.setValid(isValid);
+              // Update validation box with face position
+              this.validationBox.updateFromFaceBox({
+                x: minX,
+                y: minY,
+                width: maxX - minX,
+                height: maxY - minY
+              });
+            } else {
+              // No face detected
+              this.validationBox.updateFromFaceBox(undefined);
             }
           }
 
@@ -732,7 +745,7 @@ export class WebGazer {
     if (predictions.length === 0 && this.regressors.length > 0) {
       // Check if we have any training data
       const data = this.regressors[0].getData() as any;
-      if (data && data.clickData && data.clickData.length === 0) {
+      if (data && data.dataClicks && data.dataClicks.length === 0) {
         // Only log this warning occasionally to avoid spam
         if (Date.now() % 5000 < 50) {
           console.warn('⚠️ No gaze predictions - need calibration data. Click around the screen to calibrate!');
@@ -1153,10 +1166,10 @@ export class WebGazer {
     const xPoints: number[] = [];
     const yPoints: number[] = [];
 
-    if (data && data.clickData) {
-      for (const point of data.clickData) {
-        xPoints.push(point.screenPosition[0]);
-        yPoints.push(point.screenPosition[1]);
+    if (data && data.dataClicks) {
+      for (const point of data.dataClicks) {
+        xPoints.push(point.screenX);
+        yPoints.push(point.screenY);
       }
     }
 
@@ -1173,7 +1186,7 @@ export class WebGazer {
     }
 
     const data = this.regressors[0].getData() as any;
-    return (data && data.clickData) ? data.clickData.length : 0;
+    return (data && data.dataClicks) ? data.dataClicks.length : 0;
   }
 
   // ============================================================================

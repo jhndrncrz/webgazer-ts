@@ -1,0 +1,54 @@
+# Source files (only include built dist/)
+src/
+examples/
+docs/
+
+# Build configuration
+tsconfig.json
+vite.config.ts
+webpack.config.js
+jsdoc.conf.json
+
+# Development files
+.vscode/
+.idea/
+*.log
+*.tgz
+
+# Test files
+test/
+tests/
+__tests__/
+*.spec.ts
+*.test.ts
+test-package.mjs
+example-usage.mjs
+
+# Development HTML
+index.html
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Package manager files
+node_modules/
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Keep these important files
+!README.md
+!LICENSE.md
+!CREDITS.md
+!THESIS_DISCLAIMER.md

@@ -220,7 +220,7 @@ export class TensorFlowFaceMeshTracker extends Tracker {
       // The newer TensorFlow face-landmarks-detection API uses estimateFaces
       try {
         predictions = await this.detector.estimateFaces(video, {
-          flipHorizontal: false,
+          flipHorizontal: true,
         });
         
         // console.log('✅ estimateFaces completed. Predictions:', predictions.length);

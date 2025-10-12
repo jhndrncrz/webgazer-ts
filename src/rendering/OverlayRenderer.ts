@@ -85,6 +85,20 @@ export class OverlayRenderer implements IRenderer {
   }
 
   /**
+   * Set CSS style dimensions (for scaling)
+   * This is different from canvas dimensions - canvas dimensions are actual pixels,
+   * while style dimensions control the display size
+   * @param width - CSS width in pixels
+   * @param height - CSS height in pixels
+   */
+  public setStyleDimensions(width: number, height: number): void {
+    if (this.canvas) {
+      this.canvas.style.width = `${width}px`;
+      this.canvas.style.height = `${height}px`;
+    }
+  }
+
+  /**
    * Set visibility
    * @param visible - Whether overlay should be visible
    */
