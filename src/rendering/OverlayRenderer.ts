@@ -42,6 +42,7 @@ export class OverlayRenderer implements IRenderer {
         left: '0',
         zIndex: `${this.config.zIndex}`,
         pointerEvents: 'none',
+        display: this.config.showLandmarks || this.config.showEyeRegions || this.config.showFaceBox ? 'block' : 'none',
       },
     });
 
@@ -53,10 +54,12 @@ export class OverlayRenderer implements IRenderer {
     }
 
     this.context = DOMManager.getCanvas2DContext(this.canvas, {
-      willReadFrequently: false,
+      willReadFrequently: true, // Face overlay is drawn frequently
     });
 
     this.isInitialized = true;
+    
+    console.log('✅ Overlay canvas created:', this.config.width, 'x', this.config.height);
   }
 
   /**
@@ -113,11 +116,16 @@ export class OverlayRenderer implements IRenderer {
 
     this.clear();
 
-    // Draw points
-    this.context.fillStyle = this.config.landmarkColor;
+    // Draw all face mesh points (like legacy version)
+    // Use cyan color (#32EEDB) to match legacy
+    this.context.fillStyle = this.config.landmarkColor || '#32EEDB';
+    this.context.strokeStyle = this.config.landmarkColor || '#32EEDB';
+    this.context.lineWidth = 0.5;
+    
     for (const point of landmarks) {
       this.context.beginPath();
       this.context.arc(point.x, point.y, this.config.landmarkRadius, 0, 2 * Math.PI);
+      this.context.closePath();
       this.context.fill();
     }
   }

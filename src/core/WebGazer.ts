@@ -263,12 +263,9 @@ export class WebGazer {
       });
     }
 
-    // Stop camera
-    this.stopVideo();
-
-    // Clean up renderers
+    // Clean up renderers first (before stopping video)
     if (this.videoRenderer) {
-      this.videoRenderer.destroy();
+      this.videoRenderer.destroy(); // This will also stop the stream
       this.videoRenderer = null;
     }
 
@@ -365,8 +362,16 @@ export class WebGazer {
       throw new Error('No tracker set. Call setTracker() first.');
     }
 
+    // Recreate tracker if it was cleaned up (e.g., after end() was called)
     if (!this.tracker) {
-      throw new Error(`Tracker ${this.currentTrackerName} not created. Call setTracker() first.`);
+      const TrackerClass = WebGazer.trackerRegistry.get(this.currentTrackerName);
+      
+      if (!TrackerClass) {
+        throw new Error(`Tracker "${this.currentTrackerName}" not found in registry`);
+      }
+      
+      this.tracker = new TrackerClass();
+      console.log(`Tracker ${this.currentTrackerName} recreated after cleanup`);
     }
 
     if (!this.videoElement || !this.canvasElement) {
@@ -406,23 +411,25 @@ export class WebGazer {
    * Initialize overlay renderer
    */
   private initializeOverlayRenderer(): void {
-    if (!this.canvasElement) {
+    if (!this.videoElement) {
       return;
     }
 
-    const rect = this.canvasElement.getBoundingClientRect();
+    // Use actual video dimensions, not CSS dimensions
+    const videoWidth = this.videoElement.videoWidth;
+    const videoHeight = this.videoElement.videoHeight;
 
     this.overlayRenderer = new OverlayRenderer({
       containerId: this.config.videoContainerId,
       canvasId: this.config.faceOverlayId,
-      width: rect.width,
-      height: rect.height,
+      width: videoWidth,
+      height: videoHeight,
       zIndex: 998,
       showLandmarks: true,
       showEyeRegions: true,
       showFaceBox: true,
-      landmarkColor: '#00ff00',
-      landmarkRadius: 2,
+      landmarkColor: '#32EEDB', // Cyan color to match legacy
+      landmarkRadius: 1, // Smaller points for cleaner mesh
       eyeRegionColor: '#ff0000',
       eyeRegionLineWidth: 2,
       faceBoxColor: '#ffff00',
@@ -430,7 +437,11 @@ export class WebGazer {
     });
 
     this.overlayRenderer.initialize();
-    console.log('Overlay renderer initialized');
+    
+    // Set initial visibility based on config
+    this.overlayRenderer.setVisible(this.config.showFaceOverlay);
+    
+    console.log('Overlay renderer initialized with dimensions:', videoWidth, 'x', videoHeight);
   }
 
   /**
@@ -511,15 +522,54 @@ export class WebGazer {
             eyeFeatures: eyeFeatures
           };
 
-          // Update overlay if enabled
-          if (this.overlayRenderer && this.config.showFaceOverlay) {
-            this.overlayRenderer.update();
+          // Update overlay if enabled - draw face landmarks
+          if (this.overlayRenderer && this.config.showFaceOverlay && this.tracker) {
+            const positions = this.tracker.getPositions();
+            if (positions && positions.length > 0) {
+              // Convert positions to Point2D format for overlay renderer
+              const landmarks = positions.map(pos => ({ x: pos[0], y: pos[1] }));
+              this.overlayRenderer.drawLandmarks(landmarks);
+              
+              // Draw face bounding box if enabled
+              if (this.config.showFaceFeedbackBox && positions.length > 0) {
+                // Calculate bounding box from face landmarks
+                const xs = positions.map(p => p[0]);
+                const ys = positions.map(p => p[1]);
+                const minX = Math.min(...xs);
+                const maxX = Math.max(...xs);
+                const minY = Math.min(...ys);
+                const maxY = Math.max(...ys);
+                
+                this.overlayRenderer.drawFaceBox({
+                  x: minX,
+                  y: minY,
+                  width: maxX - minX,
+                  height: maxY - minY
+                });
+              }
+            }
           }
 
-          // Update validation box if enabled (would need face box data from tracker)
-          if (this.validationBox && this.config.showFaceFeedbackBox) {
-            // ValidationBox update logic would go here if we had face box data
-            // For now, skip this as TrackingData doesn't include faceBox
+          // Update validation box if enabled
+          if (this.validationBox && this.config.showFaceFeedbackBox && this.tracker) {
+            const positions = this.tracker.getPositions();
+            if (positions && positions.length > 0) {
+              // Calculate center of face for validation
+              const xs = positions.map(p => p[0]);
+              const ys = positions.map(p => p[1]);
+              const centerX = (Math.min(...xs) + Math.max(...xs)) / 2;
+              const centerY = (Math.min(...ys) + Math.max(...ys)) / 2;
+              
+              // Simple validation: check if face is roughly centered in video
+              const videoWidth = this.canvasElement?.width || 320;
+              const videoHeight = this.canvasElement?.height || 240;
+              const isValid = 
+                centerX > videoWidth * 0.2 && centerX < videoWidth * 0.8 &&
+                centerY > videoHeight * 0.2 && centerY < videoHeight * 0.8;
+              
+              // Update validation box (you may need to implement this method)
+              // this.validationBox.setValid(isValid);
+            }
           }
 
           // Get predictions from regressors
@@ -580,14 +630,65 @@ export class WebGazer {
    * Get eye features from tracker
    */
   private async getEyeFeatures(): Promise<EyeFeatures | null> {
-    if (!this.tracker) {
+    if (!this.tracker || !this.videoElement || !this.canvasElement) {
+      console.warn('Cannot get eye features: missing tracker, video, or canvas');
       return null;
     }
 
     try {
-      // Note: tracker.getEyePatches() signature varies by tracker implementation
-      // TensorFlowFaceMeshTracker requires 4 parameters, so we need to handle this
-      return await (this.tracker.getEyePatches as any)();
+      // Validate video element before passing to tracker
+      if (!(this.videoElement instanceof HTMLVideoElement)) {
+        console.error('videoElement is not an HTMLVideoElement:', typeof this.videoElement);
+        return null;
+      }
+
+      if (!this.videoElement.srcObject) {
+        console.warn('Video element has no srcObject (stream)');
+        return null;
+      }
+
+      // Check if video is actually playing
+      if (this.videoElement.readyState < 2) {
+        // Video not ready yet - this is normal during startup
+        return null;
+      }
+
+      // Validate video dimensions
+      if (this.videoElement.videoWidth === 0 || this.videoElement.videoHeight === 0) {
+        console.warn('Video has no dimensions yet:', 
+          this.videoElement.videoWidth, 'x', this.videoElement.videoHeight);
+        return null;
+      }
+
+      // Log video state on first successful check (for debugging)
+      if (!this.videoElement.dataset.validated) {
+        console.log('✅ Video element validated:', {
+          type: this.videoElement.constructor.name,
+          readyState: this.videoElement.readyState,
+          dimensions: `${this.videoElement.videoWidth}x${this.videoElement.videoHeight}`,
+          paused: this.videoElement.paused,
+          muted: this.videoElement.muted,
+          currentTime: this.videoElement.currentTime,
+          srcObject: !!this.videoElement.srcObject
+        });
+        this.videoElement.dataset.validated = 'true';
+      }
+
+      // Update canvas with current video frame
+      if (this.videoRenderer) {
+        this.videoRenderer.update();
+      }
+
+      // Get eye patches from tracker
+      // TensorFlowFaceMeshTracker requires 4 parameters: video, canvas, width, height
+      const eyeFeatures = await this.tracker.getEyePatches(
+        this.videoElement,
+        this.canvasElement,
+        this.canvasElement.width,
+        this.canvasElement.height
+      );
+
+      return eyeFeatures;
     } catch (error) {
       console.error('Failed to get eye features:', error);
       return null;
@@ -624,6 +725,18 @@ export class WebGazer {
         }
       } catch (error) {
         console.error('Regressor prediction failed:', error);
+      }
+    }
+
+    // Log if no predictions (likely due to no training data)
+    if (predictions.length === 0 && this.regressors.length > 0) {
+      // Check if we have any training data
+      const data = this.regressors[0].getData() as any;
+      if (data && data.clickData && data.clickData.length === 0) {
+        // Only log this warning occasionally to avoid spam
+        if (Date.now() % 5000 < 50) {
+          console.warn('⚠️ No gaze predictions - need calibration data. Click around the screen to calibrate!');
+        }
       }
     }
 
@@ -762,16 +875,20 @@ export class WebGazer {
    */
   public recordScreenPosition(x: number, y: number, eventType: 'click' | 'move' = 'click'): WebGazer {
     if (!this.isReady()) {
+      console.warn('WebGazer not ready, cannot record screen position');
       return this;
     }
 
-    // Get current tracking data synchronously if possible
+    // Get current tracking data asynchronously
     this.getTrackingData().then(trackingData => {
       if (trackingData && trackingData.eyeFeatures) {
         // Add data to all regressors
         for (const regressor of this.regressors) {
           regressor.addData(trackingData.eyeFeatures, [x, y], eventType);
         }
+        console.log(`📍 Recorded ${eventType} at (${Math.round(x)}, ${Math.round(y)})`);
+      } else {
+        console.warn('No eye features available to record');
       }
     }).catch(error => {
       console.error('Failed to record screen position:', error);
@@ -1044,6 +1161,19 @@ export class WebGazer {
     }
 
     return [xPoints, yPoints];
+  }
+
+  /**
+   * Get calibration data count
+   * @returns Number of calibration points recorded
+   */
+  public getCalibrationDataCount(): number {
+    if (this.regressors.length === 0) {
+      return 0;
+    }
+
+    const data = this.regressors[0].getData() as any;
+    return (data && data.clickData) ? data.clickData.length : 0;
   }
 
   // ============================================================================

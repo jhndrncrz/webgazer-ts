@@ -36,6 +36,8 @@ export class VideoRenderer implements IRenderer {
       id: this.config.containerId,
       styles: {
         position: 'fixed',
+        top: '0',
+        left: '0',
         zIndex: '100000',
       },
     });
@@ -49,6 +51,10 @@ export class VideoRenderer implements IRenderer {
       styles: {
         display: this.config.visible ? 'block' : 'none',
         position: 'absolute',
+        top: '0',
+        left: '0',
+        width: `${this.config.width}px`,
+        height: `${this.config.height}px`,
         transform: this.config.mirror ? 'scaleX(-1)' : 'none',
       },
     });
@@ -71,13 +77,83 @@ export class VideoRenderer implements IRenderer {
    * Set video stream
    * @param stream - MediaStream to display
    */
-  public setStream(stream: MediaStream): void {
+  public async setStream(stream: MediaStream): Promise<void> {
     if (!this.videoElement) {
       throw new Error('Video element not initialized');
     }
 
     this.stream = stream;
     this.videoElement.srcObject = stream;
+    
+    // Wait for video to be ready
+    await new Promise<void>((resolve, reject) => {
+      if (!this.videoElement) {
+        reject(new Error('Video element not available'));
+        return;
+      }
+
+      const onLoadedMetadata = () => {
+        this.videoElement?.removeEventListener('loadedmetadata', onLoadedMetadata);
+        this.videoElement?.removeEventListener('error', onError);
+        
+        if (!this.videoElement) {
+          reject(new Error('Video element lost'));
+          return;
+        }
+
+        // CRITICAL: Set width and height attributes (not just CSS styles)
+        // This is required for the video element to work properly with TensorFlow
+        // Reference: TensorFlow face-landmarks-detection demo
+        const videoWidth = this.videoElement.videoWidth;
+        const videoHeight = this.videoElement.videoHeight;
+        
+        console.log('Setting video dimensions:', { videoWidth, videoHeight });
+        
+        this.videoElement.width = videoWidth;
+        this.videoElement.height = videoHeight;
+        
+        // Update canvas dimensions to match
+        if (this.canvas) {
+          this.canvas.width = videoWidth;
+          this.canvas.height = videoHeight;
+        }
+        
+        // Update config to match actual video dimensions
+        this.config.width = videoWidth;
+        this.config.height = videoHeight;
+        
+        // Explicitly play the video
+        this.videoElement.play().then(() => {
+          console.log('✅ Video ready and playing:', {
+            readyState: this.videoElement?.readyState,
+            dimensions: `${this.videoElement?.videoWidth}x${this.videoElement?.videoHeight}`,
+            attributes: `width=${this.videoElement?.width}, height=${this.videoElement?.height}`,
+            paused: this.videoElement?.paused,
+            currentTime: this.videoElement?.currentTime
+          });
+          resolve();
+        }).catch((playError) => {
+          console.error('Failed to play video:', playError);
+          reject(playError);
+        });
+      };
+
+      const onError = (error: Event) => {
+        this.videoElement?.removeEventListener('loadedmetadata', onLoadedMetadata);
+        this.videoElement?.removeEventListener('error', onError);
+        reject(new Error('Failed to load video stream'));
+      };
+
+      this.videoElement.addEventListener('loadedmetadata', onLoadedMetadata);
+      this.videoElement.addEventListener('error', onError);
+
+      // If video is already loaded
+      if (this.videoElement.readyState >= 2) {
+        onLoadedMetadata();
+      }
+    });
+
+    console.log('Video stream set and ready');
   }
 
   /**

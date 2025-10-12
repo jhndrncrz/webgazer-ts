@@ -189,7 +189,7 @@ if (typeof window !== 'undefined') {
   }
   
   // Log detailed compatibility info in development mode
-  if (process.env.NODE_ENV === 'development') {
-    webgazer.logCompatibilityInfo();
-  }
+  // if (process.env.NODE_ENV === 'development') {
+  //   webgazer.logCompatibilityInfo();
+  // }
 }

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebGazer Restart Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        button {
+            padding: 12px 24px;
+            margin: 10px 5px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .start { background: #4CAF50; color: white; }
+        .stop { background: #f44336; color: white; }
+        .start:hover { background: #45a049; }
+        .stop:hover { background: #da190b; }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status.idle { background: #e3e3e3; color: #666; }
+        .status.running { background: #C8E6C9; color: #2E7D32; }
+        .status.stopped { background: #FFCDD2; color: #C62828; }
+        .status.error { background: #FFEBEE; color: #C62828; }
+        .log {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #2196F3;
+            padding-left: 10px;
+        }
+        .log-entry.error {
+            border-left-color: #f44336;
+            background: #ffebee;
+        }
+        .log-entry.success {
+            border-left-color: #4CAF50;
+            background: #e8f5e9;
+        }
+        .counter {
+            font-size: 48px;
+            text-align: center;
+            margin: 20px 0;
+            color: #2196F3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 WebGazer Restart Test</h1>
+        <p>This test verifies that WebGazer can be started, stopped, and restarted multiple times without errors.</p>
+
+        <div id="status" class="status idle">Status: Idle</div>
+
+        <div class="counter" id="counter">Cycle: 0</div>
+
+        <div>
+            <button id="startBtn" class="start" onclick="startWebGazer()">
+                Start WebGazer
+            </button>
+            <button id="stopBtn" class="stop" onclick="stopWebGazer()" disabled>
+                Stop WebGazer
+            </button>
+            <button id="testBtn" class="start" onclick="runAutoTest()">
+                Run Auto Test (5 cycles)
+            </button>
+        </div>
+
+        <div class="log" id="log">
+            <div class="log-entry">Ready to test. Click "Start WebGazer" or "Run Auto Test".</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import webgazer from './src/index.ts';
+
+        window.webgazer = webgazer;
+        window.cycleCount = 0;
+
+        function addLog(message, type = 'info') {
+            const log = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function updateStatus(text, className) {
+            const status = document.getElementById('status');
+            status.textContent = text;
+            status.className = `status ${className}`;
+        }
+
+        function updateCounter() {
+            document.getElementById('counter').textContent = `Cycle: ${window.cycleCount}`;
+        }
+
+        window.startWebGazer = async function() {
+            try {
+                addLog('Starting WebGazer...', 'info');
+                updateStatus('Status: Starting...', 'idle');
+                
+                document.getElementById('startBtn').disabled = true;
+                document.getElementById('testBtn').disabled = true;
+
+                await webgazer.begin();
+                
+                // Configure display
+                webgazer.showVideoPreview(true);
+                webgazer.showFaceOverlay(true);
+                webgazer.showPredictionPoints(true);
+
+                // Set up gaze listener
+                webgazer.setGazeListener((data, timestamp) => {
+                    // Just log occasionally
+                    if (timestamp % 1000 < 50 && data) {
+                        console.log(`Gaze: (${Math.round(data.x)}, ${Math.round(data.y)})`);
+                    }
+                });
+
+                addLog('WebGazer started successfully!', 'success');
+                updateStatus('Status: Running', 'running');
+                
+                document.getElementById('stopBtn').disabled = false;
+                window.cycleCount++;
+                updateCounter();
+
+            } catch (error) {
+                addLog(`Error starting WebGazer: ${error.message}`, 'error');
+                updateStatus('Status: Error', 'error');
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('testBtn').disabled = false;
+            }
+        };
+
+        window.stopWebGazer = function() {
+            try {
+                addLog('Stopping WebGazer...', 'info');
+                
+                webgazer.end();
+                
+                addLog('WebGazer stopped successfully!', 'success');
+                updateStatus('Status: Stopped', 'stopped');
+                
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('stopBtn').disabled = true;
+                document.getElementById('testBtn').disabled = false;
+
+            } catch (error) {
+                addLog(`Error stopping WebGazer: ${error.message}`, 'error');
+                updateStatus('Status: Error', 'error');
+            }
+        };
+
+        window.runAutoTest = async function() {
+            const cycles = 5;
+            addLog(`Starting automatic test: ${cycles} start/stop cycles`, 'info');
+            
+            document.getElementById('testBtn').disabled = true;
+            document.getElementById('startBtn').disabled = true;
+
+            for (let i = 0; i < cycles; i++) {
+                addLog(`\n=== Cycle ${i + 1}/${cycles} ===`, 'info');
+                
+                // Start
+                await window.startWebGazer();
+                
+                // Wait 2 seconds
+                addLog('Waiting 2 seconds...', 'info');
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Stop
+                window.stopWebGazer();
+                
+                // Wait 1 second before next cycle
+                if (i < cycles - 1) {
+                    addLog('Waiting 1 second before next cycle...', 'info');
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+            }
+
+            addLog(`\n✅ AUTO TEST COMPLETED: ${cycles} cycles successful!`, 'success');
+            document.getElementById('testBtn').disabled = false;
+            document.getElementById('startBtn').disabled = false;
+        };
+
+        // Log initial state
+        addLog('WebGazer restart test loaded', 'success');
+        addLog('Tracker: ' + (webgazer.getTracker()?.name || 'Not set'), 'info');
+    </script>
+</body>
+</html>

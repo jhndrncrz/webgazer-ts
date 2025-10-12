@@ -11,6 +11,7 @@ import type { EyeFeatures, EyePatch } from '../types/index';
 import { Tracker } from './base/Tracker';
 import { TrackerState } from './base/types';
 import * as faceLandmarksDetection from '@tensorflow-models/face-landmarks-detection';
+import * as tf from '@tensorflow/tfjs';
 
 /**
  * Face annotation structure from TensorFlow FaceMesh
@@ -75,23 +76,51 @@ export class TensorFlowFaceMeshTracker extends Tracker {
     this.setState(TrackerState.Initializing);
 
     try {
+      // Ensure TensorFlow.js is ready with a backend
+      await tf.ready();
+      
+      // Set backend if not already set (prefer WebGL for performance)
+      if (!tf.getBackend()) {
+        try {
+          await tf.setBackend('webgl');
+          await tf.ready(); // Wait for backend to be ready
+        } catch (e) {
+          // Fallback to CPU backend if WebGL fails
+          console.warn('WebGL backend failed, falling back to CPU:', e);
+          await tf.setBackend('cpu');
+          await tf.ready();
+        }
+      }
+
+      console.log('TensorFlow backend ready:', tf.getBackend());
+
       const api = faceLandmarksDetection;
 
-      // Try different API versions
+      // Create detector with proper configuration
       if (api.createDetector && api.SupportedModels) {
-        // Newer API
-        const modelType =
-          api.SupportedModels.MediaPipeFaceMesh ??
-          'MediaPipeFaceMesh';
-        this.detectorPromise = api.createDetector(modelType, { runtime: 'tfjs', refineLandmarks: true, maxFaces: 1 });
+        const model = api.SupportedModels.MediaPipeFaceMesh;
+        
+        console.log('Creating MediaPipeFaceMesh detector...');
+        
+        // Configuration for MediaPipeFaceMesh
+        // See: https://github.com/tensorflow/tfjs-models/tree/master/face-landmarks-detection
+        const detectorConfig = {
+          runtime: 'tfjs' as const,
+          maxFaces: 1,
+          refineLandmarks: true, // Better eye landmarks
+        };
+        
+        this.detector = await api.createDetector(model, detectorConfig);
+        console.log('MediaPipeFaceMesh detector created successfully');
       } else {
         throw new Error('face-landmarks-detection API not available');
       }
 
-      this.detector = await this.detectorPromise;
       this.setState(TrackerState.Ready);
+      console.log('TensorFlowFaceMesh tracker initialized and ready');
     } catch (error) {
       this.setState(TrackerState.Error);
+      console.error('Failed to initialize TensorFlow FaceMesh:', error);
       throw new Error(
         `Failed to initialize TensorFlow FaceMesh: ${error instanceof Error ? error.message : String(error)}`
       );
@@ -112,34 +141,100 @@ export class TensorFlowFaceMeshTracker extends Tracker {
     width: number,
     height: number
   ): Promise<EyeFeatures | null> {
-    if (canvas.width === 0 || !this.detector) {
+    // Validate inputs
+    if (!video || !(video instanceof HTMLVideoElement)) {
+      console.error('Invalid video element passed to getEyePatches:', typeof video);
       return null;
+    }
+
+    if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
+      console.error('Invalid canvas element passed to getEyePatches:', typeof canvas);
+      return null;
+    }
+
+    if (canvas.width === 0 || !this.detector) {
+      console.warn('Cannot get eye patches: canvas width is 0 or detector not ready');
+      return null;
+    }
+
+    // CRITICAL: Wait for video to be fully ready (like TensorFlow demo does)
+    // Reference: TensorFlow face-landmarks-detection demo renderResult()
+    if (video.readyState < 2) {
+      await new Promise<void>((resolve) => {
+        const onLoadedData = () => {
+          video.removeEventListener('loadeddata', onLoadedData);
+          resolve();
+        };
+        video.addEventListener('loadeddata', onLoadedData);
+        
+        // Timeout after 5 seconds to prevent hanging
+        setTimeout(() => {
+          video.removeEventListener('loadeddata', onLoadedData);
+          resolve();
+        }, 5000);
+      });
+    }
+
+    // Re-check after waiting
+    if (video.readyState < 2) {
+      // Only log occasionally to avoid spam
+      if (Date.now() % 5000 < 50) {
+        console.warn('Video still not ready after waiting, readyState:', video.readyState);
+      }
+      return null;
+    }
+
+    if (video.videoWidth === 0 || video.videoHeight === 0) {
+      if (Date.now() % 5000 < 50) {
+        console.warn('Video dimensions are 0:', video.videoWidth, 'x', video.videoHeight);
+      }
+      return null;
+    }
+
+    // Log video element details on first call (for debugging)
+    if (!video.dataset.trackerValidated) {
+      console.log('📹 Video element received by tracker:', {
+        tagName: video.tagName,
+        readyState: video.readyState,
+        readyStateText: ['HAVE_NOTHING', 'HAVE_METADATA', 'HAVE_CURRENT_DATA', 'HAVE_FUTURE_DATA', 'HAVE_ENOUGH_DATA'][video.readyState],
+        dimensions: `${video.videoWidth}x${video.videoHeight}`,
+        attributes: `width=${video.width}, height=${video.height}`,
+        paused: video.paused,
+        ended: video.ended,
+        seeking: video.seeking,
+        currentTime: video.currentTime.toFixed(2),
+        duration: video.duration,
+        srcObject: video.srcObject ? 'MediaStream present' : 'No srcObject'
+      });
+      video.dataset.trackerValidated = 'true';
     }
 
     const startTime = performance.now();
 
     try {
-      // Estimate faces from video
-      const model = this.detector as FaceLandmarksDetector & {
-        estimateFaces?: (
-          input: HTMLVideoElement,
-          options?: { flipHorizontal?: boolean; predictIrises?: boolean }
-        ) => Promise<Face[]>;
-      };
-
+      // Estimate faces from video using the detector
       let predictions: Face[] = [];
 
-      // Handle different API signatures
-      if (model.estimateFaces) {
-        // Try newer API first
+      // console.log('🔍 Calling estimateFaces with video element...');
+
+      // The newer TensorFlow face-landmarks-detection API uses estimateFaces
+      try {
+        predictions = await this.detector.estimateFaces(video, {
+          flipHorizontal: false,
+        });
+        
+        // console.log('✅ estimateFaces completed. Predictions:', predictions.length);
+      } catch (error) {
+        console.error('❌ Error calling estimateFaces:', error);
+        
+        // Try without options as fallback
         try {
-          predictions = await model.estimateFaces(video, {
-            flipHorizontal: false,
-            predictIrises: false,
-          });
-        } catch {
-          // Fallback to simpler call
-          predictions = await model.estimateFaces(video);
+          console.log('Trying estimateFaces without options...');
+          predictions = await this.detector.estimateFaces(video);
+          console.log('✅ Fallback estimateFaces completed. Predictions:', predictions.length);
+        } catch (fallbackError) {
+          console.error('❌ Fallback estimateFaces also failed:', fallbackError);
+          return null;
         }
       }
 
@@ -150,25 +245,77 @@ export class TensorFlowFaceMeshTracker extends Tracker {
         this.currentPositions = null;
         this.predictionReady = false;
         this.updateMetrics(faceDetectionTime, 0);
+        
+        // Log occasionally to help debug
+        if (Date.now() % 3000 < 50) {
+          console.warn('⚠️ No face detected in video frame');
+          console.log('Video state at detection time:', {
+            readyState: video.readyState,
+            width: video.videoWidth,
+            height: video.videoHeight,
+            paused: video.paused,
+            currentTime: video.currentTime
+          });
+        }
+        
         return null;
       }
 
+      // console.log('✅ Face detected! Predictions:', predictions.length);
+
       // Extract eye patches
       const eyeExtractionStart = performance.now();
-      const prediction = predictions[0] as FacePrediction;
+      const prediction = predictions[0];
 
+      // The face prediction structure from TensorFlow face-landmarks-detection
+      // For MediaPipeFaceMesh, we get keypoints array instead of annotations
+      // Try to get positions from keypoints or scaledMesh
+      let positions: number[][] | undefined;
+      
+      if ('keypoints' in prediction && Array.isArray(prediction.keypoints)) {
+        // Newer API: keypoints is an array of {x, y, z?, name?} objects
+        positions = prediction.keypoints.map((kp: any) => [kp.x, kp.y]);
+      } else if ('scaledMesh' in prediction) {
+        positions = prediction.scaledMesh as number[][];
+      }
+      
       // Store positions for overlay
-      this.currentPositions = prediction.scaledMesh ?? null;
+      this.currentPositions = positions ?? null;
+
+      // Try to get eye regions from keypoints or annotations
+      let leftEyeUpper: number[][];
+      let leftEyeLower: number[][];
+      let rightEyeUpper: number[][];
+      let rightEyeLower: number[][];
+
+      // Check if we have annotations (older API)
+      const predWithAnnotations = prediction as FacePrediction;
+      if (predWithAnnotations.annotations) {
+        leftEyeUpper = predWithAnnotations.annotations.leftEyeUpper0;
+        leftEyeLower = predWithAnnotations.annotations.leftEyeLower0;
+        rightEyeUpper = predWithAnnotations.annotations.rightEyeUpper0;
+        rightEyeLower = predWithAnnotations.annotations.rightEyeLower0;
+      } else if (positions && positions.length >= 468) {
+        // MediaPipeFaceMesh has 468 landmarks with known indices for eyes
+        // Left eye: indices 33, 133, 159, 145, 246, etc.
+        // Right eye: indices 362, 263, 386, 374, 466, etc.
+        // Using simplified eye contours
+        const leftEyeIndices = [33, 7, 163, 144, 145, 153, 154, 155, 133];
+        const rightEyeIndices = [362, 382, 381, 380, 374, 373, 390, 249, 263];
+        
+        leftEyeUpper = leftEyeIndices.map(i => positions![i]);
+        leftEyeLower = leftEyeIndices.map(i => positions![i]);
+        rightEyeUpper = rightEyeIndices.map(i => positions![i]);
+        rightEyeLower = rightEyeIndices.map(i => positions![i]);
+      } else {
+        console.error('Cannot extract eye regions from face prediction');
+        this.updateMetrics(faceDetectionTime, performance.now() - eyeExtractionStart);
+        return null;
+      }
 
       // Get eye bounding boxes
-      const leftBBox = this.calculateEyeBoundingBox(
-        prediction.annotations.leftEyeUpper0,
-        prediction.annotations.leftEyeLower0
-      );
-      const rightBBox = this.calculateEyeBoundingBox(
-        prediction.annotations.rightEyeUpper0,
-        prediction.annotations.rightEyeLower0
-      );
+      const leftBBox = this.calculateEyeBoundingBox(leftEyeUpper, leftEyeLower);
+      const rightBBox = this.calculateEyeBoundingBox(rightEyeUpper, rightEyeLower);
 
       // Validate bounding boxes
       if (
