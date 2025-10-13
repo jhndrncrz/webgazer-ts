@@ -1,6 +1,6 @@
 /**
  * External library type augmentations and definitions
- * Provides proper typing for third-party libraries used by WebGazer
+ * Provides proper typing for third-party libraries used by Webgazer
  */
 
 /**

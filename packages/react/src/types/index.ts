@@ -1,15 +1,27 @@
 /**
- * Types for WebGazer React integration
+ * Types for Webgazer React integration
  */
 
 import type { RefObject } from 'react';
+import type { GazePrediction as CoreGazePrediction } from '@webgazer-ts/core';
 
-export interface GazePrediction {
-  x: number;
-  y: number;
+// Re-export Webgazer core types from @webgazer-ts/core
+export type { 
+  Webgazer as WebgazerInstance,
+  GazeCallback,
+  GazePrediction 
+} from '@webgazer-ts/core';
+
+/**
+ * Webgazer module type (what we get from dynamic import - no longer needed but kept for backwards compatibility)
+ */
+export interface WebgazerModule {
+  default: import('@webgazer-ts/core').Webgazer;
+  webgazer?: import('@webgazer-ts/core').Webgazer;
+  [key: string]: unknown;
 }
 
-export interface WebGazerConfig {
+export interface WebgazerConfig {
   tracker?: 'TFFacemesh';
   regression?: 'ridge' | 'ridgeThreaded' | 'ridgeWeighted';
   saveDataAcrossSessions?: boolean;
@@ -22,22 +34,44 @@ export interface WebGazerConfig {
   applyKalmanFilter?: boolean;
 }
 
-export interface UseWebGazerOptions extends WebGazerConfig {
+export interface UseWebgazerOptions extends WebgazerConfig {
   autoStart?: boolean;
-  onGaze?: (data: GazePrediction | null, timestamp: number) => void;
+  onGaze?: (data: CoreGazePrediction | null, timestamp: number) => void;
 }
 
-export interface UseWebGazerReturn {
-  gazeData: GazePrediction | null;
+export interface UseWebgazerReturn {
+  // State
+  gazeData: CoreGazePrediction | null;
   isRunning: boolean;
   calibrationCount: number;
+  
+  // Core controls
   start: () => Promise<void>;
   stop: () => Promise<void>;
   pause: () => Promise<void>;
   resume: () => Promise<void>;
   clearData: () => void;
+  
+  // Video controls
   showVideo: () => void;
   hideVideo: () => void;
+  
+  // Configuration methods
+  setTracker: (trackerName: string) => void;
+  setRegression: (regressionName: string) => void;
+  showFaceOverlay: (show: boolean) => void;
+  showFaceFeedbackBox: (show: boolean) => void;
+  showPredictionPoints: (show: boolean) => void;
+  setVideoViewerSize: (width: number, height: number) => void;
+  applyKalmanFilter: (apply: boolean) => void;
+  
+  // Calibration controls
+  recordScreenPosition: (x: number, y: number, eventType?: 'click' | 'move') => void;
+  addMouseEventListeners: () => void;
+  removeMouseEventListeners: () => void;
+  
+  // Direct instance access for advanced use cases
+  webgazer: WebgazerInstance | null;
 }
 
 export interface UseCalibrationOptions {
@@ -82,8 +116,8 @@ export interface UseGazeElementOptions {
   onDwell?: () => void;
 }
 
-export interface UseGazeElementReturn {
-  ref: RefObject<HTMLElement>;
+export interface UseGazeElementReturn<T extends HTMLElement = HTMLElement> {
+  ref: RefObject<T>;
   isLooking: boolean;
   dwellTime: number;
 }

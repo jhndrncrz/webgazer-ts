@@ -1,24 +1,24 @@
 /**
- * WebGazer React Context
- * Provides WebGazer instance and state across the component tree
+ * Webgazer React Context
+ * Provides Webgazer instance and state across the component tree
  */
 
 import { createContext, useContext } from 'react';
 import type { GazePrediction } from '../types';
 
-export interface WebGazerContextValue {
+export interface WebgazerContextValue {
   gazeData: GazePrediction | null;
   isRunning: boolean;
   calibrationCount: number;
   isInitialized: boolean;
 }
 
-export const WebGazerContext = createContext<WebGazerContextValue | null>(null);
+export const WebgazerContext = createContext<WebgazerContextValue | null>(null);
 
-export function useWebGazerContext() {
-  const context = useContext(WebGazerContext);
+export function useWebgazerContext() {
+  const context = useContext(WebgazerContext);
   if (!context) {
-    throw new Error('useWebGazerContext must be used within WebGazerProvider');
+    throw new Error('useWebgazerContext must be used within WebgazerProvider');
   }
   return context;
 }

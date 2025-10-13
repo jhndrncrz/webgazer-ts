@@ -1,18 +1,18 @@
 /**
  * Event Manager
- * Central coordination of all WebGazer events
+ * Central coordination of all Webgazer events
  */
 
 import type {
   EventManagerConfig,
   EventType,
   EventListener,
-  WebGazerEventData,
+  WebgazerEventData,
 } from './types';
 
 /**
  * EventManager class
- * Manages event listeners and dispatching for all WebGazer events
+ * Manages event listeners and dispatching for all Webgazer events
  */
 export class EventManager {
   private config: EventManagerConfig;
@@ -89,7 +89,7 @@ export class EventManager {
    */
   public emit(
     eventType: EventType | string,
-    data: WebGazerEventData
+    data: WebgazerEventData
   ): void {
     const eventKey = String(eventType);
     const listenersSet = this.listeners.get(eventKey);

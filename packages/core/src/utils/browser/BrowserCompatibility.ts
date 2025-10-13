@@ -166,10 +166,10 @@ export class BrowserCompatibility {
   }
 
   /**
-   * Check if WebGazer is compatible with current browser
+   * Check if Webgazer is compatible with current browser
    * @returns True if compatible, false otherwise
    */
-  static isWebGazerCompatible(): boolean {
+  static isWebgazerCompatible(): boolean {
     const features = BrowserCompatibility.checkFeatureSupport();
     
     // Minimum requirements
@@ -222,7 +222,7 @@ export class BrowserCompatibility {
       browser.isChrome
     ) {
       warnings.push(
-        'WebGazer requires HTTPS for camera access. ' +
+        'Webgazer requires HTTPS for camera access. ' +
         'For local development, use localhost or run a local HTTPS server.'
       );
     }
@@ -306,10 +306,10 @@ export class BrowserCompatibility {
     const features = BrowserCompatibility.checkFeatureSupport();
     const warnings = BrowserCompatibility.getCompatibilityWarnings();
 
-    console.group('WebGazer Compatibility Info');
+    console.group('Webgazer Compatibility Info');
     console.log('Browser:', `${browser.name} ${browser.version}`);
     console.log('Features:', features);
-    console.log('WebGazer Compatible:', BrowserCompatibility.isWebGazerCompatible());
+    console.log('Webgazer Compatible:', BrowserCompatibility.isWebgazerCompatible());
     
     if (warnings.length > 0) {
       console.warn('Compatibility Warnings:');

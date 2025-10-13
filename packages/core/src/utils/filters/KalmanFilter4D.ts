@@ -2,7 +2,7 @@
  * 4D Kalman Filter Implementation
  * 
  * This is a full 4-dimensional Kalman filter that tracks position (x, y) and velocity (vx, vy).
- * This matches the original WebGazer.js implementation for accurate smoothing behavior.
+ * This matches the original Webgazer.js implementation for accurate smoothing behavior.
  * 
  * State vector: [x, y, vx, vy]
  * - x, y: Position coordinates
@@ -15,7 +15,7 @@
  * 4D Kalman Filter Implementation
  * 
  * This is a full 4-dimensional Kalman filter that tracks position (x, y) and velocity (vx, vy).
- * This matches the original WebGazer.js implementation for accurate smoothing behavior.
+ * This matches the original Webgazer.js implementation for accurate smoothing behavior.
  * 
  * State vector: [x, y, vx, vy]
  * - x, y: Position coordinates
@@ -134,7 +134,7 @@ export class KalmanFilter4D implements IKalmanFilter {
     
     // Process noise covariance Q
     // Models uncertainty in the motion model
-    // From original WebGazer.js:
+    // From original Webgazer.js:
     // Q = [ [dt²/4,  0,     dt/2,  0   ],
     //       [0,      dt²/4, 0,     dt/2],
     //       [dt/2,   0,     1,     0   ],

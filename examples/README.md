@@ -1,268 +1,160 @@
-# WebGazer Examples
+# Webgazer Examples
 
-This directory contains examples demonstrating how to use the WebGazer eye tracking library.
+This directory contains minimal example implementations of Webgazer, demonstrating the simplest possible usage patterns.
 
-## Examples
+## 📁 Available Examples
 
-### 1. Minimal HTML Example (`minimal-example.html`)
+### 1. Vanilla JavaScript Demo (`vanilla-js-demo/`)
+**No frameworks, no build tools - just open in your browser!**
 
-A complete, standalone HTML file that demonstrates basic WebGazer usage with a beautiful UI.
+A standalone HTML file that demonstrates Webgazer using vanilla JavaScript and ES modules.
 
-**Features:**
-- Start/stop eye tracking
-- Manual calibration by clicking points
-- Real-time gaze visualization with red dot
-- Gaze heatmap overlay
-- Live statistics display
-- Pause/resume functionality
-- Clear calibration data
-
-**How to Run:**
 ```bash
-# Option 1: Using a simple HTTP server
+cd vanilla-js-demo
 python3 -m http.server 8000
-# Then open: http://localhost:8000/examples/minimal-example.html
-
-# Option 2: Using Node.js http-server
-npx http-server -p 8000
-# Then open: http://localhost:8000/examples/minimal-example.html
-
-# Option 3: Using VS Code Live Server extension
-# Right-click on minimal-example.html and select "Open with Live Server"
+# Visit: http://localhost:8000
 ```
 
-**Usage Instructions:**
-1. Click "Start WebGazer" and allow camera access
-2. Click "Start Calibration" to enter calibration mode
-3. Click on the blue calibration points as they appear
-4. After calibration, your gaze will be tracked automatically
-5. The red dot shows where the system thinks you're looking
+**What it demonstrates:**
+- ✅ ES module import of Webgazer core
+- ✅ Automatic calibration (starts with `begin()`)
+- ✅ Real-time gaze tracking with visual feedback
+- ✅ Interactive click targets for calibration
+- ✅ Status monitoring (tracking state, calibration count, gaze position)
+- ✅ Toggle-able visual gaze dot overlay
 
-### 2. TypeScript Example (`typescript-example.ts`)
+[See vanilla-js-demo/README.md for details](./vanilla-js-demo/README.md)
 
-A comprehensive TypeScript example showing advanced usage patterns and full type safety.
+### 2. React Demo (`react-demo/`)
+**Full React project with TypeScript and Vite**
 
-**Features:**
-- Full TypeScript type safety
-- Object-oriented architecture with `EyeTrackingApp` class
-- Manual calibration with visual overlay
-- Gaze history tracking
-- Element detection (check if user is looking at specific elements)
-- Statistics collection
-- Multiple usage examples:
-  - Basic usage
-  - Custom calibration
-  - Switching regression algorithms
-  - Pause and resume
+A complete React application using the official `@webgazer-ts/react` package.
 
-**How to Use in Your Project:**
-
-```typescript
-import webgazer from 'webgazer';
-import EyeTrackingApp from './examples/typescript-example';
-
-// Create and initialize the app
-const app = new EyeTrackingApp();
-await app.initialize();
-
-// Run calibration
-await app.calibrate(9); // 9 calibration points
-
-// Let it track for a while
-await new Promise(resolve => setTimeout(resolve, 10000));
-
-// Get statistics
-const stats = app.getStatistics();
-console.log('Session stats:', stats);
-
-// Clean up
-app.stop();
+```bash
+cd react-demo
+pnpm install  # or npm install
+pnpm dev      # or npm run dev
+# Visit: http://localhost:3000
 ```
 
-## API Overview
+**What it demonstrates:**
+- ✅ Using the official `useWebgazer()` hook from `@webgazer-ts/react`
+- ✅ TypeScript integration
+- ✅ Proper React component patterns
+- ✅ Modern build setup with Vite
+- ✅ Automatic calibration (no manual setup)
 
-### Core Methods
+[See react-demo/README.md for details](./react-demo/README.md)
 
-```typescript
-// Start WebGazer
+### 3. CDN React Demo (`minimal-react-demo.html`)
+**React without build tools - just open in your browser!**
+
+A standalone HTML file that uses React via CDN with Babel transpilation.
+
+```bash
+open minimal-react-demo.html
+# or
+python3 -m http.server 8000
+# Visit: http://localhost:8000/minimal-react-demo.html
+```
+
+**What it demonstrates:**
+- ✅ Custom `useWebgazer()` hook implementation
+- ✅ React state management with eye tracking
+- ✅ How to integrate Webgazer into React apps
+- ✅ No build tools required (uses Babel standalone)
+
+### 4. Legacy Examples
+- `minimal-demo.html` - Original standalone demo (moved to `vanilla-js-demo/index.html`)
+- `MinimalReactDemo.tsx` - TypeScript component (moved to `react-demo/src/App.tsx`)
+- `typescript-example.ts` - Legacy TypeScript example (kept for reference)
+
+## 🎯 Key Concept: Automatic Continuous Calibration
+
+**All demos demonstrate a crucial Webgazer concept:**
+
+Calibration starts **automatically** when you call `webgazer.begin()`!
+
+How it works:
+- `begin()` internally calls `addMouseEventListeners()` (matches original Webgazer API)
+- Every click throughout the session improves the model
+- The model learns the mapping: eye features → screen position
+- There's no "calibration complete" state - it improves forever!
+
+**You do NOT need to explicitly call `addMouseEventListeners()`** unless you previously called `removeMouseEventListeners()` to pause calibration.
+
+## 📖 Understanding the Code
+
+### The Automatic Calibration
+```javascript
+// This is all you need!
 await webgazer.begin();
 
-// Set gaze prediction callback
-webgazer.setGazeListener((data, elapsedTime) => {
-  if (data) {
-    console.log(`Gaze at (${data.x}, ${data.y})`);
-  }
-});
+// Calibration is now active - begin() calls addMouseEventListeners() internally
+// Every click and move trains the model
+```
 
-// Record calibration point
-webgazer.recordScreenPosition(x, y, 'click');
+That's it! No explicit calibration setup needed.
 
-// Enable automatic mouse tracking for calibration
+### Manual Calibration Control (Optional)
+If you want to pause/resume calibration:
+```javascript
+// Pause calibration (stop learning from clicks)
+webgazer.removeMouseEventListeners();
+
+// Resume calibration (restart learning)
 webgazer.addMouseEventListeners();
-
-// Pause tracking
-webgazer.pause();
-
-// Resume tracking
-await webgazer.resume();
-
-// Stop and clean up
-webgazer.end();
-
-// Clear calibration data
-await webgazer.clearData();
 ```
 
-### Configuration Methods
+This single method enables/disables continuous learning from all user interactions.
 
-```typescript
-// Show/hide video preview
-webgazer.showVideoPreview(true);
-webgazer.showFaceOverlay(true);
-webgazer.showFaceFeedbackBox(true);
-webgazer.showPredictionPoints(true);
+### Optional: Calibration UI
+The `CalibrationScreen` component (and `useCalibration` hook) are **optional UI sugar** that:
+- Guide users to click specific points
+- Provide visual feedback
+- Count calibration points
 
-// Enable Kalman filter for smoothing
-webgazer.applyKalmanFilter(true);
+But they're not required - the model learns from **any** click!
 
-// Save data across browser sessions
-webgazer.saveDataAcrossSessions(true);
+## 🔍 For More Details
 
-// Set video viewer size
-webgazer.setVideoViewerSize(320, 240);
+See the comprehensive documentation:
+- **`../CALIBRATION_EXPLAINED.md`** - Deep dive into how calibration works
+- **`../TYPE_SAFETY_IMPROVEMENTS.md`** - TypeScript improvements made
+- **`../TYPE_SHARING_STRATEGY.md`** - How types are shared between packages
 
-// Set camera constraints
-await webgazer.setCameraConstraints({
-  video: {
-    width: { ideal: 640 },
-    height: { ideal: 480 }
-  }
-});
-```
+## 🚀 Quick Start Workflow
 
-### Tracker and Regressor Methods
+1. **Choose your demo** based on your tech stack:
+   - Plain JS? → `minimal-demo.html`
+   - React learning? → `minimal-react-demo.html`
+   - React project? → `MinimalReactDemo.tsx`
 
-```typescript
-// Set tracker (default: 'TFFacemesh')
-webgazer.setTracker('TFFacemesh');
+2. **Open/import the demo**
 
-// Set regression algorithm
-webgazer.setRegression('ridge'); // Options: 'ridge', 'weightedRidge', 'threadedRidge'
+3. **Click "Start Tracking"**
 
-// Add additional regressor
-webgazer.addRegression('weightedRidge');
+4. **Click around naturally** - each click improves accuracy
 
-// Get current prediction
-const prediction = await webgazer.getCurrentPrediction();
-```
+5. **Watch the gaze position** update in real-time
 
-### Browser Compatibility
+## ⚠️ Common Mistakes
 
-```typescript
-// Check browser compatibility
-const isCompatible = webgazer.detectCompatibility();
+❌ **DON'T** think you need to call `addMouseEventListeners()` - it's automatic
+❌ **DON'T** wait for "calibration to complete" - there is no completion state
+❌ **DON'T** think you need a `CalibrationScreen` component - it's optional UI sugar
 
-// Get compatibility warnings
-const warnings = webgazer.getCompatibilityWarnings();
-console.log('Warnings:', warnings);
+✅ **DO** just call `begin()` - calibration starts automatically
+✅ **DO** let users interact naturally - every click improves the model
+✅ **DO** understand that calibration is continuous throughout the session
 
-// Log detailed compatibility info
-webgazer.logCompatibilityInfo();
-```
+## 🎓 Learning Path
 
-## TypeScript Types
+1. Start with `minimal-demo.html` to understand the basics
+2. Check out `minimal-react-demo.html` to see React integration
+3. Read `CALIBRATION_EXPLAINED.md` for deep understanding
+4. Use `MinimalReactDemo.tsx` as a template for your project
 
-The library exports comprehensive TypeScript types:
+## 📦 Legacy Example
 
-```typescript
-import type {
-  GazePrediction,
-  EyeFeatures,
-  Point2D,
-  Rectangle,
-  ITracker,
-  IRegressor,
-  WebGazerConfig,
-} from 'webgazer';
-
-// Use types in your code
-function handleGaze(prediction: GazePrediction): void {
-  console.log(`x: ${prediction.x}, y: ${prediction.y}`);
-}
-```
-
-## Calibration
-
-WebGazer requires calibration to learn your specific eye characteristics. There are two approaches:
-
-### 1. Manual Calibration (Examples show this)
-- Create calibration points on the screen
-- User clicks or looks at each point
-- Call `webgazer.recordScreenPosition(x, y, 'click')` for each point
-- Collect 5-9 points distributed across the screen
-
-### 2. Automatic Mouse Tracking
-- Call `webgazer.addMouseEventListeners()`
-- System automatically records where you click and move your mouse
-- Learns over time as you interact with the page
-- Best for continuous improvement
-
-## Tips for Best Results
-
-1. **Good Lighting**: Ensure your face is well-lit
-2. **Stable Position**: Sit still and keep your head at a consistent distance from the camera
-3. **Calibration**: Collect calibration points from all areas of the screen
-4. **Multiple Points**: Use at least 9 calibration points for best accuracy
-5. **Patience**: Give the system a few seconds to stabilize after starting
-6. **Recalibrate**: If accuracy degrades, run calibration again
-7. **Kalman Filter**: Enable for smoother predictions: `webgazer.applyKalmanFilter(true)`
-
-## Browser Requirements
-
-- **Camera Access**: WebRTC getUserMedia API
-- **WebGL**: For TensorFlow.js (face tracking)
-- **Modern Browser**: Chrome, Firefox, Edge, Safari (latest versions)
-- **HTTPS**: Required for camera access (except localhost)
-
-## Troubleshooting
-
-### Camera Not Working
-- Ensure you're on HTTPS (or localhost)
-- Check browser permissions for camera access
-- Verify no other application is using the camera
-
-### Poor Tracking Accuracy
-- Improve lighting conditions
-- Run calibration with more points
-- Enable Kalman filter: `webgazer.applyKalmanFilter(true)`
-- Try the weighted regression: `webgazer.setRegression('weightedRidge')`
-- Sit closer to the camera
-- Recalibrate if your position changes
-
-### Performance Issues
-- Reduce video resolution:
-  ```typescript
-  await webgazer.setCameraConstraints({
-    video: { width: 320, height: 240 }
-  });
-  ```
-- Use threaded regression: `webgazer.setRegression('threadedRidge')`
-- Hide overlays: `webgazer.showVideoPreview(false)`
-
-## Next Steps
-
-1. Run the minimal example to understand basic usage
-2. Study the TypeScript example for advanced patterns
-3. Integrate WebGazer into your own project
-4. Customize the calibration UI to match your application
-5. Experiment with different regression algorithms
-
-## Resources
-
-- **GitHub**: https://github.com/brownhci/WebGazer
-- **Paper**: http://www.cv-foundation.org/openaccess/content_ijcv/papers/Papoutsaki_WebGazer_IJCV_2016.pdf
-- **API Documentation**: See the TypeScript types and JSDoc comments in the source code
-
-## License
-
-WebGazer is licensed under the GPL v3.0 license.
+The `typescript-example.ts` file contains a more complex example from the original codebase. It's kept for reference but the minimal demos above are recommended for learning.

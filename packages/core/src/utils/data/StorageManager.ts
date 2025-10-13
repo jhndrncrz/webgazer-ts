@@ -1,5 +1,5 @@
 /**
- * Storage manager for persisting WebGazer data using LocalForage
+ * Storage manager for persisting Webgazer data using LocalForage
  * Provides type-safe wrapper around browser storage
  */
 
@@ -25,7 +25,7 @@ export class StorageManager implements IStorageProvider {
         localforage.WEBSQL,
         localforage.LOCALSTORAGE
       ],
-      description: 'WebGazer calibration and settings storage'
+      description: 'Webgazer calibration and settings storage'
     });
   }
 

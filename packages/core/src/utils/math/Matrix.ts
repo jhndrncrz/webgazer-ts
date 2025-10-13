@@ -1,6 +1,6 @@
 /**
  * Matrix operations utility class
- * Provides comprehensive linear algebra operations for WebGazer
+ * Provides comprehensive linear algebra operations for Webgazer
  */
 
 export type MatrixData = number[][];

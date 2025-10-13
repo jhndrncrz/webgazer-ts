@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Webgazer React Minimal Demo</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+
+    .status-bar {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .status-item {
+      text-align: center;
+    }
+
+    .status-label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      margin-bottom: 5px;
+    }
+
+    .status-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .status-value.active {
+      color: #4ade80;
+    }
+
+    .status-value.inactive {
+      color: #f87171;
+    }
+
+    .controls {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      backdrop-filter: blur(10px);
+    }
+
+    button:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    button.primary {
+      background: #4ade80;
+      border-color: #4ade80;
+      color: #1a1a1a;
+    }
+
+    button.primary:hover {
+      background: #22c55e;
+      border-color: #22c55e;
+    }
+
+    .info-box {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+
+    .info-box h3 {
+      margin-bottom: 10px;
+    }
+
+    .info-box p {
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+
+    .info-box ol {
+      margin-left: 20px;
+      line-height: 2;
+    }
+
+    .calibration-prompt {
+      background: rgba(74, 222, 128, 0.2);
+      border: 2px solid rgba(74, 222, 128, 0.5);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .calibration-prompt h3 {
+      margin-bottom: 10px;
+      color: #4ade80;
+    }
+
+    .click-targets {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .click-target {
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      backdrop-filter: blur(10px);
+    }
+
+    .click-target:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+      border-color: #4ade80;
+    }
+
+    .click-target:active {
+      transform: scale(0.95);
+      background: rgba(74, 222, 128, 0.3);
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      opacity: 0.7;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // Simple useWebgazer hook (minimal version)
+    function useWebgazer() {
+      const [gazeData, setGazeData] = useState(null);
+      const [isRunning, setIsRunning] = useState(false);
+      const [calibrationCount, setCalibrationCount] = useState(0);
+      const [isCalibrating, setIsCalibrating] = useState(false);
+      const webgazerRef = useRef(null);
+
+      useEffect(() => {
+        // Dynamically import Webgazer
+        import('../packages/core/dist/webgazer-ts.js').then((module) => {
+          webgazerRef.current = module.default;
+        });
+      }, []);
+
+      const start = async () => {
+        if (!webgazerRef.current) return;
+        
+        try {
+          await webgazerRef.current.begin();
+          setIsRunning(true);
+
+          // Set up gaze listener
+          webgazerRef.current.setGazeListener((prediction) => {
+            if (prediction) {
+              setGazeData(prediction);
+            }
+          });
+
+          // Update calibration count periodically
+          const interval = setInterval(() => {
+            const points = webgazerRef.current.getStoredPoints();
+            const count = points && points[0] ? points[0].length : 0;
+            setCalibrationCount(count);
+          }, 1000);
+
+          return () => clearInterval(interval);
+        } catch (error) {
+          console.error('Failed to start Webgazer:', error);
+          alert('Failed to start eye tracking. Please ensure camera permissions are granted.');
+        }
+      };
+
+      const stop = () => {
+        if (!webgazerRef.current) return;
+        webgazerRef.current.end();
+        setIsRunning(false);
+        setGazeData(null);
+        setIsCalibrating(false);
+      };
+
+      const startCalibration = () => {
+        if (!webgazerRef.current || !isRunning) return;
+        webgazerRef.current.addMouseEventListeners();
+        setIsCalibrating(true);
+      };
+
+      const stopCalibration = () => {
+        if (!webgazerRef.current) return;
+        webgazerRef.current.removeMouseEventListeners();
+        setIsCalibrating(false);
+      };
+
+      const clearData = async () => {
+        if (!webgazerRef.current) return;
+        await webgazerRef.current.clearData();
+        setCalibrationCount(0);
+      };
+
+      return {
+        gazeData,
+        isRunning,
+        calibrationCount,
+        isCalibrating,
+        start,
+        stop,
+        startCalibration,
+        stopCalibration,
+        clearData,
+      };
+    }
+
+    // Main App Component
+    function App() {
+      const {
+        gazeData,
+        isRunning,
+        calibrationCount,
+        isCalibrating,
+        start,
+        stop,
+        startCalibration,
+        stopCalibration,
+        clearData,
+      } = useWebgazer();
+
+      const targets = [
+        'Top Left', 'Top Center', 'Top Right',
+        'Middle Left', 'Center', 'Middle Right',
+        'Bottom Left', 'Bottom Center', 'Bottom Right'
+      ];
+
+      return (
+        <div className="container">
+          <header>
+            <h1>👁️ Webgazer React Minimal Demo</h1>
+            <p className="subtitle">Using React Hooks - No Complex Setup</p>
+          </header>
+
+          {/* Status Bar */}
+          <div className="status-bar">
+            <div className="status-item">
+              <div className="status-label">Tracking Status</div>
+              <div className={`status-value ${isRunning ? 'active' : 'inactive'}`}>
+                {isRunning ? 'Running' : 'Stopped'}
+              </div>
+            </div>
+            <div className="status-item">
+              <div className="status-label">Calibration Points</div>
+              <div className="status-value">{calibrationCount}</div>
+            </div>
+            <div className="status-item">
+              <div className="status-label">Gaze Position</div>
+              <div className="status-value">
+                {gazeData 
+                  ? `(${Math.round(gazeData.x)}, ${Math.round(gazeData.y)})`
+                  : '-'
+                }
+              </div>
+            </div>
+          </div>
+
+          {/* Controls */}
+          <div className="controls">
+            <button 
+              className="primary" 
+              onClick={start} 
+              disabled={isRunning}
+            >
+              ▶️ Start Tracking
+            </button>
+            <button 
+              onClick={stop} 
+              disabled={!isRunning}
+            >
+              ⏹️ Stop Tracking
+            </button>
+            <button 
+              onClick={isCalibrating ? stopCalibration : startCalibration}
+              disabled={!isRunning}
+            >
+              {isCalibrating ? '✅ Calibration Active' : '🎯 Enable Calibration'}
+            </button>
+            <button 
+              onClick={clearData} 
+              disabled={!isRunning}
+            >
+              🗑️ Clear Data
+            </button>
+          </div>
+
+          {/* Info Box */}
+          <div className="info-box">
+            <h3>ℹ️ How to Use</h3>
+            <ol>
+              <li><strong>Click "Start Tracking"</strong> - Initializes the webcam and eye tracking</li>
+              <li><strong>Click "Enable Calibration"</strong> - Starts collecting calibration data from your clicks</li>
+              <li><strong>Click around the page</strong> - Each click trains the model to know where you're looking</li>
+              <li><strong>Keep using normally</strong> - The model improves continuously with every click!</li>
+            </ol>
+          </div>
+
+          {/* Calibration Prompt */}
+          {isCalibrating && (
+            <div className="calibration-prompt">
+              <h3>🎯 Calibration Active!</h3>
+              <p>Click the boxes below (and anywhere else on the page) to improve accuracy.</p>
+              <p>The more you click, the better the predictions become!</p>
+            </div>
+          )}
+
+          {/* Click Targets */}
+          <div className="click-targets">
+            {targets.map((target, index) => (
+              <div 
+                key={index}
+                className="click-target"
+                onClick={() => console.log(`Clicked ${target}`)}
+              >
+                <h4>{target}</h4>
+                <p>Click me!</p>
+              </div>
+            ))}
+          </div>
+
+          <footer>
+            <p>Webgazer.ts React Integration</p>
+            <p>Every click improves accuracy - there's no "calibration complete"!</p>
+          </footer>
+        </div>
+      );
+    }
+
+    // Render
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>

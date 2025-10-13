@@ -1,13 +1,13 @@
 # Credits & Acknowledgments
 
-## Original WebGazer.js
+## Original Webgazer.js
 
-**This TypeScript rewrite is built upon the groundbreaking research of the WebGazer.js team at Brown University.**
+**This TypeScript rewrite is built upon the groundbreaking research of the Webgazer.js team at Brown University.**
 
 ### Project Information
 
 - **Website:** https://webgazer.cs.brown.edu
-- **Repository:** https://github.com/brownhci/WebGazer
+- **Repository:** https://github.com/brownhci/Webgazer
 - **License:** GPL-3.0 (LGPL-3.0 for companies valued under $1M)
 
 ### Core Team
@@ -29,14 +29,14 @@
 
 ### Primary Publication
 
-**WebGazer: Scalable Webcam Eye Tracking Using User Interactions** (IJCAI 2016)
+**Webgazer: Scalable Webcam Eye Tracking Using User Interactions** (IJCAI 2016)
 
 Alexandra Papoutsaki, Patsorn Sangkloy, James Laskey, Nediyana Daskalova, Jeff Huang, James Hays
 
 ```bibtex
 @inproceedings{papoutsaki2016webgazer,
   author     = {Alexandra Papoutsaki and Patsorn Sangkloy and James Laskey and Nediyana Daskalova and Jeff Huang and James Hays},
-  title      = {{WebGazer}: Scalable Webcam Eye Tracking Using User Interactions},
+  title      = {{Webgazer}: Scalable Webcam Eye Tracking Using User Interactions},
   booktitle  = {Proceedings of the 25th International Joint Conference on Artificial Intelligence (IJCAI)},
   pages      = {3839--3845},
   year       = {2016}
@@ -51,11 +51,11 @@ Full list: https://webgazer.cs.brown.edu/#publications
 
 ---
 
-## About WebGazer-TS
+## About Webgazer-TS
 
 - Developed for our own academic thesis project
 - **Not affiliated with or endorsed by** the original team
-- **Not for production use** - use official [WebGazer.js](https://github.com/brownhci/WebGazer) instead
+- **Not for production use** - use official [Webgazer.js](https://github.com/brownhci/Webgazer) instead
 
 ### What's Maintained
 
@@ -72,7 +72,7 @@ Full list: https://webgazer.cs.brown.edu/#publications
 
 ## How to Cite
 
-**Always cite the original WebGazer.js publications, not this TypeScript rewrite.**
+**Always cite the original Webgazer.js publications, not this TypeScript rewrite.**
 
 Use the BibTeX above for the primary publication, or see the full publication list at https://webgazer.cs.brown.edu/#publications
 
@@ -81,15 +81,15 @@ Use the BibTeX above for the primary publication, or see the full publication li
 ## Disclaimers
 
 ### Academic Use Only
-This rewrite is primarily for our thesis research purposes and **not production-ready**. For production, use the official [WebGazer.js](https://github.com/brownhci/WebGazer).
+This rewrite is primarily for our thesis research purposes and **not production-ready**. For production, use the official [Webgazer.js](https://github.com/brownhci/Webgazer).
 
 ### Contact
-- **Original WebGazer.js:** webgazer@lists.cs.brown.edu
+- **Original Webgazer.js:** webgazer@lists.cs.brown.edu
 - **Official docs:** https://webgazer.cs.brown.edu
 - **Commercial licensing:** webgazer@lists.cs.brown.edu
 
 ---
 
-**Thank you to the WebGazer.js team for pioneering accessible eye tracking technology!** 🙏
+**Thank you to the Webgazer.js team for pioneering accessible eye tracking technology!** 🙏
 
 *This TypeScript rewrite would not exist without their foundational work.*

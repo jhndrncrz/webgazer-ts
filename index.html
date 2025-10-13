@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebGazer - Minimal Example</title>
+    <title>Webgazer - Minimal Example</title>
     <style>
         body {
             margin: 0;
@@ -207,13 +207,13 @@
     <canvas id="heatmap"></canvas>
 
     <div class="container">
-        <h1>👁️ WebGazer Minimal Example</h1>
+        <h1>👁️ Webgazer Minimal Example</h1>
         <p class="subtitle">A simple demonstration of eye tracking in the browser</p>
 
         <div class="instructions">
             <h3>How to Use:</h3>
             <ol>
-                <li>Click <strong>"Start WebGazer"</strong> and allow camera access</li>
+                <li>Click <strong>"Start Webgazer"</strong> and allow camera access</li>
                 <li>Click <strong>"Start Calibration"</strong> and click on each calibration point</li>
                 <li>Move your eyes around - the system will track your gaze!</li>
                 <li>The red dot shows where the system thinks you're looking</li>
@@ -221,15 +221,15 @@
         </div>
 
         <div id="status" class="status info">
-            Ready to start. Click "Start WebGazer" to begin.
+            Ready to start. Click "Start Webgazer" to begin.
         </div>
 
         <div class="controls">
-            <button id="startBtn" class="btn-start" onclick="startWebGazer()">
-                Start WebGazer
+            <button id="startBtn" class="btn-start" onclick="startWebgazer()">
+                Start Webgazer
             </button>
-            <button id="stopBtn" class="btn-stop" onclick="stopWebGazer()" disabled>
-                Stop WebGazer
+            <button id="stopBtn" class="btn-stop" onclick="stopWebgazer()" disabled>
+                Stop Webgazer
             </button>
             <button id="calibrateBtn" class="btn-calibrate" onclick="startCalibration()" disabled>
                 Start Calibration
@@ -269,7 +269,7 @@
         </div>
     </div>
 
-    <!-- Import WebGazer -->
+    <!-- Import Webgazer -->
     <script type="module">
         import webgazer from './src/index.ts';
 
@@ -290,10 +290,10 @@
             heatmapCanvas.height = window.innerHeight;
         });
 
-        // Start WebGazer
-        window.startWebGazer = async function() {
+        // Start Webgazer
+        window.startWebgazer = async function() {
             try {
-                updateStatus('Starting WebGazer...', 'info');
+                updateStatus('Starting Webgazer...', 'info');
                 
                 // Check browser compatibility
                 if (!webgazer.detectCompatibility()) {
@@ -301,7 +301,7 @@
                     throw new Error('Browser not compatible: ' + warnings.join(', '));
                 }
 
-                // Configure WebGazer
+                // Configure Webgazer
                 await webgazer.begin();
                 
                 // Show video preview (optional)
@@ -331,19 +331,19 @@
                 // Enable mouse event listeners for training
                 webgazer.addMouseEventListeners();
 
-                updateStatus('WebGazer started! Click "Start Calibration" to calibrate.', 'success');
+                updateStatus('Webgazer started! Click "Start Calibration" to calibrate.', 'success');
                 updateButtons(true);
 
             } catch (error) {
-                console.error('Failed to start WebGazer:', error);
+                console.error('Failed to start Webgazer:', error);
                 updateStatus('Error: ' + error.message, 'error');
             }
         };
 
-        // Stop WebGazer
-        window.stopWebGazer = function() {
+        // Stop Webgazer
+        window.stopWebgazer = function() {
             webgazer.end();
-            updateStatus('WebGazer stopped.', 'info');
+            updateStatus('Webgazer stopped.', 'info');
             updateButtons(false);
             document.getElementById('trackingStatus').textContent = 'Stopped';
         };
@@ -505,7 +505,7 @@
         }
 
         // Log compatibility info on load
-        console.log('WebGazer Compatibility Check:');
+        console.log('Webgazer Compatibility Check:');
         webgazer.logCompatibilityInfo();
     </script>
 </body>
@@ -517,7 +517,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WebGazer TS Demo</title>
+    <title>Webgazer TS Demo</title>
     <style>
       body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 0; }
       #plotting_canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; }

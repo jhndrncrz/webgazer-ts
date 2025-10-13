@@ -49,7 +49,7 @@ export interface ErrorEventData {
 /**
  * Generic event data
  */
-export type WebGazerEventData =
+export type WebgazerEventData =
   | MouseEventData
   | GazePredictionEventData
   | ErrorEventData
@@ -58,7 +58,7 @@ export type WebGazerEventData =
 /**
  * Event listener callback
  */
-export type EventListener<T = WebGazerEventData> = (data: T) => void;
+export type EventListener<T = WebgazerEventData> = (data: T) => void;
 
 /**
  * Mouse event handler configuration

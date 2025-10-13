@@ -44,7 +44,7 @@ export class RidgeWeightedRegressor extends Regressor {
    * Sets up Kalman filter and prepares for training
    */
   public initialize(): void {
-    // Initialize 4D Kalman filter for prediction smoothing (matches original WebGazer.js)
+    // Initialize 4D Kalman filter for prediction smoothing (matches original Webgazer.js)
     const kalmanFilter = new KalmanFilter4D({
       processNoise: 1.0,
       measurementNoise: 25.0,

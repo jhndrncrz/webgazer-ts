@@ -1,10 +1,10 @@
-# WebGazer.ts Monorepo
+# Webgazer.ts Monorepo
 
 [![License](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE.md)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18-61dafb.svg)](https://reactjs.org/)
 
-Modern TypeScript rewrite of WebGazer.js with React support.
+Modern TypeScript rewrite of Webgazer.js with React support.
 
 ## 📦 Packages
 
@@ -39,10 +39,10 @@ npm install @webgazer-ts/react
 ```
 
 ```tsx
-import { useWebGazer } from '@webgazer-ts/react';
+import { useWebgazer } from '@webgazer-ts/react';
 
 function App() {
-  const { gazeData, start, stop } = useWebGazer({
+  const { gazeData, start, stop } = useWebgazer({
     autoStart: true,
   });
 
@@ -60,7 +60,7 @@ function App() {
 
 **This is developed primarily for academic research and NOT for production use.**
 
-This TypeScript port was created to support modern development workflows and type-safe integration for research projects. **For production applications, consider the official [WebGazer.js](https://github.com/brownhci/WebGazer) library.**
+This TypeScript port was created to support modern development workflows and type-safe integration for research projects. **For production applications, consider the official [Webgazer.js](https://github.com/brownhci/Webgazer) library.**
 
 ## 📖 Documentation
 
@@ -73,7 +73,7 @@ This TypeScript port was created to support modern development workflows and typ
 ## 🎯 Features
 
 ### Core Package
-- ✅ 100% API compatible with original WebGazer.js
+- ✅ 100% API compatible with original Webgazer.js
 - ✅ Single file bundle (no external dependencies)
 - ✅ Full TypeScript support
 - ✅ Self-calibration from clicks and mouse movements
@@ -82,9 +82,9 @@ This TypeScript port was created to support modern development workflows and typ
 - ✅ Kalman filter for smooth predictions
 
 ### React Package
-- ✅ `useWebGazer()` - Main tracking hook
+- ✅ `useWebgazer()` - Main tracking hook
 - ✅ `useGazeTracking()` - Simplified gaze data hook
-- ✅ `<WebGazerProvider>` - Context provider
+- ✅ `<WebgazerProvider>` - Context provider
 - ✅ Full TypeScript support
 - ✅ Automatic lifecycle management
 - ✅ Zero configuration needed
@@ -129,9 +129,9 @@ webgazer-ts/
 
 ## 🤝 Credits
 
-Based on [WebGazer.js](https://webgazer.cs.brown.edu) by Brown HCI.
+Based on [Webgazer.js](https://webgazer.cs.brown.edu) by Brown HCI.
 
-**Original WebGazer.js Team:**
+**Original Webgazer.js Team:**
 - Alexandra Papoutsaki
 - James Laskey
 - Jeff Huang
@@ -144,8 +144,8 @@ See [LICENSE.md](LICENSE.md) for details.
 
 ## 🔗 Links
 
-- [Original WebGazer.js](https://webgazer.cs.brown.edu)
-- [WebGazer.js Paper](http://www.cs.brown.edu/~jph/files/webgazer_ijcai2016.pdf)
+- [Original Webgazer.js](https://webgazer.cs.brown.edu)
+- [Webgazer.js Paper](http://www.cs.brown.edu/~jph/files/webgazer_ijcai2016.pdf)
 - [TensorFlow.js](https://www.tensorflow.org/js)
 
 ---
@@ -266,7 +266,7 @@ The `/examples` directory contains:
 
 ```
 src/
-├── core/              # Core WebGazer class
+├── core/              # Core Webgazer class
 ├── trackers/          # Face/eye tracking
 ├── regressors/        # Gaze prediction
 ├── rendering/         # Video and overlay rendering
@@ -280,11 +280,11 @@ src/
 
 ## Credits
 
-**This project is built upon the groundbreaking work of the WebGazer.js team at Brown University.**
+**This project is built upon the groundbreaking work of the Webgazer.js team at Brown University.**
 
-### Original WebGazer.js
+### Original Webgazer.js
 - **Website:** https://webgazer.cs.brown.edu
-- **Repository:** https://github.com/brownhci/WebGazer
+- **Repository:** https://github.com/brownhci/Webgazer
 - **License:** GPL-3.0 (with LGPL-3.0 option for startups)
 
 ### Original Authors
@@ -300,12 +300,12 @@ src/
 
 ## Publications
 
-Please cite the original WebGazer.js publications:
+Please cite the original Webgazer.js publications:
 
 ```bibtex
 @inproceedings{papoutsaki2016webgazer,
   author     = {Alexandra Papoutsaki and Patsorn Sangkloy and James Laskey and Nediyana Daskalova and Jeff Huang and James Hays},
-  title      = {{WebGazer}: Scalable Webcam Eye Tracking Using User Interactions},
+  title      = {{Webgazer}: Scalable Webcam Eye Tracking Using User Interactions},
   booktitle  = {Proceedings of the 25th International Joint Conference on Artificial Intelligence (IJCAI)},
   pages      = {3839--3845},
   year       = {2016}
@@ -318,19 +318,19 @@ Full publication list: https://webgazer.cs.brown.edu/#publications
 
 ## License
 
-**WebGazer-TS:** GPL-3.0-or-later  
-**Original WebGazer.js:** GPL-3.0 (LGPL-3.0 for companies valued under $1M)
+**Webgazer-TS:** GPL-3.0-or-later  
+**Original Webgazer.js:** GPL-3.0 (LGPL-3.0 for companies valued under $1M)
 
-For commercial licensing of the original WebGazer.js: webgazer@lists.cs.brown.edu
+For commercial licensing of the original Webgazer.js: webgazer@lists.cs.brown.edu
 
 ---
 
 ## Disclaimer
 
-This is an academic research project. While the regression mathematics have been verified against the original implementation, this code has not undergone the same testing as the production WebGazer.js library.
+This is an academic research project. While the regression mathematics have been verified against the original implementation, this code has not undergone the same testing as the production Webgazer.js library.
 
-**Use at your own risk. For production use, choose the official [WebGazer.js](https://github.com/brownhci/WebGazer).**
+**Use at your own risk. For production use, choose the official [Webgazer.js](https://github.com/brownhci/Webgazer).**
 
 ---
 
-**Built with respect for the original [WebGazer.js](https://webgazer.cs.brown.edu) team** ❤️
+**Built with respect for the original [Webgazer.js](https://webgazer.cs.brown.edu) team** ❤️

@@ -1,7 +1,7 @@
 {
   "name": "@webgazer-ts/core",
   "version": "0.1.0",
-  "description": "TypeScript rewrite of WebGazer.js - Webcam eye tracking for academic research (NOT for production use)",
+  "description": "TypeScript rewrite of Webgazer.js - Webcam eye tracking for academic research (NOT for production use)",
   "type": "module",
   "license": "GPL-3.0-or-later",
   "author": {
@@ -9,13 +9,13 @@
   },
   "contributors": [
     {
-      "name": "Original WebGazer.js Team",
+      "name": "Original Webgazer.js Team",
       "url": "https://webgazer.cs.brown.edu"
     }
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/brownhci/WebGazer.git"
+    "url": "https://github.com/brownhci/Webgazer.git"
   },
   "keywords": [
     "eye-tracking",
@@ -69,7 +69,7 @@
   },
   "homepage": "https://webgazer.cs.brown.edu",
   "bugs": {
-    "url": "https://github.com/brownhci/WebGazer/issues",
+    "url": "https://github.com/brownhci/Webgazer/issues",
     "email": "webgazer@lists.cs.brown.edu"
   }
 }

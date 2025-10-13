@@ -1,5 +1,5 @@
 /**
- * Central export point for all WebGazer type definitions
+ * Central export point for all Webgazer type definitions
  */
 
 // Geometry types

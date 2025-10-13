@@ -1,5 +1,5 @@
 /**
- * Prediction-related type definitions for WebGazer
+ * Prediction-related type definitions for Webgazer
  * Defines types for gaze predictions, eye features, and tracking data
  */
 

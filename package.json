@@ -2,7 +2,7 @@
   "name": "@webgazer-ts/monorepo",
   "version": "0.1.0",
   "private": true,
-  "description": "WebGazer.ts monorepo - Eye tracking for JavaScript and React",
+  "description": "Webgazer.ts monorepo - Eye tracking for JavaScript and React",
   "type": "module",
   "workspaces": [
     "packages/*"

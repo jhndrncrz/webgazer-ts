@@ -11,7 +11,7 @@ export type {
   MouseEventData,
   GazePredictionEventData,
   ErrorEventData,
-  WebGazerEventData,
+  WebgazerEventData,
   EventListener,
   MouseEventHandlerConfig,
   EventManagerConfig,

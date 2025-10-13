@@ -1,5 +1,5 @@
 /**
- * Geometry type definitions for WebGazer
+ * Geometry type definitions for Webgazer
  * Defines basic geometric primitives used throughout the application
  */
 

@@ -1,6 +1,15 @@
 /**
- * React Components for WebGazer
+ * React Components for Webgazer
  */
 
-export { WebGazerProvider } from './WebGazerProvider';
-export type { WebGazerProviderProps } from './WebGazerProvider';
+export { WebgazerProvider } from './WebgazerProvider';
+export type { WebgazerProviderProps } from './WebgazerProvider';
+
+export { CalibrationScreen } from './CalibrationScreen';
+export type { CalibrationScreenProps } from './CalibrationScreen';
+
+export { GazeElement } from './GazeElement';
+export type { GazeElementProps } from './GazeElement';
+
+export { HeatmapOverlay } from './HeatmapOverlay';
+export type { HeatmapOverlayProps } from './HeatmapOverlay';

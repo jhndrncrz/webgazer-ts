@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Webgazer Minimal Demo - Plain HTML/JS</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+
+    .status-bar {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .status-item {
+      text-align: center;
+    }
+
+    .status-label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      margin-bottom: 5px;
+    }
+
+    .status-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .status-value.active {
+      color: #4ade80;
+    }
+
+    .status-value.inactive {
+      color: #f87171;
+    }
+
+    .controls {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      backdrop-filter: blur(10px);
+    }
+
+    button:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    button.primary {
+      background: #4ade80;
+      border-color: #4ade80;
+      color: #1a1a1a;
+    }
+
+    button.primary:hover {
+      background: #22c55e;
+      border-color: #22c55e;
+    }
+
+    .info-box {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+
+    .info-box h3 {
+      margin-bottom: 10px;
+    }
+
+    .info-box p {
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+
+    .info-box ol {
+      margin-left: 20px;
+      line-height: 2;
+    }
+
+    .calibration-prompt {
+      background: rgba(74, 222, 128, 0.2);
+      border: 2px solid rgba(74, 222, 128, 0.5);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .calibration-prompt h3 {
+      margin-bottom: 10px;
+      color: #4ade80;
+    }
+
+    .click-targets {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .click-target {
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      backdrop-filter: blur(10px);
+    }
+
+    .click-target:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+      border-color: #4ade80;
+    }
+
+    .click-target:active {
+      transform: scale(0.95);
+    }
+
+    .gaze-dot {
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      background: radial-gradient(circle, rgba(248, 113, 113, 1) 0%, rgba(248, 113, 113, 0) 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      display: none;
+    }
+
+    .gaze-dot.active {
+      display: block;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      opacity: 0.7;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>👁️ Webgazer Minimal Demo</h1>
+      <p class="subtitle">Plain HTML/JavaScript - No Frameworks</p>
+    </header>
+
+    <div class="status-bar">
+      <div class="status-item">
+        <div class="status-label">Tracking Status</div>
+        <div class="status-value inactive" id="trackingStatus">Stopped</div>
+      </div>
+      <div class="status-item">
+        <div class="status-label">Calibration Points</div>
+        <div class="status-value" id="calibrationCount">0</div>
+      </div>
+      <div class="status-item">
+        <div class="status-label">Gaze Position</div>
+        <div class="status-value" id="gazePosition">-</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="startBtn" class="primary">▶️ Start Tracking</button>
+      <button id="stopBtn" disabled>⏹️ Stop Tracking</button>
+      <button id="stopCalibrateBtn" disabled>⏸️ Pause Calibration</button>
+      <button id="clearBtn" disabled>🗑️ Clear Data</button>
+      <button id="toggleGazeDot" disabled>👁️ Toggle Gaze Dot</button>
+    </div>
+
+    <div class="info-box">
+      <h3>ℹ️ How to Use</h3>
+      <ol>
+        <li><strong>Click "Start Tracking"</strong> - Initializes the webcam and eye tracking</li>
+        <li><strong>Calibration starts automatically!</strong> - Every click you make trains the model</li>
+        <li><strong>Click around the page</strong> - Use the targets below or click anywhere</li>
+        <li><strong>Keep using normally</strong> - The model improves continuously with every click!</li>
+        <li><strong>Optional:</strong> Click "Pause Calibration" if you want to stop learning temporarily</li>
+      </ol>
+    </div>
+
+    <div class="calibration-prompt" id="calibrationPrompt" style="display: none;">
+      <h3>🎯 Calibration Active!</h3>
+      <p>Click the boxes below (and anywhere else on the page) to improve accuracy.</p>
+      <p>The more you click, the better the predictions become!</p>
+      <p><em>Note: Calibration starts automatically when you begin tracking (matches original Webgazer behavior)</em></p>
+    </div>
+
+    <div class="click-targets">
+      <div class="click-target" data-position="top-left">
+        <h4>Top Left</h4>
+        <p>Click me!</p>
+      </div>
+      <div class="click-target" data-position="top-center">
+        <h4>Top Center</h4>
+        <p>Click me!</p>
+      </div>
+      <div class="click-target" data-position="top-right">
+        <h4>Top Right</h4>
+        <p>Click me!</p>
+      </div>
+      <div class="click-target" data-position="middle-left">
+        <h4>Middle Left</h4>
+        <p>Click me!</p>
+      </div>
+      <div class="click-target" data-position="center">
+        <h4>Center</h4>
+        <p>Click me!</p>
+      </div>
+      <div class="click-target" data-position="middle-right">
+        <h4>Middle Right</h4>
+        <p>Click me!</p>
+      </div>
+      <div class="click-target" data-position="bottom-left">
+        <h4>Bottom Left</h4>
+        <p>Click me!</p>
+      </div>
+      <div class="click-target" data-position="bottom-center">
+        <h4>Bottom Center</h4>
+        <p>Click me!</p>
+      </div>
+      <div class="click-target" data-position="bottom-right">
+        <h4>Bottom Right</h4>
+        <p>Click me!</p>
+      </div>
+    </div>
+
+    <footer>
+      <p>Webgazer.ts - Open Source Eye Tracking Library</p>
+      <p>Every click improves accuracy - calibration starts automatically!</p>
+      <p>(Matches original Webgazer API behavior)</p>
+    </footer>
+  </div>
+
+  <div class="gaze-dot" id="gazeDot"></div>
+
+  <script crossorigin="anonymous" type="module">
+    // Import Webgazer
+    import webgazer from '../packages/core/dist/webgazer-ts.js';
+
+    // State
+    let isTracking = false;
+    let isCalibrating = false;
+    let showGazeDot = false;
+
+    // DOM Elements
+    const trackingStatus = document.getElementById('trackingStatus');
+    const calibrationCount = document.getElementById('calibrationCount');
+    const gazePosition = document.getElementById('gazePosition');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const stopCalibrateBtn = document.getElementById('stopCalibrateBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const toggleGazeDotBtn = document.getElementById('toggleGazeDot');
+    const calibrationPrompt = document.getElementById('calibrationPrompt');
+    const gazeDot = document.getElementById('gazeDot');
+
+    // Update calibration count periodically
+    function updateCalibrationCount() {
+      if (isTracking) {
+        const points = webgazer.getStoredPoints();
+        const count = points && points[0] ? points[0].length : 0;
+        calibrationCount.textContent = count;
+      }
+    }
+
+    // Start tracking
+    startBtn.addEventListener('click', async () => {
+      try {
+        await webgazer.begin();
+        isTracking = true;
+        isCalibrating = true; // Calibration starts automatically!
+
+        // Update UI
+        trackingStatus.textContent = 'Running';
+        trackingStatus.classList.remove('inactive');
+        trackingStatus.classList.add('active');
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        stopCalibrateBtn.disabled = false;
+        clearBtn.disabled = false;
+        toggleGazeDotBtn.disabled = false;
+        calibrationPrompt.style.display = 'block'; // Show prompt immediately
+
+        // Set up gaze listener
+        webgazer.setGazeListener((prediction) => {
+          if (prediction) {
+            gazePosition.textContent = `(${Math.round(prediction.x)}, ${Math.round(prediction.y)})`;
+            
+            // Update gaze dot position
+            if (showGazeDot) {
+              gazeDot.style.left = prediction.x + 'px';
+              gazeDot.style.top = prediction.y + 'px';
+            }
+          }
+        });
+
+        // Start updating calibration count
+        setInterval(updateCalibrationCount, 1000);
+
+        console.log('✅ Webgazer started successfully');
+        console.log('🎯 Calibration automatically enabled - every click now trains the model!');
+      } catch (error) {
+        console.error('Failed to start Webgazer:', error);
+        alert('Failed to start eye tracking. Please ensure camera permissions are granted.');
+      }
+    });
+
+    // Stop tracking
+    stopBtn.addEventListener('click', () => {
+      webgazer.end();
+      isTracking = false;
+      isCalibrating = false;
+
+      // Update UI
+      trackingStatus.textContent = 'Stopped';
+      trackingStatus.classList.remove('active');
+      trackingStatus.classList.add('inactive');
+      gazePosition.textContent = '-';
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      stopCalibrateBtn.disabled = true;
+      clearBtn.disabled = true;
+      toggleGazeDotBtn.disabled = true;
+      calibrationPrompt.style.display = 'none';
+      gazeDot.classList.remove('active');
+
+      console.log('⏹️ Webgazer stopped');
+    });
+
+    // Pause calibration (optional - users can pause learning if needed)
+    stopCalibrateBtn.addEventListener('click', () => {
+      if (isCalibrating) {
+        webgazer.removeMouseEventListeners();
+        isCalibrating = false;
+        stopCalibrateBtn.textContent = '▶️ Resume Calibration';
+        calibrationPrompt.style.display = 'none';
+        console.log('⏸️ Calibration paused');
+      } else {
+        webgazer.addMouseEventListeners();
+        isCalibrating = true;
+        stopCalibrateBtn.textContent = '⏸️ Pause Calibration';
+        calibrationPrompt.style.display = 'block';
+        console.log('▶️ Calibration resumed');
+      }
+    });
+
+    // Clear calibration data
+    clearBtn.addEventListener('click', async () => {
+      await webgazer.clearData();
+      calibrationCount.textContent = '0';
+      console.log('🗑️ Calibration data cleared');
+    });
+
+    // Toggle gaze dot visibility
+    toggleGazeDotBtn.addEventListener('click', () => {
+      showGazeDot = !showGazeDot;
+      gazeDot.classList.toggle('active', showGazeDot);
+      toggleGazeDotBtn.textContent = showGazeDot ? '👁️ Hide Gaze Dot' : '👁️ Show Gaze Dot';
+    });
+
+    // Add click feedback to targets
+    document.querySelectorAll('.click-target').forEach(target => {
+      target.addEventListener('click', function() {
+        const position = this.dataset.position;
+        const originalBg = this.style.background;
+        this.style.background = 'rgba(74, 222, 128, 0.3)';
+        setTimeout(() => {
+          this.style.background = originalBg;
+        }, 200);
+        console.log(`Clicked ${position} target`);
+      });
+    });
+
+    console.log('Webgazer demo initialized. Click "Start Tracking" to begin!');
+  </script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 /**
- * WebGazer - Main Eye Tracking Class
+ * Webgazer - Main Eye Tracking Class
  * 
- * Singleton class that orchestrates all WebGazer modules including:
+ * Singleton class that orchestrates all Webgazer modules including:
  * - Face/eye tracking (TensorFlowFaceMeshTracker)
  * - Gaze prediction (Ridge regressors)
  * - Video rendering and visualization
@@ -9,10 +9,10 @@
  * - Event handling and data collection
  * - Data persistence
  * 
- * Maintains 100% backward API compatibility with original WebGazer.
+ * Maintains 100% backward API compatibility with original Webgazer.
  */
 
-import { WebGazerConfig, WebGazerConfigData } from './WebGazerConfig';
+import { WebgazerConfig, WebgazerConfigData } from './WebgazerConfig';
 import type { ITracker, IRegressor, IRenderer } from './types';
 import type { 
   GazePrediction, 
@@ -33,9 +33,9 @@ import { DOMManager } from '../utils/browser/DOMManager';
 import { BrowserCompatibility } from '../utils/browser/BrowserCompatibility';
 
 /**
- * WebGazer state enum
+ * Webgazer state enum
  */
-export enum WebGazerState {
+export enum WebgazerState {
   NotInitialized = 'not_initialized',
   Initializing = 'initializing',
   Ready = 'ready',
@@ -61,18 +61,18 @@ export type TrackerConstructor = new (...args: unknown[]) => ITracker;
 export type RegressorConstructor = new (...args: unknown[]) => IRegressor;
 
 /**
- * Main WebGazer class - Singleton pattern
+ * Main Webgazer class - Singleton pattern
  */
-export class WebGazer {
+export class Webgazer {
   // Singleton instance
-  private static instance: WebGazer | null = null;
+  private static instance: Webgazer | null = null;
 
   // Static registries for trackers and regressors
   private static trackerRegistry: Map<string, TrackerConstructor> = new Map();
   private static regressorRegistry: Map<string, RegressorConstructor> = new Map();
 
   // Core components
-  private config: WebGazerConfig;
+  private config: WebgazerConfig;
   private tracker: ITracker | null = null;
   private regressors: IRegressor[] = [];
   private currentTrackerName: string = '';
@@ -97,7 +97,7 @@ export class WebGazer {
   private mediaDeviceManager: MediaDeviceManager;
   
   // State management
-  private state: WebGazerState = WebGazerState.NotInitialized;
+  private state: WebgazerState = WebgazerState.NotInitialized;
   private mediaStream: MediaStream | null = null;
   private gazeCallback: GazeCallback | null = null;
   private predictionLoop: number | null = null;
@@ -110,7 +110,7 @@ export class WebGazer {
    * Private constructor (Singleton pattern)
    */
   private constructor() {
-    this.config = new WebGazerConfig();
+    this.config = new WebgazerConfig();
     this.eventManager = new EventManager({
       enableEventCapture: true,
       enableGazePrediction: true
@@ -128,25 +128,25 @@ export class WebGazer {
   /**
    * Get singleton instance
    */
-  public static getInstance(): WebGazer {
-    if (!WebGazer.instance) {
-      WebGazer.instance = new WebGazer();
+  public static getInstance(): Webgazer {
+    if (!Webgazer.instance) {
+      Webgazer.instance = new Webgazer();
     }
-    return WebGazer.instance;
+    return Webgazer.instance;
   }
 
   /**
    * Register a tracker module
    */
   public static addTrackerModule(name: string, constructor: TrackerConstructor): void {
-    WebGazer.trackerRegistry.set(name, constructor);
+    Webgazer.trackerRegistry.set(name, constructor);
   }
 
   /**
    * Register a regressor module
    */
   public static addRegressionModule(name: string, constructor: RegressorConstructor): void {
-    WebGazer.regressorRegistry.set(name, constructor);
+    Webgazer.regressorRegistry.set(name, constructor);
   }
 
   // ============================================================================
@@ -156,20 +156,20 @@ export class WebGazer {
   /**
    * Begin eye tracking
    * @param onFail - Optional callback if initialization fails
-   * @returns Promise that resolves to WebGazer instance for chaining
+   * @returns Promise that resolves to Webgazer instance for chaining
    */
-  public async begin(onFail?: () => void): Promise<WebGazer> {
-    if (this.state === WebGazerState.Running || this.state === WebGazerState.Initializing) {
+  public async begin(onFail?: () => void): Promise<Webgazer> {
+    if (this.state === WebgazerState.Running || this.state === WebgazerState.Initializing) {
       return this;
     }
 
     try {
-      this.state = WebGazerState.Initializing;
+      this.state = WebgazerState.Initializing;
 
       // 1. Validate configuration
       const validation = this.config.validate();
       if (validation.errors.length > 0) {
-        console.error('WebGazer configuration errors:', validation.errors);
+        console.error('Webgazer configuration errors:', validation.errors);
         throw new Error('Invalid configuration: ' + validation.errors.join(', '));
       }
 
@@ -197,15 +197,19 @@ export class WebGazer {
         await this.loadSavedData();
       }
 
-      // 9. Start prediction loop
-      this.state = WebGazerState.Running;
+      // 9. Start mouse event listeners for continuous calibration (matches original Webgazer API)
+      // In the original Webgazer, this is called automatically in begin()
+      this.addMouseEventListeners();
+
+      // 10. Start prediction loop
+      this.state = WebgazerState.Running;
       this.startPredictionLoop();
 
-      console.log('WebGazer initialized successfully');
+      console.log('Webgazer initialized successfully');
       return this;
     } catch (error) {
-      console.error('WebGazer initialization failed:', error);
-      this.state = WebGazerState.Error;
+      console.error('Webgazer initialization failed:', error);
+      this.state = WebgazerState.Error;
       
       if (onFail) {
         onFail();
@@ -218,12 +222,12 @@ export class WebGazer {
   /**
    * Pause eye tracking (keeps camera running)
    */
-  public pause(): WebGazer {
-    if (this.state === WebGazerState.Running) {
+  public pause(): Webgazer {
+    if (this.state === WebgazerState.Running) {
       this.stopPredictionLoop();
       this.mouseEventHandler.stop();
-      this.state = WebGazerState.Paused;
-      console.log('WebGazer paused');
+      this.state = WebgazerState.Paused;
+      console.log('Webgazer paused');
     }
     return this;
   }
@@ -231,9 +235,9 @@ export class WebGazer {
   /**
    * Resume eye tracking
    */
-  public async resume(): Promise<WebGazer> {
-    if (this.state === WebGazerState.Paused) {
-      this.state = WebGazerState.Running;
+  public async resume(): Promise<Webgazer> {
+    if (this.state === WebgazerState.Paused) {
+      this.state = WebgazerState.Running;
       this.startPredictionLoop();
       
       // Restart mouse handlers if previously enabled (check storingPoints)
@@ -241,7 +245,7 @@ export class WebGazer {
         this.mouseEventHandler.start();
       }
       
-      console.log('WebGazer resumed');
+      console.log('Webgazer resumed');
     }
     return this;
   }
@@ -249,7 +253,7 @@ export class WebGazer {
   /**
    * End eye tracking and clean up resources
    */
-  public end(): WebGazer {
+  public end(): Webgazer {
     // Stop prediction loop
     this.stopPredictionLoop();
 
@@ -291,20 +295,20 @@ export class WebGazer {
     }
 
     // Reset state
-    this.state = WebGazerState.Stopped;
+    this.state = WebgazerState.Stopped;
     this.mediaStream = null;
     this.videoElement = null;
     this.canvasElement = null;
 
-    console.log('WebGazer ended');
+    console.log('Webgazer ended');
     return this;
   }
 
   /**
-   * Check if WebGazer is ready
+   * Check if Webgazer is ready
    */
   public isReady(): boolean {
-    return this.state === WebGazerState.Running || this.state === WebGazerState.Paused;
+    return this.state === WebgazerState.Running || this.state === WebgazerState.Paused;
   }
 
   // ============================================================================
@@ -364,7 +368,7 @@ export class WebGazer {
 
     // Recreate tracker if it was cleaned up (e.g., after end() was called)
     if (!this.tracker) {
-      const TrackerClass = WebGazer.trackerRegistry.get(this.currentTrackerName);
+      const TrackerClass = Webgazer.trackerRegistry.get(this.currentTrackerName);
       
       if (!TrackerClass) {
         throw new Error(`Tracker "${this.currentTrackerName}" not found in registry`);
@@ -517,7 +521,7 @@ export class WebGazer {
     }
 
     const predict = async (): Promise<void> => {
-      if (this.state !== WebGazerState.Running) {
+      if (this.state !== WebgazerState.Running) {
         return;
       }
 
@@ -763,12 +767,12 @@ export class WebGazer {
   /**
    * Set the tracker to use
    */
-  public setTracker(name: string): WebGazer {
-    const TrackerClass = WebGazer.trackerRegistry.get(name);
+  public setTracker(name: string): Webgazer {
+    const TrackerClass = Webgazer.trackerRegistry.get(name);
     
     if (!TrackerClass) {
       console.error(`Tracker "${name}" not found in registry`);
-      throw new Error(`Tracker "${name}" not registered. Available trackers: ${Array.from(WebGazer.trackerRegistry.keys()).join(', ')}`);
+      throw new Error(`Tracker "${name}" not registered. Available trackers: ${Array.from(Webgazer.trackerRegistry.keys()).join(', ')}`);
     }
 
     this.currentTrackerName = name;
@@ -792,12 +796,12 @@ export class WebGazer {
   /**
    * Set the regression algorithm (replaces all existing regressors)
    */
-  public setRegression(name: string): WebGazer {
-    const RegressorClass = WebGazer.regressorRegistry.get(name);
+  public setRegression(name: string): Webgazer {
+    const RegressorClass = Webgazer.regressorRegistry.get(name);
     
     if (!RegressorClass) {
       console.error(`Regressor "${name}" not found in registry`);
-      throw new Error(`Regressor "${name}" not registered. Available regressors: ${Array.from(WebGazer.regressorRegistry.keys()).join(', ')}`);
+      throw new Error(`Regressor "${name}" not registered. Available regressors: ${Array.from(Webgazer.regressorRegistry.keys()).join(', ')}`);
     }
 
     // Clear existing regressors
@@ -814,8 +818,8 @@ export class WebGazer {
   /**
    * Add a regression algorithm (keeps existing regressors)
    */
-  public addRegression(name: string): WebGazer {
-    const RegressorClass = WebGazer.regressorRegistry.get(name);
+  public addRegression(name: string): Webgazer {
+    const RegressorClass = Webgazer.regressorRegistry.get(name);
     
     if (!RegressorClass) {
       console.error(`Regressor "${name}" not found in registry`);
@@ -845,7 +849,7 @@ export class WebGazer {
    */
   public async getCurrentPrediction(regressorIndex: number = 0): Promise<GazePrediction | null> {
     if (!this.isReady()) {
-      console.warn('WebGazer not ready');
+      console.warn('Webgazer not ready');
       return null;
     }
 
@@ -866,7 +870,7 @@ export class WebGazer {
   /**
    * Set gaze prediction callback
    */
-  public setGazeListener(callback: GazeCallback): WebGazer {
+  public setGazeListener(callback: GazeCallback): Webgazer {
     this.gazeCallback = callback;
     return this;
   }
@@ -874,7 +878,7 @@ export class WebGazer {
   /**
    * Clear gaze prediction callback
    */
-  public clearGazeListener(): WebGazer {
+  public clearGazeListener(): Webgazer {
     this.gazeCallback = null;
     return this;
   }
@@ -886,9 +890,9 @@ export class WebGazer {
   /**
    * Record screen position for training
    */
-  public recordScreenPosition(x: number, y: number, eventType: 'click' | 'move' = 'click'): WebGazer {
+  public recordScreenPosition(x: number, y: number, eventType: 'click' | 'move' = 'click'): Webgazer {
     if (!this.isReady()) {
-      console.warn('WebGazer not ready, cannot record screen position');
+      console.warn('Webgazer not ready, cannot record screen position');
       return this;
     }
 
@@ -920,7 +924,7 @@ export class WebGazer {
   /**
    * Add mouse event listeners for automatic data collection
    */
-  public addMouseEventListeners(): WebGazer {
+  public addMouseEventListeners(): Webgazer {
     this.config.storingPoints = true;
 
     // Add click listener
@@ -942,7 +946,7 @@ export class WebGazer {
   /**
    * Remove mouse event listeners
    */
-  public removeMouseEventListeners(): WebGazer {
+  public removeMouseEventListeners(): Webgazer {
     this.config.storingPoints = false;
     this.mouseEventHandler.stop();
     console.log('Mouse event listeners removed');
@@ -956,14 +960,14 @@ export class WebGazer {
   /**
    * Show/hide video preview (alias for showVideo)
    */
-  public showVideoPreview(show: boolean): WebGazer {
+  public showVideoPreview(show: boolean): Webgazer {
     return this.showVideo(show);
   }
 
   /**
    * Show/hide video element
    */
-  public showVideo(show: boolean): WebGazer {
+  public showVideo(show: boolean): Webgazer {
     this.config.showVideo = show;
     
     if (this.videoRenderer) {
@@ -976,7 +980,7 @@ export class WebGazer {
   /**
    * Show/hide face overlay
    */
-  public showFaceOverlay(show: boolean): WebGazer {
+  public showFaceOverlay(show: boolean): Webgazer {
     this.config.showFaceOverlay = show;
     
     if (this.overlayRenderer) {
@@ -989,7 +993,7 @@ export class WebGazer {
   /**
    * Show/hide face feedback box
    */
-  public showFaceFeedbackBox(show: boolean): WebGazer {
+  public showFaceFeedbackBox(show: boolean): Webgazer {
     this.config.showFaceFeedbackBox = show;
     
     if (this.validationBox) {
@@ -1002,7 +1006,7 @@ export class WebGazer {
   /**
    * Show/hide prediction points
    */
-  public showPredictionPoints(show: boolean): WebGazer {
+  public showPredictionPoints(show: boolean): Webgazer {
     this.config.showGazeDot = show;
     
     if (this.gazeDotRenderer) {
@@ -1027,7 +1031,7 @@ export class WebGazer {
   /**
    * Stop video stream
    */
-  public stopVideo(): WebGazer {
+  public stopVideo(): Webgazer {
     if (this.mediaStream) {
       // Stop all tracks in the stream
       const tracks = this.mediaStream.getTracks();
@@ -1047,7 +1051,7 @@ export class WebGazer {
   /**
    * Set static video source
    */
-  public setStaticVideo(videoLocation: string): WebGazer {
+  public setStaticVideo(videoLocation: string): Webgazer {
     if (this.videoElement) {
       this.videoElement.src = videoLocation;
     }
@@ -1061,7 +1065,7 @@ export class WebGazer {
     this.config.cameraConstraints = constraints as any;
     
     // If already running, restart camera
-    if (this.state === WebGazerState.Running || this.state === WebGazerState.Paused) {
+    if (this.state === WebgazerState.Running || this.state === WebgazerState.Paused) {
       this.stopVideo();
       await this.initializeCamera();
       
@@ -1104,7 +1108,7 @@ export class WebGazer {
   /**
    * Enable/disable data persistence across sessions
    */
-  public async saveDataAcrossSessions(save: boolean): Promise<WebGazer> {
+  public async saveDataAcrossSessions(save: boolean): Promise<Webgazer> {
     this.config.saveDataAcrossSessions = save;
     
     if (save) {
@@ -1198,7 +1202,7 @@ export class WebGazer {
   /**
    * Enable/disable Kalman filter
    */
-  public applyKalmanFilter(apply: boolean): WebGazer {
+  public applyKalmanFilter(apply: boolean): Webgazer {
     this.config.applyKalmanFilter = apply;
     
     // Update all regressors to enable/disable Kalman filter
@@ -1217,7 +1221,7 @@ export class WebGazer {
   /**
    * Get configuration object (for backward compatibility)
    */
-  public get params(): WebGazerConfig {
+  public get params(): WebgazerConfig {
     return this.config;
   }
 
@@ -1247,7 +1251,7 @@ export class WebGazer {
    * Detect browser compatibility
    */
   public detectCompatibility(): boolean {
-    return BrowserCompatibility.isWebGazerCompatible();
+    return BrowserCompatibility.isWebgazerCompatible();
   }
 
   /**
@@ -1267,7 +1271,7 @@ export class WebGazer {
   /**
    * Get current state
    */
-  public getState(): WebGazerState {
+  public getState(): WebgazerState {
     return this.state;
   }
 
@@ -1287,4 +1291,4 @@ export class WebGazer {
 }
 
 // Export singleton instance as default
-export default WebGazer.getInstance();
+export default Webgazer.getInstance();

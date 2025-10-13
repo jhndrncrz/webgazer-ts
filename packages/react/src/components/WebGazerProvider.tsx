@@ -1,19 +1,19 @@
 /**
- * WebGazerProvider Component
- * Provides WebGazer context to child components
+ * WebgazerProvider Component
+ * Provides Webgazer context to child components
  */
 
 import React from 'react';
-import { WebGazerContext } from '../context/WebGazerContext';
-import { useWebGazer } from '../hooks/useWebGazer';
-import type { UseWebGazerOptions } from '../types';
+import { WebgazerContext } from '../context/WebgazerContext';
+import { useWebgazer } from '../hooks/useWebgazer';
+import type { UseWebgazerOptions } from '../types';
 
-export interface WebGazerProviderProps extends UseWebGazerOptions {
+export interface WebgazerProviderProps extends UseWebgazerOptions {
   children: React.ReactNode;
 }
 
-export function WebGazerProvider({ children, ...options }: WebGazerProviderProps) {
-  const webgazer = useWebGazer(options);
+export function WebgazerProvider({ children, ...options }: WebgazerProviderProps) {
+  const webgazer = useWebgazer(options);
 
   const contextValue = {
     gazeData: webgazer.gazeData,
@@ -23,8 +23,8 @@ export function WebGazerProvider({ children, ...options }: WebGazerProviderProps
   };
 
   return (
-    <WebGazerContext.Provider value={contextValue}>
+    <WebgazerContext.Provider value={contextValue}>
       {children}
-    </WebGazerContext.Provider>
+    </WebgazerContext.Provider>
   );
 }

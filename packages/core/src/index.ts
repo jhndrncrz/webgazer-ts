@@ -1,17 +1,17 @@
 /**
- * WebGazer - Eye Tracking Library
+ * Webgazer - Eye Tracking Library
  * Main Entry Point
  * 
  * This is the public API entry point that:
  * 1. Registers default tracker and regressor modules
  * 2. Sets up default configuration
- * 3. Exports the singleton WebGazer instance
+ * 3. Exports the singleton Webgazer instance
  * 4. Exports public types for TypeScript users
  * 
  * @module webgazer
  */
 
-import { WebGazer } from './core/WebGazer';
+import { Webgazer } from './core/Webgazer';
 import { TensorFlowFaceMeshTracker } from './trackers/TensorFlowFaceMeshTracker';
 import { RidgeRegressor } from './regressors/RidgeRegressor';
 import { RidgeWeightedRegressor } from './regressors/RidgeWeightedRegressor';
@@ -26,37 +26,37 @@ import { RidgeThreadedRegressor } from './regressors/RidgeThreadedRegressor';
  * This tracker uses TensorFlow.js and the MediaPipe FaceMesh model to detect
  * facial landmarks and extract eye features.
  */
-WebGazer.addTrackerModule('TFFacemesh', TensorFlowFaceMeshTracker);
+Webgazer.addTrackerModule('TFFacemesh', TensorFlowFaceMeshTracker);
 
 /**
  * Register the Ridge Regression regressor (basic implementation).
  * This regressor uses standard ridge regression for gaze prediction.
  */
-WebGazer.addRegressionModule('ridge', RidgeRegressor);
+Webgazer.addRegressionModule('ridge', RidgeRegressor);
 
 /**
  * Register the Weighted Ridge Regression regressor.
  * This regressor uses time-weighted ridge regression, giving more weight
  * to recent calibration data.
  */
-WebGazer.addRegressionModule('weightedRidge', RidgeWeightedRegressor);
+Webgazer.addRegressionModule('weightedRidge', RidgeWeightedRegressor);
 
 /**
  * Register the Threaded Ridge Regression regressor.
  * This regressor uses Web Workers for computation when available,
  * with automatic fallback to synchronous computation.
  */
-WebGazer.addRegressionModule('threadedRidge', RidgeThreadedRegressor);
+Webgazer.addRegressionModule('threadedRidge', RidgeThreadedRegressor);
 
 // ============================================================================
 // Get Singleton Instance
 // ============================================================================
 
 /**
- * Get the singleton WebGazer instance.
- * All interactions with WebGazer should go through this instance.
+ * Get the singleton Webgazer instance.
+ * All interactions with Webgazer should go through this instance.
  */
-const webgazer = WebGazer.getInstance();
+const webgazer = Webgazer.getInstance();
 
 // ============================================================================
 // Set Default Configuration
@@ -79,8 +79,8 @@ webgazer.setRegression('ridge');
 // ============================================================================
 
 /**
- * Export the WebGazer singleton as the default export.
- * This allows users to import WebGazer like:
+ * Export the Webgazer singleton as the default export.
+ * This allows users to import Webgazer like:
  * 
  * @example
  * ```typescript
@@ -107,7 +107,7 @@ export { webgazer };
 
 /**
  * Export core types for TypeScript users.
- * These types allow users to properly type their code when using WebGazer.
+ * These types allow users to properly type their code when using Webgazer.
  */
 
 // Geometry types
@@ -145,7 +145,7 @@ export type {
   MouseEventData,
   GazePredictionEventData,
   ErrorEventData,
-  WebGazerEventData,
+  WebgazerEventData,
   EventListener,
   MouseEventHandlerConfig,
   EventManagerConfig,
@@ -154,14 +154,20 @@ export type {
 export { EventType } from './events/types';
 
 /**
- * Export WebGazerConfig type for configuration management.
+ * Export Webgazer class type and related types
  */
-export type { WebGazerConfig } from './core/WebGazerConfig';
+export type { Webgazer } from './core/Webgazer';
+export type { GazeCallback } from './core/Webgazer';
 
 /**
- * Export WebGazerState enum for state management.
+ * Export WebgazerConfig type for configuration management.
  */
-export { WebGazerState } from './core/WebGazer';
+export type { WebgazerConfig } from './core/WebgazerConfig';
+
+/**
+ * Export WebgazerState enum for state management.
+ */
+export { WebgazerState } from './core/Webgazer';
 
 /**
  * Export utility classes that users might need.
@@ -192,10 +198,10 @@ if (typeof window !== 'undefined') {
   const isCompatible = webgazer.detectCompatibility();
   
   if (!isCompatible) {
-    console.warn('⚠️ WebGazer: Browser compatibility issues detected.');
+    console.warn('⚠️ Webgazer: Browser compatibility issues detected.');
     console.warn('Run webgazer.getCompatibilityWarnings() for details.');
   } else {
-    console.log('✅ WebGazer: Browser is compatible!');
+    console.log('✅ Webgazer: Browser is compatible!');
   }
   
   // Log detailed compatibility info in development mode

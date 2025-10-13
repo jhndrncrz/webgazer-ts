@@ -1,24 +1,42 @@
 /**
  * @webgazer-ts/react
- * React hooks and components for WebGazer.ts eye tracking
+ * React hooks and components for Webgazer.ts eye tracking
  */
 
 // Hooks
-export { useWebGazer, useGazeTracking } from './hooks';
+export { 
+  useWebgazer, 
+  useGazeTracking,
+  useCalibration,
+  useGazeElement,
+  useGazeHeatmap,
+  useGazeRecording,
+} from './hooks';
 
 // Components
-export { WebGazerProvider } from './components';
-export type { WebGazerProviderProps } from './components';
+export { 
+  WebgazerProvider,
+  CalibrationScreen,
+  GazeElement,
+  HeatmapOverlay,
+} from './components';
+
+export type { 
+  WebgazerProviderProps,
+  CalibrationScreenProps,
+  GazeElementProps,
+  HeatmapOverlayProps,
+} from './components';
 
 // Context
-export { useWebGazerContext } from './context/WebGazerContext';
+export { useWebgazerContext } from './context/WebgazerContext';
 
 // Types
 export type {
   GazePrediction,
-  WebGazerConfig,
-  UseWebGazerOptions,
-  UseWebGazerReturn,
+  WebgazerConfig,
+  UseWebgazerOptions,
+  UseWebgazerReturn,
   UseCalibrationOptions,
   CalibrationResult,
   CalibrationPoint,
@@ -27,3 +45,12 @@ export type {
   UseGazeElementOptions,
   UseGazeElementReturn,
 } from './types';
+
+// Hook-specific types
+export type {
+  HeatmapPoint,
+  UseGazeHeatmapOptions,
+  UseGazeHeatmapReturn,
+  GazeRecordingEntry,
+  UseGazeRecordingReturn,
+} from './hooks';

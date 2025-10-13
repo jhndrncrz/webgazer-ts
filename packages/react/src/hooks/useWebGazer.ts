@@ -1,22 +1,19 @@
 /**
- * useWebGazer Hook
- * Main hook for initializing and controlling WebGazer eye tracking
+ * useWebgazer Hook
+ * Main hook for initializing and controlling Webgazer eye tracking
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import type { UseWebGazerOptions, UseWebGazerReturn, GazePrediction } from '../types';
+import webgazer from '@webgazer-ts/core';
+import type { 
+  UseWebgazerOptions, 
+  UseWebgazerReturn, 
+  GazePrediction,
+  WebgazerInstance,
+  GazeCallback
+} from '../types';
 
-// Dynamic import to avoid bundling issues
-let webgazerInstance: any = null;
-
-async function getWebGazer() {
-  if (!webgazerInstance) {
-    webgazerInstance = await import('@webgazer-ts/core');
-  }
-  return webgazerInstance.default || webgazerInstance;
-}
-
-export function useWebGazer(options: UseWebGazerOptions = {}): UseWebGazerReturn {
+export function useWebgazer(options: UseWebgazerOptions = {}): UseWebgazerReturn {
   const {
     autoStart = false,
     tracker = 'TFFacemesh',
@@ -33,21 +30,20 @@ export function useWebGazer(options: UseWebGazerOptions = {}): UseWebGazerReturn
   const [gazeData, setGazeData] = useState<GazePrediction | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [calibrationCount, setCalibrationCount] = useState(0);
-  const webgazerRef = useRef<any>(null);
-  const gazeListenerRef = useRef<((data: GazePrediction | null, timestamp: number) => void) | null>(null);
+  const webgazerRef = useRef<WebgazerInstance | null>(null);
+  const gazeListenerRef = useRef<GazeCallback | null>(null);
 
-  // Initialize WebGazer
+  // Initialize Webgazer
   useEffect(() => {
     let mounted = true;
 
     async function initialize() {
       try {
-        const webgazer = await getWebGazer();
         if (!mounted) return;
 
         webgazerRef.current = webgazer;
 
-        // Configure WebGazer
+        // Configure Webgazer
         webgazer
           .setTracker(tracker)
           .setRegression(regression)
@@ -73,7 +69,8 @@ export function useWebGazer(options: UseWebGazerOptions = {}): UseWebGazerReturn
         const intervalId = setInterval(() => {
           if (mounted && webgazerRef.current) {
             const points = webgazer.getStoredPoints();
-            setCalibrationCount(points ? points.length : 0);
+            // getStoredPoints returns [xArray, yArray], so count is length of either array
+            setCalibrationCount(points && points[0] ? points[0].length : 0);
           }
         }, 1000);
 
@@ -101,7 +98,7 @@ export function useWebGazer(options: UseWebGazerOptions = {}): UseWebGazerReturn
           clearInterval(intervalId);
         };
       } catch (error) {
-        console.error('Failed to initialize WebGazer:', error);
+        console.error('Failed to initialize Webgazer:', error);
       }
     }
 
@@ -136,7 +133,7 @@ export function useWebGazer(options: UseWebGazerOptions = {}): UseWebGazerReturn
         webgazerRef.current.showPredictionPoints(true);
       }
     } catch (error) {
-      console.error('Failed to start WebGazer:', error);
+      console.error('Failed to start Webgazer:', error);
     }
   }, [showVideoPreview, showFaceOverlay, showFaceFeedbackBox, showGazeDot]);
 
@@ -149,7 +146,7 @@ export function useWebGazer(options: UseWebGazerOptions = {}): UseWebGazerReturn
       setIsRunning(false);
       setGazeData(null);
     } catch (error) {
-      console.error('Failed to stop WebGazer:', error);
+      console.error('Failed to stop Webgazer:', error);
     }
   }, []);
 
@@ -161,7 +158,7 @@ export function useWebGazer(options: UseWebGazerOptions = {}): UseWebGazerReturn
       await webgazerRef.current.pause();
       setIsRunning(false);
     } catch (error) {
-      console.error('Failed to pause WebGazer:', error);
+      console.error('Failed to pause Webgazer:', error);
     }
   }, []);
 
@@ -173,7 +170,7 @@ export function useWebGazer(options: UseWebGazerOptions = {}): UseWebGazerReturn
       await webgazerRef.current.resume();
       setIsRunning(true);
     } catch (error) {
-      console.error('Failed to resume WebGazer:', error);
+      console.error('Failed to resume Webgazer:', error);
     }
   }, []);
 
@@ -211,16 +208,129 @@ export function useWebGazer(options: UseWebGazerOptions = {}): UseWebGazerReturn
     }
   }, []);
 
+  // Configuration methods - expose Webgazer configuration API
+  const setTracker = useCallback((trackerName: string) => {
+    if (!webgazerRef.current) return;
+    try {
+      webgazerRef.current.setTracker(trackerName);
+    } catch (error) {
+      console.error('Failed to set tracker:', error);
+    }
+  }, []);
+
+  const setRegression = useCallback((regressionName: string) => {
+    if (!webgazerRef.current) return;
+    try {
+      webgazerRef.current.setRegression(regressionName);
+    } catch (error) {
+      console.error('Failed to set regression:', error);
+    }
+  }, []);
+
+  const showFaceOverlayToggle = useCallback((show: boolean) => {
+    if (!webgazerRef.current) return;
+    try {
+      webgazerRef.current.showFaceOverlay(show);
+    } catch (error) {
+      console.error('Failed to toggle face overlay:', error);
+    }
+  }, []);
+
+  const showFaceFeedbackBoxToggle = useCallback((show: boolean) => {
+    if (!webgazerRef.current) return;
+    try {
+      webgazerRef.current.showFaceFeedbackBox(show);
+    } catch (error) {
+      console.error('Failed to toggle face feedback box:', error);
+    }
+  }, []);
+
+  const showPredictionPoints = useCallback((show: boolean) => {
+    if (!webgazerRef.current) return;
+    try {
+      webgazerRef.current.showPredictionPoints(show);
+    } catch (error) {
+      console.error('Failed to toggle prediction points:', error);
+    }
+  }, []);
+
+  const setVideoViewerSize = useCallback((width: number, height: number) => {
+    if (!webgazerRef.current) return;
+    try {
+      webgazerRef.current.setVideoViewerSize(width, height);
+    } catch (error) {
+      console.error('Failed to set video viewer size:', error);
+    }
+  }, []);
+
+  const applyKalmanFilter = useCallback((apply: boolean) => {
+    if (!webgazerRef.current) return;
+    try {
+      webgazerRef.current.applyKalmanFilter(apply);
+    } catch (error) {
+      console.error('Failed to apply Kalman filter:', error);
+    }
+  }, []);
+
+  const recordScreenPosition = useCallback((x: number, y: number, eventType: 'click' | 'move' = 'click') => {
+    if (!webgazerRef.current) return;
+    try {
+      webgazerRef.current.recordScreenPosition(x, y, eventType);
+    } catch (error) {
+      console.error('Failed to record screen position:', error);
+    }
+  }, []);
+
+  const addMouseEventListeners = useCallback(() => {
+    if (!webgazerRef.current) return;
+    try {
+      webgazerRef.current.addMouseEventListeners();
+    } catch (error) {
+      console.error('Failed to add mouse event listeners:', error);
+    }
+  }, []);
+
+  const removeMouseEventListeners = useCallback(() => {
+    if (!webgazerRef.current) return;
+    try {
+      webgazerRef.current.removeMouseEventListeners();
+    } catch (error) {
+      console.error('Failed to remove mouse event listeners:', error);
+    }
+  }, []);
+
   return {
+    // State
     gazeData,
     isRunning,
     calibrationCount,
+    
+    // Core controls
     start,
     stop,
     pause,
     resume,
     clearData,
+    
+    // Video controls
     showVideo,
     hideVideo,
+    
+    // Configuration
+    setTracker,
+    setRegression,
+    showFaceOverlay: showFaceOverlayToggle,
+    showFaceFeedbackBox: showFaceFeedbackBoxToggle,
+    showPredictionPoints,
+    setVideoViewerSize,
+    applyKalmanFilter,
+    
+    // Calibration controls
+    recordScreenPosition,
+    addMouseEventListeners,
+    removeMouseEventListeners,
+    
+    // Direct instance access for advanced use cases
+    webgazer: webgazerRef.current,
   };
 }

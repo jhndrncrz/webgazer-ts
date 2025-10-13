@@ -1,5 +1,5 @@
 /**
- * Core type definitions and interfaces for WebGazer
+ * Core type definitions and interfaces for Webgazer
  * Defines the main contracts for trackers, regressors, and configuration
  */
 
@@ -183,9 +183,9 @@ export interface IStorageProvider {
 }
 
 /**
- * Configuration interface for WebGazer
+ * Configuration interface for Webgazer
  */
-export interface IWebGazerConfig {
+export interface IWebgazerConfig {
   // Video settings
   videoContainerId: string;
   videoElementId: string;
@@ -268,9 +268,9 @@ export type RegressorConstructor = new () => IRegressor;
 export type EventType = 'click' | 'move';
 
 /**
- * Lifecycle state of WebGazer
+ * Lifecycle state of Webgazer
  */
-export enum WebGazerState {
+export enum WebgazerState {
   NotInitialized = 'NOT_INITIALIZED',
   Initializing = 'INITIALIZING',
   Ready = 'READY',

@@ -1,5 +1,5 @@
 /**
- * Configuration management for WebGazer
+ * Configuration management for Webgazer
  * Provides type-safe parameter management, validation, and persistence
  */
 
@@ -33,9 +33,9 @@ export interface CameraConstraints {
 }
 
 /**
- * Configuration data structure for WebGazer
+ * Configuration data structure for Webgazer
  */
-export interface WebGazerConfigData {
+export interface WebgazerConfigData {
   // Timing parameters
   moveTickSize: number;
   dataTimestep: number;
@@ -85,10 +85,10 @@ export interface ValidationResult {
 }
 
 /**
- * WebGazer configuration management class
+ * Webgazer configuration management class
  * Handles all configuration parameters with validation and persistence
  */
-export class WebGazerConfig implements WebGazerConfigData {
+export class WebgazerConfig implements WebgazerConfigData {
   // Timing parameters
   public moveTickSize: number;
   public dataTimestep: number;
@@ -130,7 +130,7 @@ export class WebGazerConfig implements WebGazerConfigData {
   /**
    * Default configuration values
    */
-  private static readonly DEFAULT_CONFIG: WebGazerConfigData = {
+  private static readonly DEFAULT_CONFIG: WebgazerConfigData = {
     moveTickSize: 50,
     dataTimestep: 50,
     videoContainerId: 'webgazerVideoContainer',
@@ -170,12 +170,12 @@ export class WebGazerConfig implements WebGazerConfigData {
   };
 
   /**
-   * Create a new WebGazer configuration
+   * Create a new Webgazer configuration
    * @param initialConfig - Optional initial configuration values
    */
-  constructor(initialConfig?: Partial<WebGazerConfigData>) {
+  constructor(initialConfig?: Partial<WebgazerConfigData>) {
     // Initialize with defaults
-    const config = { ...WebGazerConfig.DEFAULT_CONFIG, ...initialConfig };
+    const config = { ...WebgazerConfig.DEFAULT_CONFIG, ...initialConfig };
 
     // Assign all properties
     this.moveTickSize = config.moveTickSize;
@@ -286,7 +286,7 @@ export class WebGazerConfig implements WebGazerConfigData {
    * Reset configuration to default values
    */
   public reset(): void {
-    const defaultConfig = WebGazerConfig.DEFAULT_CONFIG;
+    const defaultConfig = WebgazerConfig.DEFAULT_CONFIG;
     
     this.moveTickSize = defaultConfig.moveTickSize;
     this.dataTimestep = defaultConfig.dataTimestep;
@@ -316,7 +316,7 @@ export class WebGazerConfig implements WebGazerConfigData {
    * Convert configuration to JSON-serializable object
    * @returns Plain object representation of configuration
    */
-  public toJSON(): WebGazerConfigData {
+  public toJSON(): WebgazerConfigData {
     return {
       moveTickSize: this.moveTickSize,
       dataTimestep: this.dataTimestep,
@@ -346,25 +346,25 @@ export class WebGazerConfig implements WebGazerConfigData {
   /**
    * Create configuration from JSON object
    * @param json - JSON object to parse
-   * @returns New WebGazerConfig instance
+   * @returns New WebgazerConfig instance
    */
-  public static fromJSON(json: Partial<WebGazerConfigData>): WebGazerConfig {
-    return new WebGazerConfig(json);
+  public static fromJSON(json: Partial<WebgazerConfigData>): WebgazerConfig {
+    return new WebgazerConfig(json);
   }
 
   /**
    * Create a deep copy of this configuration
-   * @returns New WebGazerConfig instance with same values
+   * @returns New WebgazerConfig instance with same values
    */
-  public clone(): WebGazerConfig {
-    return new WebGazerConfig(this.toJSON());
+  public clone(): WebgazerConfig {
+    return new WebgazerConfig(this.toJSON());
   }
 
   /**
    * Update multiple configuration values at once
    * @param updates - Partial configuration to merge
    */
-  public update(updates: Partial<WebGazerConfigData>): void {
+  public update(updates: Partial<WebgazerConfigData>): void {
     Object.assign(this, updates);
   }
 
@@ -372,8 +372,8 @@ export class WebGazerConfig implements WebGazerConfigData {
    * Get the default configuration
    * @returns Default configuration values
    */
-  public static getDefaults(): WebGazerConfigData {
-    return JSON.parse(JSON.stringify(WebGazerConfig.DEFAULT_CONFIG));
+  public static getDefaults(): WebgazerConfigData {
+    return JSON.parse(JSON.stringify(WebgazerConfig.DEFAULT_CONFIG));
   }
 
   /**
