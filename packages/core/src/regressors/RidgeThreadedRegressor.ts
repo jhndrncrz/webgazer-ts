@@ -7,7 +7,7 @@ import { Regressor } from './base/Regressor';
 import { RegressorState } from './base/types';
 import type { EyeFeatures, GazePrediction } from '../types/index';
 import { Matrix } from '../utils/math/Matrix';
-import { KalmanFilter4D } from '../utils/filters/KalmanFilter4D';
+import { KalmanFilter } from '../utils/filters/KalmanFilter';
 import { EyeExtractor } from '../utils/image/EyeExtractor';
 import type {
   WorkerMessage,
@@ -43,7 +43,7 @@ export class RidgeThreadedRegressor extends Regressor {
   constructor() {
     super({
       ridgeParameter: Math.pow(10, -5),
-      dataWindowSize: 50,
+      dataWindowSize: 500, // Increased from 50 to allow more calibration points
       trailDataWindowSize: 10,
       trailTimeWindow: 1000,
       useKalmanFilter: true,
@@ -62,12 +62,11 @@ export class RidgeThreadedRegressor extends Regressor {
    * Sets up Kalman filter and Web Worker
    */
   public initialize(): void {
-    // Initialize 4D Kalman filter for prediction smoothing (matches original Webgazer.js)
-    const kalmanFilter = new KalmanFilter4D({
-      processNoise: 1.0,
-      measurementNoise: 25.0,
-      initialErrorCovariance: 100.0,
-      deltaTime: 1.0,
+    // Initialize 1D Kalman filter for prediction smoothing (better performance than 4D)
+    const kalmanFilter = new KalmanFilter({
+      processNoise: 0.5,
+      measurementNoise: 10.0,
+      errorCovariance: 50.0,
     });
 
     this.setKalmanFilter(kalmanFilter);

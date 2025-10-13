@@ -46,7 +46,8 @@ export class GazeDotRenderer implements IRenderer {
         zIndex: '999999',
         display: this.config.visible ? 'block' : 'none',
         transform: 'translate(-50%, -50%)',
-        transition: this.config.smooth ? 'left 0.1s, top 0.1s' : 'none',
+        // Remove CSS transition for better performance - Kalman filter already smooths
+        willChange: 'transform',  // Hint browser for GPU acceleration
       },
     });
 
@@ -72,9 +73,9 @@ export class GazeDotRenderer implements IRenderer {
 
     this.currentPosition = position;
 
+    // Use transform instead of left/top for better performance (GPU accelerated)
     DOMManager.applyStyles(this.dotElement, {
-      left: `${position.x}px`,
-      top: `${position.y}px`,
+      transform: `translate(${position.x}px, ${position.y}px) translate(-50%, -50%)`,
     });
   }
 
@@ -104,12 +105,8 @@ export class GazeDotRenderer implements IRenderer {
    */
   public setSmooth(smooth: boolean): void {
     this.config.smooth = smooth;
-
-    if (this.dotElement) {
-      DOMManager.applyStyles(this.dotElement, {
-        transition: smooth ? 'left 0.1s, top 0.1s' : 'none',
-      });
-    }
+    // Note: Smoothing is now handled by Kalman filter for better performance
+    // CSS transitions are removed to avoid double smoothing and improve responsiveness
   }
 
   /**

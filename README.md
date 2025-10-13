@@ -1,49 +1,67 @@
-# Webgazer.ts Monorepo
+# Webgazer.ts
 
 [![License](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE.md)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18-61dafb.svg)](https://reactjs.org/)
+[![npm version](https://img.shields.io/npm/v/@webgazer-ts/core.svg)](https://www.npmjs.com/package/@webgazer-ts/core)
 [![Documentation](https://img.shields.io/badge/docs-online-brightgreen.svg)](https://jhndrncrz.github.io/webgazer-ts/)
 
-Modern TypeScript rewrite of Webgazer.js with React support.
+Modern TypeScript rewrite of [Webgazer.js](https://webgazer.cs.brown.edu) with React support and improved performance.
+
+## ✨ Features
+
+- 🎯 **Eye tracking in the browser** - No special hardware required
+- � **Drop-in replacement** - Compatible with original Webgazer.js
+- ⚛️ **React integration** - Official hooks and components
+- 🔒 **Privacy-first** - All processing happens locally
+- 📘 **Full TypeScript** - Complete type safety
+- 🎨 **Modern architecture** - Modular, tree-shakeable code
+- ⚡ **Performance optimized** - GPU acceleration, Kalman filtering
+- �📚 **Complete documentation** - Guides, API reference, examples
+
+## 📦 Packages
+
+| Package | npm | Description |
+|---------|-----|-------------|
+| [@webgazer-ts/core](./packages/core) | [![npm](https://img.shields.io/npm/v/@webgazer-ts/core.svg)](https://www.npmjs.com/package/@webgazer-ts/core) | Core eye tracking library |
+| [@webgazer-ts/react](./packages/react) | [![npm](https://img.shields.io/npm/v/@webgazer-ts/react.svg)](https://www.npmjs.com/package/@webgazer-ts/react) | React hooks and components |
 
 ## 📚 Documentation
 
 **[View Full Documentation →](https://jhndrncrz.github.io/webgazer-ts/)**
 
-- 📖 [Getting Started Guide](https://jhndrncrz.github.io/webgazer-ts/guide/getting-started)
+- 📖 [Getting Started](https://jhndrncrz.github.io/webgazer-ts/guide/getting-started)
 - 🔧 [Core API Reference](https://jhndrncrz.github.io/webgazer-ts/api/core/)
 - ⚛️ [React API Reference](https://jhndrncrz.github.io/webgazer-ts/api/react/)
-- 📝 [Migration Guide](https://jhndrncrz.github.io/webgazer-ts/guide/migration)
-- 💡 [Examples](https://jhndrncrz.github.io/webgazer-ts/examples/basic)
+- 📝 [Migration from Webgazer.js](https://jhndrncrz.github.io/webgazer-ts/guide/migration)
+- 💡 [Examples & Demos](https://jhndrncrz.github.io/webgazer-ts/examples/basic)
 
-## 📦 Packages
+## � Quick Start
 
-This monorepo contains two packages:
+### Core Library (Vanilla JS/TS)
 
-- **[@webgazer-ts/core](./packages/core)** - Core eye tracking library (drop-in replacement for webgazer.js)
-- **[@webgazer-ts/react](./packages/react)** - React hooks and components
-
-## 🚀 Quick Start
-
-### For Vanilla JS / Drop-in Replacement
-
-```html
-<!-- Single file, no external dependencies -->
-<script src="webgazer-ts.umd.cjs"></script>
-<script>
-  window.webgazer
-    .setRegression('ridge')
-    .setTracker('TFFacemesh')
-    .begin();
-
-  webgazer.setGazeListener((data, timestamp) => {
-    console.log('Gaze at:', data.x, data.y);
-  });
-</script>
+```bash
+npm install @webgazer-ts/core
 ```
 
-### For React
+```typescript
+import webgazer from '@webgazer-ts/core';
+
+// Start eye tracking
+await webgazer.begin();
+
+// Listen for gaze predictions
+webgazer.setGazeListener((data, elapsedTime) => {
+  if (data) {
+    console.log(`Gaze at (${data.x}, ${data.y})`);
+  }
+});
+
+// When done
+webgazer.end();
+```
+
+### React Integration
 
 ```bash
 npm install @webgazer-ts/react
@@ -53,12 +71,40 @@ npm install @webgazer-ts/react
 import { useWebgazer } from '@webgazer-ts/react';
 
 function App() {
-  const { gazeData, start, stop } = useWebgazer({
+  const { gazeData, isTracking, start, stop } = useWebgazer({
     autoStart: true,
   });
 
   return (
     <div>
+      <h1>Gaze Position</h1>
+      {gazeData && (
+        <p>Looking at: ({gazeData.x.toFixed(0)}, {gazeData.y.toFixed(0)})</p>
+      )}
+      <button onClick={() => isTracking ? stop() : start()}>
+        {isTracking ? 'Stop' : 'Start'} Tracking
+      </button>
+    </div>
+  );
+}
+```
+
+### CDN (Browser)
+
+```html
+<!-- UMD bundle (adds window.webgazer) -->
+<script src="https://unpkg.com/@webgazer-ts/core@latest/dist/webgazer-ts.umd.cjs"></script>
+
+<script>
+  webgazer.begin().then(() => {
+    webgazer.setGazeListener((data, time) => {
+      if (data) {
+        console.log('Gaze:', data.x, data.y);
+      }
+    });
+  });
+</script>
+```
       {gazeData && <p>Gaze: ({gazeData.x}, {gazeData.y})</p>}
       <button onClick={start}>Start</button>
       <button onClick={stop}>Stop</button>
