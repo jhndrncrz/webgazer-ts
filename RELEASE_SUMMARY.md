@@ -305,6 +305,27 @@ pnpm docs:build
 pnpm docs:preview
 ```
 
+## 🐛 Post-Release Fixes
+
+### Case Sensitivity Issue (Oct 13, 2025)
+
+GitHub Actions builds were failing on Linux due to file name casing mismatches:
+
+**Problem:** 
+- macOS: Case-insensitive filesystem (treats `WebGazer.ts` and `Webgazer.ts` as same)
+- Linux (GitHub Actions): Case-sensitive filesystem
+- Git tracked files with wrong casing (`WebGazer`) vs imports (`Webgazer`)
+
+**Fixed Files:**
+- Core: `WebGazer.ts` → `Webgazer.ts`, `WebGazerConfig.ts` → `WebgazerConfig.ts`
+- React: `WebGazerContext.ts` → `WebgazerContext.ts`, `WebGazerProvider.tsx` → `WebgazerProvider.tsx`, `useWebGazer.ts` → `useWebgazer.ts`
+
+**Commits:**
+- `9a7bf14` - Fixed core package casing
+- `3a73267` - Fixed React package casing
+
+See [`CASE_SENSITIVITY_FIX.md`](./CASE_SENSITIVITY_FIX.md) for details.
+
 ## ✅ Pre-Flight Checklist
 
 Before deploying:
@@ -316,7 +337,8 @@ Before deploying:
 - [x] Tests pass (if any)
 - [x] README updated
 - [x] GitHub Actions workflow ready
-- [ ] Git repository clean
+- [x] Git repository clean (after case-sensitivity fix)
+- [x] Case-sensitivity issues resolved
 - [ ] npm credentials ready (if publishing)
 - [ ] GitHub Pages enabled
 
