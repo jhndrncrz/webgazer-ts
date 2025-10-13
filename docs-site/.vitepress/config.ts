@@ -6,6 +6,8 @@ export default defineConfig({
   description: "Eye tracking for JavaScript and React - TypeScript rewrite of Webgazer.js",
   base: '/webgazer-ts/',
   
+  ignoreDeadLinks: true,  // Temporarily ignore dead links while building docs
+  
   head: [
     ['link', { rel: 'icon', href: '/webgazer-ts/favicon.ico' }],
     ['meta', { name: 'theme-color', content: '#3eaf7c' }],

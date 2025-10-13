@@ -23,5 +23,9 @@
   "excludeProtected": false,
   "excludeInternal": true,
   "sort": ["source-order"],
-  "gitRevision": "main"
+  "gitRevision": "main",
+  "tsconfig": "../packages/core/tsconfig.json",
+  "compilerOptions": {
+    "skipLibCheck": true
+  }
 }
