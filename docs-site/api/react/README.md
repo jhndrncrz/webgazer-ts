@@ -322,7 +322,7 @@ Defined in: [react/src/hooks/useGazeHeatmap.ts:21](https://github.com/jhndrncrz/
 
 ### WebgazerProviderProps
 
-Defined in: react/src/components/WebgazerProvider.tsx:11
+Defined in: [react/src/components/WebgazerProvider.tsx:11](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/react/src/components/WebgazerProvider.tsx#L11)
 
 #### Extends
 
@@ -334,7 +334,7 @@ Defined in: react/src/components/WebgazerProvider.tsx:11
 
 > **children**: `ReactNode`
 
-Defined in: react/src/components/WebgazerProvider.tsx:12
+Defined in: [react/src/components/WebgazerProvider.tsx:12](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/react/src/components/WebgazerProvider.tsx#L12)
 
 ##### tracker?
 
@@ -1504,7 +1504,7 @@ Defined in: [react/src/components/HeatmapOverlay.tsx:16](https://github.com/jhnd
 
 > **WebgazerProvider**(`__namedParameters`): `Element`
 
-Defined in: react/src/components/WebgazerProvider.tsx:15
+Defined in: [react/src/components/WebgazerProvider.tsx:15](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/react/src/components/WebgazerProvider.tsx#L15)
 
 #### Parameters
 
@@ -1522,7 +1522,7 @@ Defined in: react/src/components/WebgazerProvider.tsx:15
 
 > **useWebgazerContext**(): `WebgazerContextValue`
 
-Defined in: react/src/context/WebgazerContext.ts:18
+Defined in: [react/src/context/WebgazerContext.ts:18](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/react/src/context/WebgazerContext.ts#L18)
 
 #### Returns
 
@@ -1633,7 +1633,7 @@ React hooks and components for Webgazer.ts eye tracking
 
 > **useWebgazer**(`options`): [`UseWebgazerReturn`](#usewebgazerreturn)
 
-Defined in: react/src/hooks/useWebgazer.ts:16
+Defined in: [react/src/hooks/useWebgazer.ts:16](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/react/src/hooks/useWebgazer.ts#L16)
 
 @webgazer-ts/react
 React hooks and components for Webgazer.ts eye tracking
