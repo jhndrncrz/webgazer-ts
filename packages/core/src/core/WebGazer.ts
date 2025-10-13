@@ -117,8 +117,8 @@ export class WebGazer {
     });
     this.mouseEventHandler = new MouseEventHandler({
       captureClicks: true,
-      captureMoves: false,
-      moveThrottle: 50,
+      captureMoves: true,  // Enable mouse movement tracking (matches original webgazer.js)
+      moveThrottle: 50,    // Throttle to 50ms between move events
       ignoredSelectors: []
     });
     this.storageManager = new StorageManager();
@@ -928,11 +928,13 @@ export class WebGazer {
       this.recordScreenPosition(data.position.x, data.position.y, 'click');
     });
 
-    // Add move listener (simplified - always off by default)
-    // Can be enabled through mouseEventHandler configuration if needed
+    // Add move listener for continuous calibration (matches original webgazer.js)
+    this.mouseEventHandler.addMoveListener((data) => {
+      this.recordScreenPosition(data.position.x, data.position.y, 'move');
+    });
 
     this.mouseEventHandler.start();
-    console.log('Mouse event listeners added');
+    console.log('Mouse event listeners added (clicks + movements)');
     
     return this;
   }

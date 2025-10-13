@@ -1,75 +1,38 @@
 {
-  "name": "webgazer-ts",
+  "name": "@webgazer-ts/monorepo",
   "version": "0.1.0",
-  "description": "TypeScript rewrite of WebGazer.js - Webcam eye tracking for academic research (NOT for production use)",
+  "private": true,
+  "description": "WebGazer.ts monorepo - Eye tracking for JavaScript and React",
   "type": "module",
-  "license": "GPL-3.0-or-later",
-  "author": {
-    "name": "John Adrian Cruz"
-  },
-  "contributors": [
-    {
-      "name": "Original WebGazer.js Team",
-      "url": "https://webgazer.cs.brown.edu"
-    }
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/brownhci/WebGazer.git"
-  },
-  "keywords": [
-    "eye-tracking",
-    "webgazer",
-    "typescript",
-    "gaze-prediction",
-    "webcam",
-    "tensorflow",
-    "face-detection",
-    "academic",
-    "research",
-    "thesis"
-  ],
-  "main": "./dist/webgazer-ts.umd.cjs",
-  "module": "./dist/webgazer-ts.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/webgazer-ts.js",
-      "require": "./dist/webgazer-ts.umd.cjs",
-      "types": "./dist/index.d.ts"
-    }
-  },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE.md",
-    "CREDITS.md"
+  "workspaces": [
+    "packages/*"
   ],
   "scripts": {
-    "dev": "vite",
-    "build": "npm run build:bundle && npm run build:types",
-    "build:types": "tsc --declaration --emitDeclarationOnly --outDir dist",
-    "build:bundle": "vite build",
-    "preview": "vite preview",
-    "prepublishOnly": "npm run build"
-  },
-  "dependencies": {
-    "@tensorflow-models/face-landmarks-detection": "^1.0.6",
-    "@tensorflow/tfjs": "^4.22.0",
-    "localforage": "^1.10.0",
-    "regression": "2.0.1"
-  },
-  "devDependencies": {
-    "typescript": "^5.6.3",
-    "vite": "^5.4.8"
+    "build": "pnpm --filter @webgazer-ts/core build && pnpm --filter @webgazer-ts/react build",
+    "build:core": "pnpm --filter @webgazer-ts/core build",
+    "build:react": "pnpm --filter @webgazer-ts/react build",
+    "dev": "pnpm --filter @webgazer-ts/core dev",
+    "dev:react": "pnpm --filter @webgazer-ts/react dev",
+    "clean": "pnpm --filter @webgazer-ts/core clean && pnpm --filter @webgazer-ts/react clean"
   },
   "packageManager": "pnpm@9.12.0",
   "engines": {
     "node": ">=16.0.0"
   },
+  "keywords": [
+    "eye-tracking",
+    "webgazer",
+    "typescript",
+    "react",
+    "gaze-prediction",
+    "monorepo"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jhndrncrz/webgazer-ts.git"
+  },
   "homepage": "https://webgazer.cs.brown.edu",
   "bugs": {
-    "url": "https://github.com/brownhci/WebGazer/issues",
-    "email": "webgazer@lists.cs.brown.edu"
+    "url": "https://github.com/jhndrncrz/webgazer-ts/issues"
   }
 }

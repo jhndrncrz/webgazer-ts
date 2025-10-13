@@ -1,48 +1,156 @@
-# WebGazer-TS
+# WebGazer.ts Monorepo
 
-> A modern TypeScript rewrite of [WebGazer.js](https://webgazer.cs.brown.edu) for academic research purposes.
+[![License](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE.md)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18-61dafb.svg)](https://reactjs.org/)
 
-[![Original Project](https://img.shields.io/badge/Original-WebGazer.js-blue)](https://github.com/brownhci/WebGazer)
-[![License](https://img.shields.io/badge/License-GPL--3.0-green.svg)](LICENSE.md)
+Modern TypeScript rewrite of WebGazer.js with React support.
 
----
+## 📦 Packages
+
+This monorepo contains two packages:
+
+- **[@webgazer-ts/core](./packages/core)** - Core eye tracking library (drop-in replacement for webgazer.js)
+- **[@webgazer-ts/react](./packages/react)** - React hooks and components
+
+## 🚀 Quick Start
+
+### For Vanilla JS / Drop-in Replacement
+
+```html
+<!-- Single file, no external dependencies -->
+<script src="webgazer-ts.umd.cjs"></script>
+<script>
+  window.webgazer
+    .setRegression('ridge')
+    .setTracker('TFFacemesh')
+    .begin();
+
+  webgazer.setGazeListener((data, timestamp) => {
+    console.log('Gaze at:', data.x, data.y);
+  });
+</script>
+```
+
+### For React
+
+```bash
+npm install @webgazer-ts/react
+```
+
+```tsx
+import { useWebGazer } from '@webgazer-ts/react';
+
+function App() {
+  const { gazeData, start, stop } = useWebGazer({
+    autoStart: true,
+  });
+
+  return (
+    <div>
+      {gazeData && <p>Gaze: ({gazeData.x}, {gazeData.y})</p>}
+      <button onClick={start}>Start</button>
+      <button onClick={stop}>Stop</button>
+    </div>
+  );
+}
+```
 
 ## ⚠️ Academic Research Project
 
-**This is developed primarily for our thesis project and NOT for production use.**
+**This is developed primarily for academic research and NOT for production use.**
 
-This TypeScript port was created to support modern development workflows and type-safe integration for our thesis project. **For production applications, use the official [WebGazer.js](https://github.com/brownhci/WebGazer) library.**
+This TypeScript port was created to support modern development workflows and type-safe integration for research projects. **For production applications, consider the official [WebGazer.js](https://github.com/brownhci/WebGazer) library.**
+
+## 📖 Documentation
+
+- [Core Package README](./packages/core/README.md) - API documentation for vanilla JS
+- [React Package README](./packages/react/README.md) - React hooks and components
+- [Drop-in Replacement Guide](./DROP_IN_REPLACEMENT_COMPLETE.md) - Migration from webgazer.js
+- [React API Preview](./REACT_WRAPPER_API_PREVIEW.md) - Comprehensive React examples
+- [Quick Reference](./QUICK_REFERENCE.md) - API cheat sheet
+
+## 🎯 Features
+
+### Core Package
+- ✅ 100% API compatible with original WebGazer.js
+- ✅ Single file bundle (no external dependencies)
+- ✅ Full TypeScript support
+- ✅ Self-calibration from clicks and mouse movements
+- ✅ Multiple regression models (ridge, ridgeThreaded, ridgeWeighted)
+- ✅ TensorFlow.js face mesh tracking
+- ✅ Kalman filter for smooth predictions
+
+### React Package
+- ✅ `useWebGazer()` - Main tracking hook
+- ✅ `useGazeTracking()` - Simplified gaze data hook
+- ✅ `<WebGazerProvider>` - Context provider
+- ✅ Full TypeScript support
+- ✅ Automatic lifecycle management
+- ✅ Zero configuration needed
+
+## 🛠️ Development
+
+This is a pnpm workspace monorepo.
+
+```bash
+# Install dependencies
+pnpm install
+
+# Build all packages
+pnpm build
+
+# Build specific package
+pnpm build:core
+pnpm build:react
+
+# Development mode (watch)
+pnpm dev          # Core package
+pnpm dev:react    # React package
+```
+
+## 📁 Project Structure
+
+```
+webgazer-ts/
+├── packages/
+│   ├── core/              # @webgazer-ts/core
+│   │   ├── src/           # Source code
+│   │   ├── dist/          # Built files
+│   │   └── package.json
+│   └── react/             # @webgazer-ts/react
+│       ├── src/           # React hooks and components
+│       ├── dist/          # Built files
+│       └── package.json
+├── examples/              # Example demos
+├── docs/                  # Documentation
+└── pnpm-workspace.yaml    # Workspace configuration
+```
+
+## 🤝 Credits
+
+Based on [WebGazer.js](https://webgazer.cs.brown.edu) by Brown HCI.
+
+**Original WebGazer.js Team:**
+- Alexandra Papoutsaki
+- James Laskey
+- Jeff Huang
+
+## 📄 License
+
+GPL-3.0-or-later
+
+See [LICENSE.md](LICENSE.md) for details.
+
+## 🔗 Links
+
+- [Original WebGazer.js](https://webgazer.cs.brown.edu)
+- [WebGazer.js Paper](http://www.cs.brown.edu/~jph/files/webgazer_ijcai2016.pdf)
+- [TensorFlow.js](https://www.tensorflow.org/js)
 
 ---
 
-## About
-
-WebGazer-TS is a webcam-based eye tracking library that predicts where users are looking on a web page in real-time. It self-calibrates by learning from user interactions without requiring special hardware.
-
-**Key Features:**
-- Real-time gaze prediction using webcam
-- Self-calibration from clicks and cursor movements
-- No video data sent to servers (runs entirely in browser)
-- Full TypeScript type safety
-- 100% API compatible with original WebGazer.js
-
----
-
-## Quick Start
-
-### Installation
-
-```bash
-npm install webgazer-ts
-```
-
-Or with yarn:
-```bash
-yarn add webgazer-ts
-```
-
-Or with pnpm:
-```bash
+Made with ❤️ for academic research
 pnpm add webgazer-ts
 ```
 

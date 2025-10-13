@@ -1,0 +1,66 @@
+{
+  "name": "@webgazer-ts/react",
+  "version": "0.1.0",
+  "description": "React hooks and components for WebGazer.ts eye tracking library",
+  "type": "module",
+  "license": "GPL-3.0-or-later",
+  "author": {
+    "name": "John Adrian Cruz"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jhndrncrz/webgazer-ts.git",
+    "directory": "packages/react"
+  },
+  "keywords": [
+    "eye-tracking",
+    "webgazer",
+    "react",
+    "hooks",
+    "typescript",
+    "gaze-prediction",
+    "webcam"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "npm run build:bundle && npm run build:types",
+    "build:types": "tsc --declaration --emitDeclarationOnly --outDir dist",
+    "build:bundle": "vite build",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@webgazer-ts/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": ">=17.0.0",
+    "react-dom": ">=17.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.8"
+  },
+  "packageManager": "pnpm@9.12.0",
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
