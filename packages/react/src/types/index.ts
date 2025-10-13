@@ -3,7 +3,7 @@
  */
 
 import type { RefObject } from 'react';
-import type { GazePrediction as CoreGazePrediction } from '@webgazer-ts/core';
+import type { Webgazer, GazePrediction as CoreGazePrediction } from '@webgazer-ts/core';
 
 // Re-export Webgazer core types from @webgazer-ts/core
 export type { 
@@ -71,7 +71,7 @@ export interface UseWebgazerReturn {
   removeMouseEventListeners: () => void;
   
   // Direct instance access for advanced use cases
-  webgazer: WebgazerInstance | null;
+  webgazer: Webgazer | null;
 }
 
 export interface UseCalibrationOptions {

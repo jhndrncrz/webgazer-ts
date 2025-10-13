@@ -1,0 +1,25 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["../packages/react/src/index.ts"],
+  "out": "./api/react",
+  "plugin": ["typedoc-plugin-markdown"],
+  "outputFileStrategy": "modules",
+  "entryPointStrategy": "expand",
+  "readme": "none",
+  "hideGenerator": true,
+  "hideBreadcrumbs": false,
+  "categorizeByGroup": true,
+  "categoryOrder": [
+    "Hooks",
+    "Components",
+    "Context",
+    "Utils",
+    "Types",
+    "*"
+  ],
+  "excludePrivate": true,
+  "excludeProtected": false,
+  "excludeInternal": true,
+  "sort": ["source-order"],
+  "gitRevision": "main"
+}

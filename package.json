@@ -1,6 +1,6 @@
 {
   "name": "@webgazer-ts/monorepo",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Webgazer.ts monorepo - Eye tracking for JavaScript and React",
   "type": "module",
@@ -13,7 +13,13 @@
     "build:react": "pnpm --filter @webgazer-ts/react build",
     "dev": "pnpm --filter @webgazer-ts/core dev",
     "dev:react": "pnpm --filter @webgazer-ts/react dev",
-    "clean": "pnpm --filter @webgazer-ts/core clean && pnpm --filter @webgazer-ts/react clean"
+    "clean": "pnpm --filter @webgazer-ts/core clean && pnpm --filter @webgazer-ts/react clean",
+    "docs:dev": "vitepress dev docs-site",
+    "docs:build": "pnpm run docs:api && vitepress build docs-site",
+    "docs:preview": "vitepress preview docs-site",
+    "docs:api": "pnpm run docs:api:core && pnpm run docs:api:react",
+    "docs:api:core": "typedoc --options docs-site/typedoc.core.json",
+    "docs:api:react": "typedoc --options docs-site/typedoc.react.json"
   },
   "packageManager": "pnpm@9.12.0",
   "engines": {
@@ -34,5 +40,10 @@
   "homepage": "https://webgazer.cs.brown.edu",
   "bugs": {
     "url": "https://github.com/jhndrncrz/webgazer-ts/issues"
+  },
+  "devDependencies": {
+    "typedoc": "^0.28.14",
+    "typedoc-plugin-markdown": "^4.9.0",
+    "vitepress": "^1.6.4"
   }
 }

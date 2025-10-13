@@ -3,8 +3,19 @@
 [![License](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE.md)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18-61dafb.svg)](https://reactjs.org/)
+[![Documentation](https://img.shields.io/badge/docs-online-brightgreen.svg)](https://jhndrncrz.github.io/webgazer-ts/)
 
 Modern TypeScript rewrite of Webgazer.js with React support.
+
+## 📚 Documentation
+
+**[View Full Documentation →](https://jhndrncrz.github.io/webgazer-ts/)**
+
+- 📖 [Getting Started Guide](https://jhndrncrz.github.io/webgazer-ts/guide/getting-started)
+- 🔧 [Core API Reference](https://jhndrncrz.github.io/webgazer-ts/api/core/)
+- ⚛️ [React API Reference](https://jhndrncrz.github.io/webgazer-ts/api/react/)
+- 📝 [Migration Guide](https://jhndrncrz.github.io/webgazer-ts/guide/migration)
+- 💡 [Examples](https://jhndrncrz.github.io/webgazer-ts/examples/basic)
 
 ## 📦 Packages
 
@@ -66,9 +77,8 @@ This TypeScript port was created to support modern development workflows and typ
 
 - [Core Package README](./packages/core/README.md) - API documentation for vanilla JS
 - [React Package README](./packages/react/README.md) - React hooks and components
-- [Drop-in Replacement Guide](./DROP_IN_REPLACEMENT_COMPLETE.md) - Migration from webgazer.js
-- [React API Preview](./REACT_WRAPPER_API_PREVIEW.md) - Comprehensive React examples
-- [Quick Reference](./QUICK_REFERENCE.md) - API cheat sheet
+- **[📚 Full Documentation Website](https://jhndrncrz.github.io/webgazer-ts/)** - Complete guides, API reference, and examples
+- [CHANGELOG](./CHANGELOG.md) - Version history and release notes
 
 ## 🎯 Features
 

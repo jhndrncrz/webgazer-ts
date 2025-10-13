@@ -1,6 +1,6 @@
 {
   "name": "@webgazer-ts/core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "TypeScript rewrite of Webgazer.js - Webcam eye tracking for academic research (NOT for production use)",
   "type": "module",
   "license": "GPL-3.0-or-later",
