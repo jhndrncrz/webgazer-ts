@@ -38,6 +38,8 @@ export class GazeDotRenderer implements IRenderer {
       id: this.config.dotId,
       styles: {
         position: 'fixed',
+        left: '0px',
+        top: '0px',
         width: `${this.config.size}px`,
         height: `${this.config.size}px`,
         borderRadius: '50%',
@@ -45,7 +47,6 @@ export class GazeDotRenderer implements IRenderer {
         pointerEvents: 'none',
         zIndex: '999999',
         display: this.config.visible ? 'block' : 'none',
-        transform: 'translate(-50%, -50%)',
         // Remove CSS transition for better performance - Kalman filter already smooths
         willChange: 'transform',  // Hint browser for GPU acceleration
       },

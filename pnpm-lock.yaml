@@ -74,8 +74,8 @@ importers:
   packages/react:
     dependencies:
       '@webgazer-ts/core':
-        specifier: workspace:*
-        version: link:../core
+        specifier: ^0.2.0
+        version: 0.2.0(@mediapipe/face_mesh@0.4.1633559619)(@tensorflow-models/face-detection@1.0.3(@mediapipe/face_detection@0.4.1646425229)(@tensorflow/tfjs-backend-webgl@4.22.0(@tensorflow/tfjs-core@4.22.0))(@tensorflow/tfjs-converter@4.22.0(@tensorflow/tfjs-core@4.22.0))(@tensorflow/tfjs-core@4.22.0))(@tensorflow/tfjs-backend-webgl@4.22.0(@tensorflow/tfjs-core@4.22.0))(@tensorflow/tfjs-converter@4.22.0(@tensorflow/tfjs-core@4.22.0))(@tensorflow/tfjs-core@4.22.0)(seedrandom@3.0.5)
     devDependencies:
       '@testing-library/jest-dom':
         specifier: ^6.9.1
@@ -1051,6 +1051,10 @@ packages:
 
   '@vueuse/shared@12.8.2':
     resolution: {integrity: sha512-dznP38YzxZoNloI0qpEfpkms8knDtaoQ6Y/sfS0L7Yki4zh40LFHEhur0odJC6xTHG5dxWVPiUWBXn+wCG2s5w==}
+
+  '@webgazer-ts/core@0.2.0':
+    resolution: {integrity: sha512-UkqhDAXdKs4jwZHXr9Se4KzWpfzZR0zCrxSSIIJyy/aVDyuH1AZtBv79e5J2Obj1hmAfQnN3GKzJaoe6TXmHYg==}
+    engines: {node: '>=16.0.0'}
 
   '@webgpu/types@0.1.38':
     resolution: {integrity: sha512-7LrhVKz2PRh+DD7+S+PVaFd5HxaWQvoMqBbsV9fNJO1pjUs1P8bM2vQVNfk+3URTqbuTI7gkXi0rfsN0IadoBA==}
@@ -3217,6 +3221,21 @@ snapshots:
       vue: 3.5.22(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
+
+  '@webgazer-ts/core@0.2.0(@mediapipe/face_mesh@0.4.1633559619)(@tensorflow-models/face-detection@1.0.3(@mediapipe/face_detection@0.4.1646425229)(@tensorflow/tfjs-backend-webgl@4.22.0(@tensorflow/tfjs-core@4.22.0))(@tensorflow/tfjs-converter@4.22.0(@tensorflow/tfjs-core@4.22.0))(@tensorflow/tfjs-core@4.22.0))(@tensorflow/tfjs-backend-webgl@4.22.0(@tensorflow/tfjs-core@4.22.0))(@tensorflow/tfjs-converter@4.22.0(@tensorflow/tfjs-core@4.22.0))(@tensorflow/tfjs-core@4.22.0)(seedrandom@3.0.5)':
+    dependencies:
+      '@tensorflow-models/face-landmarks-detection': 1.0.6(@mediapipe/face_mesh@0.4.1633559619)(@tensorflow-models/face-detection@1.0.3(@mediapipe/face_detection@0.4.1646425229)(@tensorflow/tfjs-backend-webgl@4.22.0(@tensorflow/tfjs-core@4.22.0))(@tensorflow/tfjs-converter@4.22.0(@tensorflow/tfjs-core@4.22.0))(@tensorflow/tfjs-core@4.22.0))(@tensorflow/tfjs-backend-webgl@4.22.0(@tensorflow/tfjs-core@4.22.0))(@tensorflow/tfjs-converter@4.22.0(@tensorflow/tfjs-core@4.22.0))(@tensorflow/tfjs-core@4.22.0)
+      '@tensorflow/tfjs': 4.22.0(seedrandom@3.0.5)
+      localforage: 1.10.0
+      regression: 2.0.1
+    transitivePeerDependencies:
+      - '@mediapipe/face_mesh'
+      - '@tensorflow-models/face-detection'
+      - '@tensorflow/tfjs-backend-webgl'
+      - '@tensorflow/tfjs-converter'
+      - '@tensorflow/tfjs-core'
+      - encoding
+      - seedrandom
 
   '@webgpu/types@0.1.38': {}
 

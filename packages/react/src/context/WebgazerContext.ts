@@ -4,12 +4,9 @@
  */
 
 import { createContext, useContext } from 'react';
-import type { GazePrediction } from '../types';
+import type { UseWebgazerReturn } from '../types';
 
-export interface WebgazerContextValue {
-  gazeData: GazePrediction | null;
-  isRunning: boolean;
-  calibrationCount: number;
+export interface WebgazerContextValue extends UseWebgazerReturn {
   isInitialized: boolean;
 }
 

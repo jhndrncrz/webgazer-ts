@@ -64,7 +64,6 @@ import type { IKalmanFilter, KalmanFilter4DConfig, KalmanFilter4DState } from '.
  */
 export class KalmanFilter4D implements IKalmanFilter {
   // Filter parameters
-  private readonly processNoise: number;
   private readonly measurementNoise: number;
   private readonly initialErrorCovariance: number;
   private readonly deltaTime: number;
@@ -95,13 +94,11 @@ export class KalmanFilter4D implements IKalmanFilter {
    */
   constructor(config: KalmanFilter4DConfig = {}) {
     const {
-      processNoise = 1.0,
-      measurementNoise = 25.0,
-      initialErrorCovariance = 100.0,
-      deltaTime = 1.0
+      measurementNoise = 47.0,      // pixel_error from original
+      initialErrorCovariance = 0.0001,  // P_initial from original
+      deltaTime = 0.1                // delta_t from original (1/10)
     } = config;
     
-    this.processNoise = processNoise;
     this.measurementNoise = measurementNoise;
     this.initialErrorCovariance = initialErrorCovariance;
     this.deltaTime = deltaTime;
@@ -134,20 +131,18 @@ export class KalmanFilter4D implements IKalmanFilter {
     
     // Process noise covariance Q
     // Models uncertainty in the motion model
-    // From original Webgazer.js:
-    // Q = [ [dt²/4,  0,     dt/2,  0   ],
-    //       [0,      dt²/4, 0,     dt/2],
-    //       [dt/2,   0,     1,     0   ],
-    //       [0,      dt/2,  0,     1   ] ] * processNoise
-    const dt2 = dt * dt;
-    const dt_over_2 = dt / 2;
-    const dt2_over_4 = dt2 / 4;
-    
+    // From original Webgazer.js (matches exactly):
+    // Q_base = [ [1/4, 0,   1/2, 0],
+    //            [0,   1/4, 0,   1/2],
+    //            [1/2, 0,   1,   0],
+    //            [0,   1/2, 0,   1] ]
+    // Q = Q_base * delta_t
+    // This is NOT the standard kinematic Q matrix!
     this.Q = [
-      [dt2_over_4 * processNoise, 0, dt_over_2 * processNoise, 0],
-      [0, dt2_over_4 * processNoise, 0, dt_over_2 * processNoise],
-      [dt_over_2 * processNoise, 0, processNoise, 0],
-      [0, dt_over_2 * processNoise, 0, processNoise]
+      [0.25 * dt, 0, 0.5 * dt, 0],
+      [0, 0.25 * dt, 0, 0.5 * dt],
+      [0.5 * dt, 0, 1.0 * dt, 0],
+      [0, 0.5 * dt, 0, 1.0 * dt]
     ];
     
     // Measurement matrix H (we observe position only)

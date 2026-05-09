@@ -298,8 +298,8 @@ export class CalibrationManager {
       // Custom point count - distribute evenly
       const cols = Math.ceil(Math.sqrt(this.config.pointCount));
       const rows = Math.ceil(this.config.pointCount / cols);
-      const stepX = (screenWidth - 2 * margin) / (cols - 1);
-      const stepY = (screenHeight - 2 * margin) / (rows - 1);
+      const stepX = cols > 1 ? (screenWidth - 2 * margin) / (cols - 1) : 0;
+      const stepY = rows > 1 ? (screenHeight - 2 * margin) / (rows - 1) : 0;
 
       for (let i = 0; i < this.config.pointCount; i++) {
         const row = Math.floor(i / cols);

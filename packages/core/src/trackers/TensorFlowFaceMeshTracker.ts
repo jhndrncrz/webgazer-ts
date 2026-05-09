@@ -86,21 +86,16 @@ export class TensorFlowFaceMeshTracker extends Tracker {
           await tf.ready(); // Wait for backend to be ready
         } catch (e) {
           // Fallback to CPU backend if WebGL fails
-          console.warn('WebGL backend failed, falling back to CPU:', e);
           await tf.setBackend('cpu');
           await tf.ready();
         }
       }
-
-      console.log('TensorFlow backend ready:', tf.getBackend());
 
       const api = faceLandmarksDetection;
 
       // Create detector with proper configuration
       if (api.createDetector && api.SupportedModels) {
         const model = api.SupportedModels.MediaPipeFaceMesh;
-        
-        console.log('Creating MediaPipeFaceMesh detector...');
         
         // Configuration for MediaPipeFaceMesh
         // See: https://github.com/tensorflow/tfjs-models/tree/master/face-landmarks-detection
@@ -111,13 +106,11 @@ export class TensorFlowFaceMeshTracker extends Tracker {
         };
         
         this.detector = await api.createDetector(model, detectorConfig);
-        console.log('MediaPipeFaceMesh detector created successfully');
       } else {
         throw new Error('face-landmarks-detection API not available');
       }
 
       this.setState(TrackerState.Ready);
-      console.log('TensorFlowFaceMesh tracker initialized and ready');
     } catch (error) {
       this.setState(TrackerState.Error);
       console.error('Failed to initialize TensorFlow FaceMesh:', error);
@@ -185,28 +178,7 @@ export class TensorFlowFaceMeshTracker extends Tracker {
     }
 
     if (video.videoWidth === 0 || video.videoHeight === 0) {
-      if (Date.now() % 5000 < 50) {
-        console.warn('Video dimensions are 0:', video.videoWidth, 'x', video.videoHeight);
-      }
       return null;
-    }
-
-    // Log video element details on first call (for debugging)
-    if (!video.dataset.trackerValidated) {
-      console.log('📹 Video element received by tracker:', {
-        tagName: video.tagName,
-        readyState: video.readyState,
-        readyStateText: ['HAVE_NOTHING', 'HAVE_METADATA', 'HAVE_CURRENT_DATA', 'HAVE_FUTURE_DATA', 'HAVE_ENOUGH_DATA'][video.readyState],
-        dimensions: `${video.videoWidth}x${video.videoHeight}`,
-        attributes: `width=${video.width}, height=${video.height}`,
-        paused: video.paused,
-        ended: video.ended,
-        seeking: video.seeking,
-        currentTime: video.currentTime.toFixed(2),
-        duration: video.duration,
-        srcObject: video.srcObject ? 'MediaStream present' : 'No srcObject'
-      });
-      video.dataset.trackerValidated = 'true';
     }
 
     const startTime = performance.now();

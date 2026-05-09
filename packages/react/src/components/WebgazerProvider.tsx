@@ -16,9 +16,7 @@ export function WebgazerProvider({ children, ...options }: WebgazerProviderProps
   const webgazer = useWebgazer(options);
 
   const contextValue = {
-    gazeData: webgazer.gazeData,
-    isRunning: webgazer.isRunning,
-    calibrationCount: webgazer.calibrationCount,
+    ...webgazer,
     isInitialized: true,
   };
 

@@ -57,18 +57,16 @@ export interface KalmanFilterConfig {
 
 /**
  * Configuration for 4D Kalman Filter (position + velocity)
+ * Based on original webgazer.js implementation
  */
 export interface KalmanFilter4DConfig {
-  /** Process noise covariance */
-  processNoise?: number;
-  
-  /** Measurement noise covariance in pixels */
+  /** Measurement noise covariance in pixels (default: 47.0 from original) */
   measurementNoise?: number;
   
-  /** Initial error covariance */
+  /** Initial error covariance (default: 0.0001 from original) */
   initialErrorCovariance?: number;
   
-  /** Time delta between updates in seconds */
+  /** Time delta between updates in seconds (default: 0.1 = 100ms) */
   deltaTime?: number;
 }
 

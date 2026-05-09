@@ -31,6 +31,7 @@ import { StorageManager } from '../utils/data/StorageManager';
 import { MediaDeviceManager } from '../utils/browser/MediaDeviceManager';
 import { DOMManager } from '../utils/browser/DOMManager';
 import { BrowserCompatibility } from '../utils/browser/BrowserCompatibility';
+import { DataWindow } from '../utils/data/DataWindow';
 
 /**
  * Webgazer state enum
@@ -102,6 +103,10 @@ export class Webgazer {
   private gazeCallback: GazeCallback | null = null;
   private predictionLoop: number | null = null;
   
+  // Smoothing buffer for predictions (matches original webgazer.js)
+  // Original: smoothingVals = new util.DataWindow(4)
+  private smoothingBuffer: DataWindow<GazePrediction>;
+  
   // Video elements
   private videoElement: HTMLVideoElement | null = null;
   private canvasElement: HTMLCanvasElement | null = null;
@@ -123,6 +128,9 @@ export class Webgazer {
     });
     this.storageManager = new StorageManager();
     this.mediaDeviceManager = new MediaDeviceManager();
+    
+    // Initialize smoothing buffer (4 predictions, matches original)
+    this.smoothingBuffer = new DataWindow<GazePrediction>(4);
   }
 
   /**
@@ -296,6 +304,9 @@ export class Webgazer {
 
     // Reset state
     this.state = WebgazerState.Stopped;
+    if (this.mediaStream) {
+      this.mediaDeviceManager.stopVideoStream();
+    }
     this.mediaStream = null;
     this.videoElement = null;
     this.canvasElement = null;
@@ -593,21 +604,46 @@ export class Webgazer {
           const predictions = await this.getPredictions(eyeFeatures);
 
           if (predictions.length > 0) {
-            const prediction = predictions[0]; // Use first regressor's prediction
+            let prediction = predictions[0]; // Use first regressor's prediction
 
-            // Call user callback
+            // Apply smoothing (matches original webgazer.js)
+            // Original: averages last 4 predictions for smoother tracking
+            this.smoothingBuffer.push(prediction);
+            
+            // Calculate moving average
+            let smoothedX = 0;
+            let smoothedY = 0;
+            const bufferLength = this.smoothingBuffer.length;
+            
+            for (let i = 0; i < bufferLength; i++) {
+              const pred = this.smoothingBuffer.get(i);
+              smoothedX += pred.x;
+              smoothedY += pred.y;
+            }
+            
+            // Use smoothed prediction
+            const smoothedPrediction: GazePrediction = {
+              x: smoothedX / bufferLength,
+              y: smoothedY / bufferLength
+            };
+
+            // Constrain to viewport (matches original webgazer.js)
+            smoothedPrediction.x = Math.max(0, Math.min(smoothedPrediction.x, window.innerWidth));
+            smoothedPrediction.y = Math.max(0, Math.min(smoothedPrediction.y, window.innerHeight));
+
+            // Call user callback with smoothed prediction
             if (this.gazeCallback) {
-              this.gazeCallback(prediction, Date.now());
+              this.gazeCallback(smoothedPrediction, Date.now());
             }
 
-            // Update gaze dot
+            // Update gaze dot with smoothed prediction
             if (this.gazeDotRenderer && this.config.showGazeDot) {
-              this.gazeDotRenderer.setPosition(prediction);
+              this.gazeDotRenderer.setPosition(smoothedPrediction);
             }
 
-            // Emit prediction event
+            // Emit prediction event with smoothed prediction
             this.eventManager.emit('gazePrediction', {
-              prediction,
+              prediction: smoothedPrediction,
               timestamp: Date.now()
             });
           }
@@ -892,7 +928,6 @@ export class Webgazer {
    */
   public recordScreenPosition(x: number, y: number, eventType: 'click' | 'move' = 'click'): Webgazer {
     if (!this.isReady()) {
-      console.warn('Webgazer not ready, cannot record screen position');
       return this;
     }
 
@@ -903,12 +938,9 @@ export class Webgazer {
         for (const regressor of this.regressors) {
           regressor.addData(trackingData.eyeFeatures, [x, y], eventType);
         }
-        console.log(`📍 Recorded ${eventType} at (${Math.round(x)}, ${Math.round(y)})`);
-      } else {
-        console.warn('No eye features available to record');
       }
-    }).catch(error => {
-      console.error('Failed to record screen position:', error);
+    }).catch(() => {
+      // Silent fail - recording position is not critical
     });
 
     return this;
@@ -927,6 +959,9 @@ export class Webgazer {
   public addMouseEventListeners(): Webgazer {
     this.config.storingPoints = true;
 
+    // Clear previously bound listeners to avoid duplications
+    this.mouseEventHandler.clearListeners();
+
     // Add click listener
     this.mouseEventHandler.addClickListener((data) => {
       this.recordScreenPosition(data.position.x, data.position.y, 'click');
@@ -938,7 +973,6 @@ export class Webgazer {
     });
 
     this.mouseEventHandler.start();
-    console.log('Mouse event listeners added (clicks + movements)');
     
     return this;
   }

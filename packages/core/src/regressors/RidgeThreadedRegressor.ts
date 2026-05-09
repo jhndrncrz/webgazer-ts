@@ -7,7 +7,7 @@ import { Regressor } from './base/Regressor';
 import { RegressorState } from './base/types';
 import type { EyeFeatures, GazePrediction } from '../types/index';
 import { Matrix } from '../utils/math/Matrix';
-import { KalmanFilter } from '../utils/filters/KalmanFilter';
+import { KalmanFilter4D } from '../utils/filters/KalmanFilter4D';
 import { EyeExtractor } from '../utils/image/EyeExtractor';
 import type {
   WorkerMessage,
@@ -44,7 +44,7 @@ export class RidgeThreadedRegressor extends Regressor {
     super({
       ridgeParameter: Math.pow(10, -5),
       dataWindowSize: 500, // Increased from 50 to allow more calibration points
-      trailDataWindowSize: 10,
+      trailDataWindowSize: 20, // 1000ms / 50ms = 20 samples (matches original)
       trailTimeWindow: 1000,
       useKalmanFilter: true,
     });
@@ -62,20 +62,15 @@ export class RidgeThreadedRegressor extends Regressor {
    * Sets up Kalman filter and Web Worker
    */
   public initialize(): void {
-    // Initialize 1D Kalman filter for prediction smoothing (better performance than 4D)
-    const kalmanFilter = new KalmanFilter({
-      processNoise: 0.5,
-      measurementNoise: 10.0,
-      errorCovariance: 50.0,
+    // Initialize 4D Kalman filter (reduced noise for better responsiveness)
+    const kalmanFilter = new KalmanFilter4D({
+      measurementNoise: 25.0,          // Reduced from 47 for better responsiveness
+      initialErrorCovariance: 0.0001,
+      deltaTime: 0.1,
     });
 
     this.setKalmanFilter(kalmanFilter);
     this.setState(RegressorState.Ready);
-
-    // Initialize Web Worker if enabled
-    if (this.useWorker) {
-      this.initializeWorker();
-    }
   }
 
   /**

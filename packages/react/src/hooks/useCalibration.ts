@@ -40,8 +40,8 @@ export function useCalibration(options: UseCalibrationOptions = {}): UseCalibrat
       const col = i % cols;
       const row = Math.floor(i / cols);
       
-      const x = margin + (width / (cols - 1)) * col;
-      const y = margin + (height / (rows - 1)) * row;
+      const x = margin + (cols > 1 ? (width / (cols - 1)) * col : width / 2);
+      const y = margin + (rows > 1 ? (height / (rows - 1)) * row : height / 2);
       
       newPoints.push({ x, y, index: i });
     }

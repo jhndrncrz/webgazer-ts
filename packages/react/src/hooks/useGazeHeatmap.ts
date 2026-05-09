@@ -52,14 +52,18 @@ export function useGazeHeatmap(options: UseGazeHeatmapOptions = {}): UseGazeHeat
   // Collect gaze points
   useEffect(() => {
     if (gazeData) {
-      setPoints(prev => [
-        ...prev,
-        {
-          x: gazeData.x,
-          y: gazeData.y,
-          timestamp: Date.now(),
-        },
-      ]);
+      setPoints(prev => {
+        const newPoints = [
+          ...prev,
+          {
+            x: gazeData.x,
+            y: gazeData.y,
+            timestamp: Date.now(),
+          },
+        ];
+        // Cap point array growth to prevent O(N) performance degradation
+        return newPoints.slice(-1000);
+      });
     }
   }, [gazeData]);
 
@@ -77,6 +81,9 @@ export function useGazeHeatmap(options: UseGazeHeatmapOptions = {}): UseGazeHeat
 
     // Clear canvas
     ctx.clearRect(0, 0, width, height);
+
+    // Apply blur before drawing
+    ctx.filter = `blur(${blur}px)`;
 
     // Create gradient for coloring
     const colorGradient = ctx.createLinearGradient(0, 0, 0, radius * 2);
@@ -104,9 +111,7 @@ export function useGazeHeatmap(options: UseGazeHeatmapOptions = {}): UseGazeHeat
       );
     });
 
-    // Apply blur
-    ctx.filter = `blur(${blur}px)`;
-    ctx.drawImage(canvas, 0, 0);
+    // Reset filter
     ctx.filter = 'none';
   }, [points, width, height, radius, maxOpacity, blur, gradient]);
 

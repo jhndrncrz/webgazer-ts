@@ -37,6 +37,8 @@ export function useWebgazer(options: UseWebgazerOptions = {}): UseWebgazerReturn
   useEffect(() => {
     let mounted = true;
 
+    let intervalId: ReturnType<typeof setInterval> | null = null;
+
     async function initialize() {
       try {
         if (!mounted) return;
@@ -66,7 +68,7 @@ export function useWebgazer(options: UseWebgazerOptions = {}): UseWebgazerReturn
         webgazer.setGazeListener(gazeListenerRef.current);
 
         // Update calibration count periodically
-        const intervalId = setInterval(() => {
+        intervalId = setInterval(() => {
           if (mounted && webgazerRef.current) {
             const points = webgazer.getStoredPoints();
             // getStoredPoints returns [xArray, yArray], so count is length of either array
@@ -93,10 +95,6 @@ export function useWebgazer(options: UseWebgazerOptions = {}): UseWebgazerReturn
             webgazer.showPredictionPoints(true);
           }
         }
-
-        return () => {
-          clearInterval(intervalId);
-        };
       } catch (error) {
         console.error('Failed to initialize Webgazer:', error);
       }
@@ -106,7 +104,11 @@ export function useWebgazer(options: UseWebgazerOptions = {}): UseWebgazerReturn
 
     return () => {
       mounted = false;
+      if (intervalId !== null) {
+        clearInterval(intervalId);
+      }
       if (webgazerRef.current) {
+        webgazerRef.current.clearGazeListener();
         webgazerRef.current.end();
       }
     };

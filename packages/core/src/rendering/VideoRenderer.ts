@@ -123,19 +123,16 @@ export class VideoRenderer implements IRenderer {
         this.config.height = videoHeight;
         
         // Explicitly play the video
-        this.videoElement.play().then(() => {
-          console.log('✅ Video ready and playing:', {
-            readyState: this.videoElement?.readyState,
-            dimensions: `${this.videoElement?.videoWidth}x${this.videoElement?.videoHeight}`,
-            attributes: `width=${this.videoElement?.width}, height=${this.videoElement?.height}`,
-            paused: this.videoElement?.paused,
-            currentTime: this.videoElement?.currentTime
+        // Try to play
+        this.videoElement
+          .play()
+          .then(() => {
+            resolve();
+          })
+          .catch(playError => {
+            console.error('Failed to play video:', playError);
+            reject(playError);
           });
-          resolve();
-        }).catch((playError) => {
-          console.error('Failed to play video:', playError);
-          reject(playError);
-        });
       };
 
       const onError = (error: Event) => {
