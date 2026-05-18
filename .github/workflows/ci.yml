@@ -37,14 +37,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Typecheck all packages
-        run: pnpm run typecheck
-
-      - name: Run tests with coverage (core)
-        run: pnpm --filter @webgazer-ts/core test:coverage
-
-      - name: Run tests with coverage (react)
-        run: pnpm --filter @webgazer-ts/react test:coverage
+      - name: Run CI test gate
+        run: bash scripts/ci-test.sh
 
       - name: Upload core coverage
         if: matrix.node-version == '20'
@@ -84,14 +78,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build all packages
-        run: pnpm run build
-
-      - name: Build examples
-        run: pnpm run examples:build
-
-      - name: Build docs
-        run: pnpm run docs:build
+      - name: Run CI build gate
+        run: bash scripts/ci-build.sh
 
       - name: Upload core dist
         uses: actions/upload-artifact@v4
