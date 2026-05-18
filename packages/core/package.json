@@ -15,7 +15,8 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/brownhci/Webgazer.git"
+    "url": "https://github.com/jhndrncrz/webgazer-ts.git",
+    "directory": "packages/core"
   },
   "keywords": [
     "eye-tracking",
@@ -31,9 +32,14 @@
   ],
   "main": "./dist/webgazer-ts.umd.cjs",
   "module": "./dist/webgazer-ts.js",
+  "browser": "./dist/webgazer.js",
+  "unpkg": "./dist/webgazer.js",
+  "jsdelivr": "./dist/webgazer.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "browser": "./dist/webgazer-ts.js",
+      "node": "./ssr.js",
       "import": "./dist/webgazer-ts.js",
       "require": "./dist/webgazer-ts.umd.cjs",
       "types": "./dist/index.d.ts"
@@ -41,17 +47,22 @@
   },
   "files": [
     "dist",
+    "ssr.js",
+    "ssr.cjs",
+    "ssr.d.ts",
     "README.md",
     "LICENSE.md",
     "CREDITS.md"
   ],
   "scripts": {
     "dev": "vite",
-    "build": "npm run build:bundle && npm run build:types",
+    "build": "vite build && tsc --declaration --emitDeclarationOnly --outDir dist",
     "build:types": "tsc --declaration --emitDeclarationOnly --outDir dist",
     "build:bundle": "vite build",
     "preview": "vite preview",
-    "prepublishOnly": "npm run build"
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
     "@tensorflow-models/face-landmarks-detection": "^1.0.6",
@@ -60,16 +71,18 @@
     "regression": "2.0.1"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "^3.2.4",
+    "jsdom": "^27.0.0",
     "typescript": "^5.6.3",
-    "vite": "^5.4.8"
+    "vite": "^5.4.8",
+    "vitest": "^3.2.4"
   },
   "packageManager": "pnpm@9.12.0",
   "engines": {
     "node": ">=16.0.0"
   },
-  "homepage": "https://webgazer.cs.brown.edu",
+  "homepage": "https://jhndrncrz.github.io/webgazer-ts/",
   "bugs": {
-    "url": "https://github.com/brownhci/Webgazer/issues",
-    "email": "webgazer@lists.cs.brown.edu"
+    "url": "https://github.com/jhndrncrz/webgazer-ts/issues"
   }
 }

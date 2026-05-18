@@ -5,6 +5,30 @@ All notable changes to Webgazer.ts will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2025-10-13
+
+### 🐛 Critical Bug Fixes
+
+#### 1. Fixed Kalman Filter Q Matrix
+- **Issue:** Q matrix calculation was incorrect, using standard kinematic formula instead of original's empirically-tuned values.
+- **Impact:** Position variance was 20x too small, velocity variance 10x too small, resulting in jitter.
+- **Fix:** Implemented exact Q matrix from original webgazer.js.
+
+#### 2. Fixed Trail Data Window Size
+- **Issue:** Trail data window hardcoded to 10 samples instead of calculating from time/tick size.
+- **Impact:** Only capturing 500ms of mouse movement instead of 1000ms.
+- **Fix:** Changed to 20 samples (1000ms / 50ms) to match original.
+
+#### 3. Added Missing Smoothing Layer
+- **Issue:** Missing moving average smoothing stage that exists in original implementation.
+- **Fix:** Added `DataWindow<GazePrediction>(4)` buffer to average last 4 predictions.
+- **Architecture:** Raw → Kalman → **Moving Average** → Display.
+
+### ✨ Improvements
+
+- **Viewport Bounding:** Predictions are now clamped to the viewport boundaries.
+- **Optimized Measurement Noise:** Reduced measurement noise from 47 to 25 for faster, more responsive tracking.
+
 ## [0.2.0] - 2025-10-13
 
 ### 🚀 Performance Improvements

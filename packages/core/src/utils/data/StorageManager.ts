@@ -12,6 +12,7 @@ import type { IStorageProvider } from '../../core/types';
  */
 export class StorageManager implements IStorageProvider {
   private readonly storageInstance: LocalForage;
+  private availabilityCheck: Promise<boolean> | null = null;
 
   /**
    * Create a new StorageManager
@@ -155,6 +156,21 @@ export class StorageManager implements IStorageProvider {
    */
   driverName(): string {
     return this.storageInstance.driver();
+  }
+
+  /**
+   * Check whether a usable storage backend is available in the current runtime.
+   * In jsdom/SSR this can legitimately be unavailable, and callers can use this
+   * to skip persistence without treating it as a runtime failure.
+   */
+  async isAvailable(): Promise<boolean> {
+    if (!this.availabilityCheck) {
+      this.availabilityCheck = this.storageInstance.ready()
+        .then(() => true)
+        .catch(() => false);
+    }
+
+    return this.availabilityCheck;
   }
 }
 

@@ -20,3 +20,5 @@ export type {
   GazeRecordingEntry,
   UseGazeRecordingReturn
 } from './useGazeRecording';
+
+export type { UseGazeTrackingReturn } from './useGazeTracking';

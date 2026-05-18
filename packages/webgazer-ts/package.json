@@ -1,0 +1,42 @@
+{
+  "name": "webgazer-ts",
+  "version": "0.2.0",
+  "description": "Top-level package facade for webgazer-ts core and React APIs",
+  "type": "module",
+  "license": "GPL-3.0-or-later",
+  "main": "./index.cjs",
+  "module": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "require": "./index.cjs",
+      "types": "./index.d.ts"
+    },
+    "./react": {
+      "import": "./react.js",
+      "require": "./react.cjs",
+      "types": "./react.d.ts"
+    }
+  },
+  "files": [
+    "index.js",
+    "index.cjs",
+    "index.d.ts",
+    "react.js",
+    "react.cjs",
+    "react.d.ts"
+  ],
+  "scripts": {
+    "build": "node -e \"process.stdout.write('webgazer-ts facade ready\\n')\""
+  },
+  "dependencies": {
+    "@webgazer-ts/core": "workspace:*",
+    "@webgazer-ts/react": "workspace:*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jhndrncrz/webgazer-ts.git",
+    "directory": "packages/webgazer-ts"
+  }
+}

@@ -1,7 +1,21 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
+import { copyFileSync, existsSync } from 'fs';
 
 export default defineConfig({
+  plugins: [
+    {
+      name: 'legacy-webgazer-bundle-aliases',
+      writeBundle() {
+        const source = resolve(__dirname, 'dist/webgazer-ts.umd.cjs');
+        const legacyAlias = resolve(__dirname, 'dist/webgazer.js');
+
+        if (existsSync(source)) {
+          copyFileSync(source, legacyAlias);
+        }
+      },
+    },
+  ],
   server: {
     port: 5173,
     open: true
@@ -9,6 +23,7 @@ export default defineConfig({
   build: {
     target: 'es2020',
     lib: {
+      // Use the main index as library entry for both ESM and UMD builds
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'webgazer',
       formats: ['es', 'umd'],
@@ -16,33 +31,23 @@ export default defineConfig({
     },
     rollupOptions: {
       // Bundle ALL dependencies for true drop-in replacement
-      // Everything (TensorFlow.js, Face Landmarks Detection, LocalForage, etc.) is bundled
       output: {
-        // Use named exports but include a footer to ensure window.webgazer is the default
+        // For UMD format: expose named exports AND assign the default instance to window.webgazer
         exports: 'named',
         extend: true,
-        // Add footer to unwrap the default export for drop-in replacement
+        // Reliable footer: if there's a `default` export in the UMD bundle,
+        // assign it to window.webgazer so script-tag usage works.
+        // `webgazer` here refers to the UMD global name set by `name: 'webgazer'` above.
         footer: `
-// Drop-in replacement compatibility: Unwrap default export to window.webgazer
-if (typeof window !== 'undefined' && typeof webgazer !== 'undefined' && webgazer.default) {
-  // Replace the module object with the default export directly
-  const instance = webgazer.default;
-  for (const key in webgazer) {
-    if (key !== 'default') {
-      instance[key] = webgazer[key];
-    }
-  }
-  if (typeof define === 'function' && define.amd) {
-    // For AMD, return the instance
-  } else if (typeof module !== 'undefined' && module.exports) {
-    // For CommonJS, export the instance
-    module.exports = instance;
-  } else {
-    // For browser globals, replace window.webgazer with the instance
-    window.webgazer = instance;
+// Drop-in replacement: assign the default Webgazer instance to window.webgazer
+if (typeof window !== 'undefined') {
+  if (typeof webgazer !== 'undefined' && webgazer['default']) {
+    window['webgazer'] = webgazer['default'];
+  } else if (typeof webgazer !== 'undefined') {
+    window['webgazer'] = webgazer;
   }
 }
-        `.trim()
+`.trim()
       }
     }
   }

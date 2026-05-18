@@ -27,6 +27,7 @@ import { RidgeThreadedRegressor } from './regressors/RidgeThreadedRegressor';
  * facial landmarks and extract eye features.
  */
 Webgazer.addTrackerModule('TFFacemesh', TensorFlowFaceMeshTracker);
+Webgazer.addTrackerModule('TFFaceMesh', TensorFlowFaceMeshTracker);
 
 /**
  * Register the Ridge Regression regressor (basic implementation).
@@ -40,6 +41,7 @@ Webgazer.addRegressionModule('ridge', RidgeRegressor);
  * to recent calibration data.
  */
 Webgazer.addRegressionModule('weightedRidge', RidgeWeightedRegressor);
+Webgazer.addRegressionModule('ridgeWeighted', RidgeWeightedRegressor);
 
 /**
  * Register the Threaded Ridge Regression regressor.
@@ -47,6 +49,7 @@ Webgazer.addRegressionModule('weightedRidge', RidgeWeightedRegressor);
  * with automatic fallback to synchronous computation.
  */
 Webgazer.addRegressionModule('threadedRidge', RidgeThreadedRegressor);
+Webgazer.addRegressionModule('ridgeThreaded', RidgeThreadedRegressor);
 
 // ============================================================================
 // Get Singleton Instance
@@ -186,26 +189,13 @@ export type {
 } from './utils/filters/types';
 
 // ============================================================================
-// Browser Compatibility Check
+// Browser Compatibility Check (on-demand only)
 // ============================================================================
-
-/**
- * Automatically check browser compatibility when the module is loaded.
- * This will log warnings to the console if any required features are missing.
- */
-if (typeof window !== 'undefined') {
-  // Check compatibility and log info
-  const isCompatible = webgazer.detectCompatibility();
-  
-  if (!isCompatible) {
-    console.warn('⚠️ Webgazer: Browser compatibility issues detected.');
-    console.warn('Run webgazer.getCompatibilityWarnings() for details.');
-  } else {
-    console.log('✅ Webgazer: Browser is compatible!');
-  }
-  
-  // Log detailed compatibility info in development mode
-  // if (process.env.NODE_ENV === 'development') {
-  //   webgazer.logCompatibilityInfo();
-  // }
-}
+// Automatic check is intentionally NOT run at import time to avoid:
+//  - Noise in SSR / Node.js environments
+//  - Console output in test environments
+//  - Unexpected side-effects when the library is imported
+//
+// Users can manually check compatibility by calling:
+//   webgazer.detectCompatibility()
+//   webgazer.getCompatibilityWarnings()

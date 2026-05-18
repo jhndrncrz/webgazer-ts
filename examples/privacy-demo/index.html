@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WebGazer-TS — Privacy &amp; Consent</title>
+  <meta name="description" content="Privacy information for WebGazer-TS: what data is collected, how it is used, and how to opt out." />
+  <style>
+    :root {
+      --bg: #0c0e1a;
+      --surface: #13162b;
+      --surface2: #1a1f38;
+      --accent: #6366f1;
+      --accent2: #8b5cf6;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --green: #22c55e;
+      --yellow: #eab308;
+      --red: #ef4444;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      background: linear-gradient(135deg, #1a1f38, #13162b);
+      border-bottom: 1px solid #2d3152;
+      padding: 2.5rem 2rem;
+      text-align: center;
+    }
+    header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.4rem;
+    }
+    header p { color: var(--muted); font-size: 0.95rem; }
+    main { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+    .card {
+      background: var(--surface);
+      border: 1px solid #2d3152;
+      border-radius: var(--radius);
+      padding: 1.5rem 2rem;
+    }
+    .card-icon { font-size: 1.6rem; margin-bottom: 0.75rem; }
+    .card h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; }
+    .card p, .card li { font-size: 0.88rem; color: var(--muted); line-height: 1.75; }
+    .card ul { padding-left: 1.2rem; }
+    .card li { margin-bottom: 0.25rem; }
+    .highlight {
+      background: var(--surface2);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.85rem;
+      color: var(--text);
+    }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .flow-step {
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+    }
+    .flow-step .num {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 0.5rem;
+    }
+    .flow-step p { font-size: 0.78rem; color: var(--muted); }
+    .badge-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--surface2);
+      border: 1px solid #2d3152;
+      border-radius: 999px;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.78rem;
+      color: var(--text);
+    }
+    .badge.green { border-color: var(--green); color: var(--green); }
+    .badge.accent { border-color: var(--accent); color: var(--accent); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 0.75rem; }
+    th { background: var(--surface2); color: var(--muted); font-weight: 600; padding: 0.6rem 0.8rem; text-align: left; border-bottom: 1px solid #2d3152; }
+    td { padding: 0.6rem 0.8rem; border-bottom: 1px solid #1e2133; color: var(--muted); }
+    td strong { color: var(--text); }
+    .ok-cell { color: var(--green); font-weight: 600; }
+    .no-cell { color: var(--red); font-weight: 600; }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+      border-top: 1px solid #1e2133;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🔒 Privacy &amp; Camera Consent</h1>
+  <p>Everything you need to know before enabling your webcam for eye tracking</p>
+</header>
+
+<main>
+
+  <!-- TL;DR -->
+  <div class="card">
+    <div class="card-icon">✅</div>
+    <h2>The Short Version</h2>
+    <div class="highlight">
+      <strong>Your webcam video never leaves your device.</strong>
+      All processing happens locally in your browser using TensorFlow.js.
+      No images, video frames, or gaze data are sent to any server.
+    </div>
+    <div class="badge-row">
+      <span class="badge green">✓ 100% local processing</span>
+      <span class="badge green">✓ No data uploaded</span>
+      <span class="badge green">✓ No third-party analytics</span>
+      <span class="badge accent">Open source — GPL-3.0</span>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div class="card">
+    <div class="card-icon">⚙️</div>
+    <h2>How Eye Tracking Works</h2>
+    <p>WebGazer-TS processes your webcam feed locally to estimate where on the screen you're looking.</p>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="num">1</div>
+        <p>Browser captures webcam frames</p>
+      </div>
+      <div class="flow-step">
+        <div class="num">2</div>
+        <p>TF.js detects face landmarks in your browser</p>
+      </div>
+      <div class="flow-step">
+        <div class="num">3</div>
+        <p>Eye regions extracted locally</p>
+      </div>
+      <div class="flow-step">
+        <div class="num">4</div>
+        <p>Ridge regression predicts gaze position</p>
+      </div>
+      <div class="flow-step">
+        <div class="num">5</div>
+        <p>x, y coordinates passed to your callback</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- What is / is not collected -->
+  <div class="card">
+    <div class="card-icon">📊</div>
+    <h2>What Is (and Isn't) Collected</h2>
+    <table>
+      <thead>
+        <tr><th>Data</th><th>Collected?</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Video frames</strong></td><td class="ok-cell">Local only</td><td>Processed in browser, never uploaded</td></tr>
+        <tr><td><strong>Face landmarks</strong></td><td class="ok-cell">Local only</td><td>Computed by TF.js, not persisted</td></tr>
+        <tr><td><strong>Gaze coordinates</strong></td><td class="ok-cell">Local only</td><td>Available in your JS callback only</td></tr>
+        <tr><td><strong>Calibration data</strong></td><td class="ok-cell">Local storage</td><td>Stored in your browser's localforage (optional)</td></tr>
+        <tr><td><strong>Camera feed uploaded</strong></td><td class="no-cell">Never</td><td>No WebSocket or HTTP upload</td></tr>
+        <tr><td><strong>Identity / biometrics</strong></td><td class="no-cell">Never</td><td>Not derived or stored</td></tr>
+        <tr><td><strong>Analytics/tracking pixels</strong></td><td class="no-cell">None</td><td>This library has no analytics dependencies</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Camera permission -->
+  <div class="card">
+    <div class="card-icon">📷</div>
+    <h2>Camera Permission</h2>
+    <ul>
+      <li>The browser will ask for camera permission when <code>webgazer.begin()</code> is called — not before.</li>
+      <li>You can check the current permission state without triggering a prompt: <code>webgazer.checkCameraPermission()</code></li>
+      <li>Denying permission is handled gracefully — tracking will not start and your page won't crash.</li>
+      <li>You can revoke camera access at any time via your browser's site settings.</li>
+      <li>Calling <code>webgazer.end()</code> stops the camera stream and removes all DOM elements.</li>
+    </ul>
+    <div class="highlight" style="margin-top:1rem">
+      HTTPS or <code>localhost</code> is required for camera access. This is a browser security requirement, not specific to this library.
+    </div>
+  </div>
+
+  <!-- Attribution -->
+  <div class="card">
+    <div class="card-icon">📚</div>
+    <h2>Attribution &amp; Original Project</h2>
+    <p>
+      <strong>WebGazer-TS</strong> is a TypeScript rewrite of
+      <a href="https://webgazer.cs.brown.edu" target="_blank">WebGazer.js</a>
+      by Brown University's Human-Computer Interaction Group.
+      All credit for the core methodology belongs to the original team.
+    </p>
+    <br/>
+    <p>If you use this in academic work, please cite the original WebGazer.js paper:</p>
+    <div class="highlight" style="font-family:monospace;font-size:0.78rem;white-space:pre-wrap">Papoutsaki, A., Sangkloy, P., Laskey, J., Daskalova, N.,
+Huang, J., and Hays, J. WebGazer: Scalable Webcam Eye
+Tracking Using User Interactions. IJCAI 2016.</div>
+    <div class="badge-row" style="margin-top:0.75rem">
+      <a class="badge" href="https://webgazer.cs.brown.edu" target="_blank">Original WebGazer.js ↗</a>
+      <a class="badge" href="https://github.com/brownhci/webgazer" target="_blank">Original GitHub ↗</a>
+      <a class="badge" href="https://github.com/jhndrncrz/webgazer-ts" target="_blank">webgazer-ts GitHub ↗</a>
+    </div>
+  </div>
+
+  <!-- License -->
+  <div class="card">
+    <div class="card-icon">⚖️</div>
+    <h2>License</h2>
+    <p>
+      WebGazer-TS is released under the <strong>GPL-3.0-or-later</strong> license,
+      matching the original WebGazer.js license. This means you can freely use, modify,
+      and distribute the code, provided derivative works are also open source under the same terms.
+    </p>
+    <br/>
+    <p>
+      The original WebGazer.js also offers an <strong>LGPL-3.0</strong> option for companies
+      valued under $1M. For commercial licensing inquiries for the original library, contact
+      <a href="mailto:webgazer@lists.cs.brown.edu">webgazer@lists.cs.brown.edu</a>.
+    </p>
+  </div>
+
+</main>
+
+<footer>
+  WebGazer-TS — A TypeScript port of Brown HCI's WebGazer.js •
+  <a href="https://github.com/jhndrncrz/webgazer-ts">GitHub</a> •
+  <a href="https://webgazer.cs.brown.edu">Original Project</a>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WebGazer-TS — Script Tag Drop-in Demo</title>
+  <meta name="description" content="Demonstrates webgazer-ts as a drop-in replacement for the original WebGazer.js using a script tag and window.webgazer." />
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --accent: #6366f1;
+      --accent2: #8b5cf6;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --green: #22c55e;
+      --yellow: #eab308;
+      --red: #ef4444;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.25rem;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+    .badge {
+      display: inline-block;
+      background: var(--surface2);
+      border: 1px solid #3f4468;
+      color: var(--accent);
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      margin-bottom: 0.5rem;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      max-width: 900px;
+    }
+    @media (max-width: 640px) { .layout { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--surface);
+      border: 1px solid #2d3152;
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+    .card h2 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; }
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--muted);
+      flex-shrink: 0;
+      transition: background 0.3s;
+    }
+    .dot.green { background: var(--green); box-shadow: 0 0 8px var(--green); }
+    .dot.yellow { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); }
+    .dot.red { background: var(--red); box-shadow: 0 0 8px var(--red); }
+    .status-label { font-size: 0.85rem; color: var(--muted); }
+    .gaze-display {
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+      margin: 1rem 0;
+    }
+    .gaze-coord {
+      font-size: 2rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--accent);
+      letter-spacing: -1px;
+    }
+    .gaze-label { font-size: 0.75rem; color: var(--muted); margin-top: 0.25rem; }
+    .btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
+    button {
+      padding: 0.5rem 1.1rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    button:active { transform: scale(0.97); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+    }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid #3f4468;
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-danger {
+      background: #3f1f1f;
+      color: var(--red);
+      border: 1px solid #5f2020;
+    }
+    .btn-danger:hover { border-color: var(--red); }
+    button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    code {
+      font-family: 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.8rem;
+      background: var(--bg);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      color: #a78bfa;
+    }
+    pre {
+      background: var(--bg);
+      border: 1px solid #2d3152;
+      border-radius: 8px;
+      padding: 1rem;
+      font-size: 0.75rem;
+      overflow-x: auto;
+      color: #c4c4ff;
+      line-height: 1.6;
+    }
+    .permission-box {
+      background: #1a1f2e;
+      border: 1px solid #2d3152;
+      border-radius: 8px;
+      padding: 1rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .permission-box strong { color: var(--text); }
+    #gazeTrail {
+      position: fixed;
+      pointer-events: none;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 9999;
+    }
+    .log {
+      max-height: 140px;
+      overflow-y: auto;
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-family: monospace;
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 0.75rem;
+    }
+    .log div { margin-bottom: 0.2rem; }
+    .log .ok { color: var(--green); }
+    .log .err { color: var(--red); }
+    .log .info { color: #6366f1; }
+  </style>
+</head>
+<body>
+
+<span class="badge">Drop-in Replacement Demo</span>
+<h1>WebGazer-TS Script Tag Demo</h1>
+<p class="subtitle">Uses <code>window.webgazer</code> — identical to original WebGazer.js usage</p>
+
+<div class="layout">
+  <!-- Status + controls -->
+  <div class="card">
+    <h2>🎯 Gaze Tracking</h2>
+
+    <div class="status-row">
+      <div class="dot" id="statusDot"></div>
+      <span class="status-label" id="statusText">Not started</span>
+    </div>
+
+    <div class="gaze-display">
+      <div class="gaze-coord" id="gazeCoord">—, —</div>
+      <div class="gaze-label">Gaze position (pixels from top-left)</div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn-primary" id="btnStart" onclick="startTracking()">Start Tracking</button>
+      <button class="btn-secondary" id="btnPause" onclick="pauseTracking()" disabled>Pause</button>
+      <button class="btn-secondary" id="btnResume" onclick="resumeTracking()" disabled>Resume</button>
+      <button class="btn-danger" id="btnStop" onclick="stopTracking()" disabled>Stop</button>
+    </div>
+  </div>
+
+  <!-- How this works -->
+  <div class="card">
+    <h2>📋 How It Works</h2>
+    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:0.75rem;">
+      This page uses the UMD bundle exactly like the original WebGazer.js:
+    </p>
+    <pre>&lt;script src="webgazer.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  // window.webgazer is available ✓
+  webgazer
+    .setGazeListener((data, t) =&gt; {
+      if (data) {
+        console.log(data.x, data.y);
+      }
+    })
+    .begin();
+&lt;/script&gt;</pre>
+  </div>
+
+  <!-- Permission explanation -->
+  <div class="card">
+    <h2>🔒 Camera &amp; Privacy</h2>
+    <div class="permission-box">
+      <strong>What happens when you click "Start":</strong><br/><br/>
+      1. Your browser asks for webcam permission.<br/>
+      2. The video stream is processed <strong>entirely in your browser</strong>.<br/>
+      3. TensorFlow.js detects your face landmarks locally.<br/>
+      4. <strong>No video, images, or gaze data ever leave your device.</strong><br/><br/>
+      Based on <a href="https://webgazer.cs.brown.edu" style="color:var(--accent)">Brown HCI WebGazer.js</a>.
+    </div>
+  </div>
+
+  <!-- Event log -->
+  <div class="card">
+    <h2>📝 Event Log</h2>
+    <div class="log" id="eventLog">
+      <div class="info">[init] Page loaded. Click "Start Tracking" to begin.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Visual gaze trail canvas -->
+<canvas id="gazeTrail"></canvas>
+
+<!--
+  In a real deployment, replace this path with the CDN URL:
+  https://unpkg.com/@webgazer-ts/core@latest/dist/webgazer.js
+-->
+<script src="../../packages/core/dist/webgazer.js"></script>
+<script>
+// ============================================================================
+// Demo logic — uses window.webgazer exactly as original WebGazer.js docs show
+// ============================================================================
+
+const log = (msg, type = 'info') => {
+  const el = document.getElementById('eventLog');
+  const div = document.createElement('div');
+  div.className = type;
+  div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+  el.prepend(div);
+};
+
+function setStatus(text, dotClass) {
+  document.getElementById('statusText').textContent = text;
+  const dot = document.getElementById('statusDot');
+  dot.className = 'dot ' + dotClass;
+}
+
+function updateButtons(state) {
+  document.getElementById('btnStart').disabled = state !== 'idle';
+  document.getElementById('btnPause').disabled = state !== 'running';
+  document.getElementById('btnResume').disabled = state !== 'paused';
+  document.getElementById('btnStop').disabled = state === 'idle';
+}
+
+// Gaze trail
+const canvas = document.getElementById('gazeTrail');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+let trailPoints = [];
+function drawTrail(x, y) {
+  trailPoints.push({ x, y, t: Date.now() });
+  // Keep last 30 points
+  const now = Date.now();
+  trailPoints = trailPoints.filter(p => now - p.t < 1500);
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  trailPoints.forEach((p, i) => {
+    const alpha = (i / trailPoints.length) * 0.6;
+    const r = 4 + (i / trailPoints.length) * 8;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(99, 102, 241, ${alpha})`;
+    ctx.fill();
+  });
+}
+
+// ============================================================================
+// Original WebGazer.js API — exact same pattern as docs
+// ============================================================================
+
+async function startTracking() {
+  log('Requesting camera access…', 'info');
+  setStatus('Initializing…', 'yellow');
+  updateButtons('starting');
+
+  try {
+    // This is the exact original WebGazer.js API pattern:
+    await webgazer
+      .setGazeListener((data, elapsedTime) => {
+        if (data == null) return;
+        document.getElementById('gazeCoord').textContent =
+          `${Math.round(data.x)}, ${Math.round(data.y)}`;
+        drawTrail(data.x, data.y);
+      })
+      .begin();
+
+    webgazer
+      .showVideo(true)
+      .showFaceOverlay(true)
+      .showFaceFeedbackBox(true)
+      .showPredictionPoints(true);
+
+    log('✓ Tracking started! Move your eyes around.', 'ok');
+    setStatus('Running', 'green');
+    updateButtons('running');
+  } catch (err) {
+    log('✗ Failed: ' + err.message, 'err');
+    setStatus('Error — check camera permission', 'red');
+    updateButtons('idle');
+  }
+}
+
+function pauseTracking() {
+  webgazer.pause();
+  log('Paused.', 'info');
+  setStatus('Paused', 'yellow');
+  updateButtons('paused');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+async function resumeTracking() {
+  await webgazer.resume();
+  log('Resumed.', 'info');
+  setStatus('Running', 'green');
+  updateButtons('running');
+}
+
+function stopTracking() {
+  webgazer.clearGazeListener().end();
+  log('Stopped.', 'info');
+  setStatus('Stopped', '');
+  updateButtons('idle');
+  document.getElementById('gazeCoord').textContent = '—, —';
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+</script>
+</body>
+</html>

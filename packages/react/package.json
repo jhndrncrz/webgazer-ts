@@ -42,10 +42,11 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@webgazer-ts/core": "^0.2.0"
+    "@webgazer-ts/core": "workspace:*"
   },
   "peerDependencies": {
     "react": ">=17.0.0",
@@ -58,6 +59,7 @@
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.3",
+    "@vitest/coverage-v8": "^3.2.4",
     "@vitest/ui": "^3.2.4",
     "jsdom": "^27.0.0",
     "react": "^18.3.1",

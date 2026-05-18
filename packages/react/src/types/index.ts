@@ -23,7 +23,7 @@ export interface WebgazerModule {
 
 export interface WebgazerConfig {
   tracker?: 'TFFacemesh';
-  regression?: 'ridge' | 'ridgeThreaded' | 'ridgeWeighted';
+  regression?: 'ridge' | 'weightedRidge' | 'threadedRidge' | 'ridgeWeighted' | 'ridgeThreaded';
   saveDataAcrossSessions?: boolean;
   videoViewerWidth?: number;
   videoViewerHeight?: number;

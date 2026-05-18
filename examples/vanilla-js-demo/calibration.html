@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebGazer.js 9-Point Calibration Demo</title>
+    <script src="../../packages/core/dist/webgazer.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: sans-serif;
+        }
+        .calibration-point {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: red;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            z-index: 1000;
+            opacity: 0.2;
+            transition: opacity 0.3s, background-color 0.3s;
+        }
+        .calibration-point:hover {
+            opacity: 1;
+        }
+        .calibration-point.calibrated {
+            background-color: yellow;
+            opacity: 1;
+        }
+        .calibration-point.finished {
+            background-color: green;
+        }
+        #instructions {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            z-index: 2000;
+        }
+        #gaze-dot {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 0, 0, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="instructions">
+    <h1>Calibration Demo</h1>
+    <p>Please click on each of the 9 red points 5 times each.</p>
+    <p>The points will turn yellow while you click, and green when done.</p>
+    <button id="start-btn">Start Calibration</button>
+</div>
+
+<div id="gaze-dot"></div>
+
+<!-- 9 Points -->
+<button class="calibration-point" id="pt1" style="top: 10%; left: 10%;" data-clicks="0"></button>
+<button class="calibration-point" id="pt2" style="top: 10%; left: 50%;" data-clicks="0"></button>
+<button class="calibration-point" id="pt3" style="top: 10%; left: 90%;" data-clicks="0"></button>
+<button class="calibration-point" id="pt4" style="top: 50%; left: 10%;" data-clicks="0"></button>
+<button class="calibration-point" id="pt5" style="top: 50%; left: 50%;" data-clicks="0"></button>
+<button class="calibration-point" id="pt6" style="top: 50%; left: 90%;" data-clicks="0"></button>
+<button class="calibration-point" id="pt7" style="top: 90%; left: 10%;" data-clicks="0"></button>
+<button class="calibration-point" id="pt8" style="top: 90%; left: 50%;" data-clicks="0"></button>
+<button class="calibration-point" id="pt9" style="top: 90%; left: 90%;" data-clicks="0"></button>
+
+<script>
+    const CLICKS_REQUIRED = 5;
+    let calibratedPoints = 0;
+
+    document.getElementById('start-btn').addEventListener('click', async () => {
+        document.getElementById('instructions').style.display = 'none';
+        
+        await window.webgazer.setRegression('ridge')
+            .showVideo(true)
+            .showFaceOverlay(true)
+            .showPredictionPoints(false)
+            .begin();
+
+        window.webgazer.setGazeListener((data) => {
+            if (data) {
+                const dot = document.getElementById('gaze-dot');
+                dot.style.display = 'block';
+                dot.style.left = data.x + 'px';
+                dot.style.top = data.y + 'px';
+            }
+        });
+    });
+
+    document.querySelectorAll('.calibration-point').forEach(pt => {
+        pt.addEventListener('click', (e) => {
+            let clicks = parseInt(pt.getAttribute('data-clicks'));
+            clicks++;
+            pt.setAttribute('data-clicks', clicks);
+
+            if (clicks < CLICKS_REQUIRED) {
+                pt.classList.add('calibrated');
+            } else {
+                pt.classList.add('finished');
+                pt.disabled = true;
+                calibratedPoints++;
+            }
+
+            if (calibratedPoints === 9) {
+                alert('Calibration complete! You can now move your eyes around to see the prediction.');
+                window.webgazer.showPredictionPoints(true);
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

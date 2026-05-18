@@ -148,16 +148,57 @@ webgazer.setCameraConstraints(constraints);
 Optimize for your use case:
 
 ```typescript
-// Reduce prediction frequency (ms, default: 16)
+// Set maximum frame rate (default: 60)
+webgazer.setMaxFPS(30);
+
+// Or set by interval in ms
 webgazer.setPredictionInterval(33); // ~30 FPS
 
-// Skip frames for face detection
-webgazer.setFaceDetectionInterval(3); // Every 3rd frame
+// Skip frames for face detection (for slow devices)
+// 1 = every frame, 2 = every other frame, etc.
+webgazer.setFaceDetectionInterval(2);
+```
+
+## Logging & Debugging
+
+Control console output:
+
+```typescript
+// Set log level ('debug' | 'info' | 'warn' | 'error' | 'none')
+webgazer.setLogLevel('debug');
+
+// Legacy alias for setLogLevel('debug')
+webgazer.setDebugMode(true);
+```
+
+## Quality of Life Features
+
+### Auto-Pause on Blur
+
+Automatically stop tracking when the user switches tabs to save battery and respect privacy.
+
+```typescript
+webgazer.setAutoPauseOnBlur(true);
+```
+
+## Smoothing & Filtering
+
+Reduce jitter in gaze predictions:
+
+```typescript
+// Choose smoothing algorithm ('average' | 'kalman' | 'ema')
+webgazer.setSmoothingType('ema');
+
+// Configure Exponential Moving Average (EMA) strength (0-1)
+webgazer.setEMAAlpha(0.2);
+
+// Enable/disable Kalman filter
+webgazer.applyKalmanFilter(true);
 ```
 
 ## Event Callbacks
 
-Hook into Webgazer lifecycle:
+Hook into Webgazer lifecycle using the EventEmitter style:
 
 ```typescript
 // When tracking starts
@@ -165,25 +206,12 @@ webgazer.on('start', () => {
   console.log('Tracking started');
 });
 
-// When face is detected/lost
-webgazer.on('faceDetected', () => {
-  console.log('Face found');
-});
-
-webgazer.on('faceLost', () => {
-  console.log('Face lost');
-});
-
 // When prediction updates
 webgazer.on('prediction', (data) => {
   console.log('New prediction:', data);
 });
-
-// On errors
-webgazer.on('error', (error) => {
-  console.error('Webgazer error:', error);
-});
 ```
+
 
 ## Advanced Configuration
 

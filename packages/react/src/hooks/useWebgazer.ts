@@ -32,6 +32,8 @@ export function useWebgazer(options: UseWebgazerOptions = {}): UseWebgazerReturn
   const [calibrationCount, setCalibrationCount] = useState(0);
   const webgazerRef = useRef<WebgazerInstance | null>(null);
   const gazeListenerRef = useRef<GazeCallback | null>(null);
+  // Track whether begin() has fully resolved, so cleanup doesn't call end() prematurely
+  const hasStartedRef = useRef(false);
 
   // Initialize Webgazer
   useEffect(() => {
@@ -72,13 +74,22 @@ export function useWebgazer(options: UseWebgazerOptions = {}): UseWebgazerReturn
           if (mounted && webgazerRef.current) {
             const points = webgazer.getStoredPoints();
             // getStoredPoints returns [xArray, yArray], so count is length of either array
-            setCalibrationCount(points && points[0] ? points[0].length : 0);
+            if (mounted) {
+              setCalibrationCount(points && points[0] ? points[0].length : 0);
+            }
           }
         }, 1000);
 
         // Auto-start if requested
         if (autoStart) {
           await webgazer.begin();
+          // Guard: component may have unmounted while begin() was awaiting
+          if (!mounted) {
+            webgazer.clearGazeListener();
+            webgazer.end();
+            return;
+          }
+          hasStartedRef.current = true;
           setIsRunning(true);
 
           // Apply video preview settings
@@ -109,7 +120,12 @@ export function useWebgazer(options: UseWebgazerOptions = {}): UseWebgazerReturn
       }
       if (webgazerRef.current) {
         webgazerRef.current.clearGazeListener();
-        webgazerRef.current.end();
+        // Only call end() if begin() actually completed to avoid calling end() on a
+        // half-initialized or never-started instance
+        if (hasStartedRef.current) {
+          webgazerRef.current.end();
+          hasStartedRef.current = false;
+        }
       }
     };
   }, []); // Only run once on mount
@@ -120,6 +136,7 @@ export function useWebgazer(options: UseWebgazerOptions = {}): UseWebgazerReturn
     
     try {
       await webgazerRef.current.begin();
+      hasStartedRef.current = true;
       setIsRunning(true);
 
       if (showVideoPreview) {

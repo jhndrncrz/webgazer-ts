@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WebGazer-TS — Advanced Module Demo</title>
+  <meta name="description" content="Demonstrates switching regression models and adding custom modules in WebGazer-TS." />
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --accent: #6366f1;
+      --accent2: #8b5cf6;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --green: #22c55e;
+      --yellow: #eab308;
+      --red: #ef4444;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.25rem;
+    }
+    .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+    .badge {
+      display: inline-block;
+      background: var(--surface2);
+      border: 1px solid #3f4468;
+      color: var(--accent);
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      margin-bottom: 0.5rem;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 1.5rem;
+      max-width: 960px;
+    }
+    @media (max-width: 700px) { .layout { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--surface);
+      border: 1px solid #2d3152;
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+    .card h2 { font-size: 0.95rem; font-weight: 600; margin-bottom: 1rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .field { margin-bottom: 1.2rem; }
+    label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 0.4rem; font-weight: 500; }
+    select, input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid #2d3152;
+      border-radius: 8px;
+      color: var(--text);
+      padding: 0.5rem 0.75rem;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    select:focus, input:focus { border-color: var(--accent); }
+    .btn {
+      width: 100%;
+      padding: 0.6rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; }
+    .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid #3f4468; }
+    .btn-secondary:hover { border-color: var(--accent); }
+    .btn-danger { background: #2a1010; color: var(--red); border: 1px solid #5f1515; }
+    button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .sep { height: 1px; background: #2d3152; margin: 1rem 0; }
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--surface2);
+      border: 1px solid #2d3152;
+      border-radius: 99px;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+    .dot.green { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .dot.yellow { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); }
+    .metric {
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+      margin-bottom: 0.75rem;
+    }
+    .metric-val { font-size: 2rem; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+    .metric-label { font-size: 0.72rem; color: var(--muted); margin-top: 0.15rem; }
+    .metrics-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    pre {
+      background: var(--bg);
+      border: 1px solid #2d3152;
+      border-radius: 8px;
+      padding: 1rem;
+      font-size: 0.72rem;
+      overflow-x: auto;
+      color: #a5b4fc;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+    .log {
+      max-height: 180px;
+      overflow-y: auto;
+      font-size: 0.72rem;
+      font-family: monospace;
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 0.75rem;
+      color: var(--muted);
+    }
+    .log .ok { color: var(--green); }
+    .log .err { color: var(--red); }
+    .log .info { color: #818cf8; }
+    .log .warn { color: var(--yellow); }
+  </style>
+</head>
+<body>
+
+<span class="badge">Advanced Module Demo</span>
+<h1>Regression &amp; Tracker Modules</h1>
+<p class="subtitle">Switch algorithms at runtime and register custom modules</p>
+
+<div class="layout">
+
+  <!-- Left: Controls -->
+  <div style="display:flex;flex-direction:column;gap:1rem">
+    <div class="card">
+      <h2>Configuration</h2>
+
+      <div class="field">
+        <label>Tracker</label>
+        <select id="trackerSel">
+          <option value="TFFacemesh">TFFacemesh (default)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Regression Model</label>
+        <select id="regressionSel">
+          <option value="ridge">ridge (standard)</option>
+          <option value="weightedRidge">weightedRidge (time-weighted)</option>
+          <option value="threadedRidge">threadedRidge (Web Worker)</option>
+        </select>
+      </div>
+
+      <div class="sep"></div>
+      <button class="btn btn-primary" id="btnStart" onclick="startTracking()">Start Tracking</button>
+      <div style="height:0.5rem"></div>
+      <button class="btn btn-secondary" id="btnSwitch" onclick="switchRegression()" disabled>Switch Regression</button>
+      <div style="height:0.5rem"></div>
+      <button class="btn btn-danger" id="btnStop" onclick="stopTracking()" disabled>Stop</button>
+    </div>
+
+    <div class="card">
+      <h2>Custom Module</h2>
+      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:0.75rem">
+        Register a mock regression module at runtime using<br/>
+        <code style="font-size:0.75rem;background:#0f1117;padding:0.1rem 0.3rem;border-radius:4px;color:#a78bfa">webgazer.addRegressionModule(name, Ctor)</code>
+      </p>
+      <button class="btn btn-secondary" onclick="registerMockModule()">Register 'mockReg'</button>
+    </div>
+  </div>
+
+  <!-- Right: Info -->
+  <div style="display:flex;flex-direction:column;gap:1rem">
+    <div class="card">
+      <div class="status-chip">
+        <div class="dot" id="statusDot"></div>
+        <span id="statusText">Not started</span>
+      </div>
+
+      <div class="metrics-row">
+        <div class="metric">
+          <div class="metric-val" id="gazeX">—</div>
+          <div class="metric-label">Gaze X (px)</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val" id="gazeY">—</div>
+          <div class="metric-label">Gaze Y (px)</div>
+        </div>
+      </div>
+
+      <div class="metrics-row">
+        <div class="metric">
+          <div class="metric-val" id="activeReg" style="font-size:0.9rem">—</div>
+          <div class="metric-label">Active Regression</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val" id="calCount">0</div>
+          <div class="metric-label">Training Points</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Example Code</h2>
+      <pre id="codeDisplay">// Select a configuration and start tracking</pre>
+    </div>
+
+    <div class="card">
+      <h2>Event Log</h2>
+      <div class="log" id="eventLog">
+        <div class="info">[init] Ready. Configure and click Start.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="../../packages/core/dist/webgazer.js"></script>
+<script>
+let currentRegression = 'ridge';
+let calInterval = null;
+
+const codeExamples = {
+  ridge: `// Standard Ridge Regression
+webgazer
+  .setTracker('TFFacemesh')
+  .setRegression('ridge')
+  .setGazeListener((data, t) => {
+    if (data) console.log(data.x, data.y);
+  })
+  .begin();`,
+  weightedRidge: `// Time-Weighted Ridge Regression
+// Recent clicks get more weight
+webgazer
+  .setTracker('TFFacemesh')
+  .setRegression('weightedRidge')
+  .begin();`,
+  threadedRidge: `// Threaded Ridge Regression
+// Uses Web Worker when available
+webgazer
+  .setTracker('TFFacemesh')
+  .setRegression('threadedRidge')
+  .begin();`,
+};
+
+function log(msg, type = 'info') {
+  const el = document.getElementById('eventLog');
+  const div = document.createElement('div');
+  div.className = type;
+  div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+  el.prepend(div);
+}
+
+function setStatus(text, dotClass) {
+  document.getElementById('statusText').textContent = text;
+  const dot = document.getElementById('statusDot');
+  dot.className = 'dot ' + dotClass;
+}
+
+function updateCodeDisplay() {
+  const reg = document.getElementById('regressionSel').value;
+  document.getElementById('codeDisplay').textContent = codeExamples[reg] || '// Custom module';
+}
+
+document.getElementById('regressionSel').addEventListener('change', updateCodeDisplay);
+updateCodeDisplay();
+
+async function startTracking() {
+  const tracker = document.getElementById('trackerSel').value;
+  const regression = document.getElementById('regressionSel').value;
+  currentRegression = regression;
+
+  log(`Starting with tracker=${tracker}, regression=${regression}`, 'info');
+  setStatus('Initializing…', 'yellow');
+
+  document.getElementById('btnStart').disabled = true;
+
+  try {
+    await webgazer
+      .setTracker(tracker)
+      .setRegression(regression)
+      .saveDataAcrossSessions(false)
+      .showVideo(true)
+      .showFaceOverlay(true)
+      .showPredictionPoints(true)
+      .setGazeListener((data) => {
+        if (data) {
+          document.getElementById('gazeX').textContent = Math.round(data.x);
+          document.getElementById('gazeY').textContent = Math.round(data.y);
+        }
+      })
+      .begin();
+
+    document.getElementById('activeReg').textContent = regression;
+    setStatus('Running — ' + regression, 'green');
+    document.getElementById('btnStop').disabled = false;
+    document.getElementById('btnSwitch').disabled = false;
+    log('✓ Started!', 'ok');
+
+    calInterval = setInterval(() => {
+      const count = webgazer.getCalibrationDataCount?.() ?? '?';
+      document.getElementById('calCount').textContent = count;
+    }, 1000);
+  } catch (err) {
+    log('✗ ' + err.message, 'err');
+    setStatus('Error', '');
+    document.getElementById('btnStart').disabled = false;
+  }
+}
+
+function switchRegression() {
+  const newReg = document.getElementById('regressionSel').value;
+  if (newReg === currentRegression) {
+    log(`Already using ${newReg}`, 'warn');
+    return;
+  }
+  try {
+    webgazer.setRegression(newReg);
+    currentRegression = newReg;
+    document.getElementById('activeReg').textContent = newReg;
+    log(`✓ Switched to ${newReg}`, 'ok');
+  } catch (err) {
+    log('✗ Switch failed: ' + err.message, 'err');
+  }
+}
+
+function stopTracking() {
+  if (calInterval) clearInterval(calInterval);
+  webgazer.end();
+  setStatus('Stopped', '');
+  document.getElementById('btnStart').disabled = false;
+  document.getElementById('btnStop').disabled = true;
+  document.getElementById('btnSwitch').disabled = true;
+  document.getElementById('gazeX').textContent = '—';
+  document.getElementById('gazeY').textContent = '—';
+  log('Stopped.', 'warn');
+}
+
+function registerMockModule() {
+  // This demonstrates the instance-level addRegressionModule API
+  // (matches original WebGazer: webgazer.addRegressionModule(name, Ctor))
+  class MockRegressor {
+    initialize() { return Promise.resolve(); }
+    predict() { return null; }
+    addData() {}
+    getData() { return {}; }
+    setData() {}
+    updateConfiguration() {}
+  }
+
+  // Instance-level registration — works like original WebGazer.js
+  webgazer.addRegressionModule('mockReg', MockRegressor);
+
+  // Add it to the dropdown
+  const sel = document.getElementById('regressionSel');
+  if (!sel.querySelector('[value="mockReg"]')) {
+    const opt = document.createElement('option');
+    opt.value = 'mockReg';
+    opt.textContent = 'mockReg (custom — returns null)';
+    sel.appendChild(opt);
+  }
+
+  codeExamples.mockReg = `// Register a custom regression module
+// (instance-level API — matches original WebGazer)
+class MyRegressor {
+  initialize() { return Promise.resolve(); }
+  predict(eyeFeatures) { return { x: 0, y: 0 }; }
+  addData(eyes, screen, type) { /* store training data */ }
+  getData() { return this._data; }
+  setData(d) { this._data = d; }
+  updateConfiguration(cfg) {}
+}
+
+webgazer.addRegressionModule('myReg', MyRegressor);
+webgazer.setRegression('myReg');`;
+
+  log("✓ Registered 'mockReg' module. Switch to it in the dropdown.", 'ok');
+  updateCodeDisplay();
+}
+</script>
+</body>
+</html>

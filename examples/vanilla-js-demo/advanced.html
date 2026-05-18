@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Webgazer Advanced Modules Demo</title>
+    <script src="../../packages/core/dist/webgazer.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f0f2f5; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 600px; margin: 0 auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        select, button { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; font-size: 16px; }
+        button { background: #007bff; color: white; border: none; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #0056b3; }
+        #status { margin-top: 20px; padding: 10px; border-radius: 4px; }
+        .running { background: #d4edda; color: #155724; }
+        .stopped { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Advanced Modules Demo</h1>
+        <p>Experiment with different regression models and trackers.</p>
+        
+        <div class="form-group">
+            <label for="regressor">Regression Model:</label>
+            <select id="regressor">
+                <option value="ridge">Standard Ridge (Default)</option>
+                <option value="weightedRidge">Weighted Ridge (Time-weighted)</option>
+                <option value="threadedRidge">Threaded Ridge (Web Worker)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="tracker">Face Tracker:</label>
+            <select id="tracker">
+                <option value="TFFacemesh">TensorFlow FaceMesh (Default)</option>
+            </select>
+        </div>
+
+        <button id="toggleBtn">Start Webgazer</button>
+        
+        <div id="status" class="stopped">Status: Stopped</div>
+        
+        <div style="margin-top: 20px;">
+            <strong>Current Prediction:</strong> <span id="prediction">-</span>
+        </div>
+    </div>
+
+    <script>
+        const regressorSelect = document.getElementById('regressor');
+        const trackerSelect = document.getElementById('tracker');
+        const toggleBtn = document.getElementById('toggleBtn');
+        const statusDiv = document.getElementById('status');
+        const predictionSpan = document.getElementById('prediction');
+        
+        let isRunning = false;
+
+        toggleBtn.addEventListener('click', async () => {
+            if (!isRunning) {
+                const regressor = regressorSelect.value;
+                const tracker = trackerSelect.value;
+                
+                console.log(`Starting with: Tracker=${tracker}, Regressor=${regressor}`);
+                
+                try {
+                    await window.webgazer
+                        .setTracker(tracker)
+                        .setRegression(regressor)
+                        .setGazeListener((data) => {
+                            if (data) {
+                                predictionSpan.innerText = `X: ${Math.round(data.x)}, Y: ${Math.round(data.y)}`;
+                            }
+                        })
+                        .begin();
+                        
+                    isRunning = true;
+                    toggleBtn.innerText = 'Stop Webgazer';
+                    statusDiv.innerText = `Status: Running (${regressor})`;
+                    statusDiv.className = 'running';
+                    regressorSelect.disabled = true;
+                    trackerSelect.disabled = true;
+                } catch (e) {
+                    alert('Initialization failed: ' + e.message);
+                }
+            } else {
+                window.webgazer.end();
+                isRunning = false;
+                toggleBtn.innerText = 'Start Webgazer';
+                statusDiv.innerText = 'Status: Stopped';
+                statusDiv.className = 'stopped';
+                predictionSpan.innerText = '-';
+                regressorSelect.disabled = false;
+                trackerSelect.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

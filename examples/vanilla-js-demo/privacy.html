@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Webgazer Privacy and Consent Demo</title>
+    <script src="../../packages/core/dist/webgazer.js"></script>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 40px; color: #333; background: #fdfdfd; }
+        .consent-box { border: 2px solid #007bff; padding: 30px; border-radius: 12px; background: white; }
+        .privacy-highlight { background: #e7f3ff; padding: 15px; border-left: 5px solid #007bff; margin: 20px 0; }
+        .btn { padding: 12px 24px; font-size: 18px; border-radius: 6px; cursor: pointer; border: none; transition: 0.2s; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-primary:hover { background: #0056b3; }
+        .btn-danger { background: #dc3545; color: white; margin-left: 10px; }
+        #webgazer-container { margin-top: 30px; display: none; }
+    </style>
+</head>
+<body>
+    <div id="consent-view" class="consent-box">
+        <h1>Welcome to Webgazer Privacy Demo</h1>
+        <p>Before we begin, we want to inform you about how your data is handled:</p>
+        
+        <div class="privacy-highlight">
+            <ul>
+                <li><strong>Local Processing:</strong> All eye tracking and video analysis happens entirely within your browser.</li>
+                <li><strong>No Image Uploads:</strong> Your webcam video stream is <u>never</u> sent to any server.</li>
+                <li><strong>Voluntary:</strong> You can stop tracking at any time, which immediately kills the webcam process.</li>
+                <li><strong>Open Source:</strong> This library is fully open source and transparent about its data handling.</li>
+            </ul>
+        </div>
+
+        <p>By clicking "I Consent", you allow this page to access your webcam locally for eye tracking purposes.</p>
+        
+        <button id="consentBtn" class="btn btn-primary">I Consent & Start</button>
+    </div>
+
+    <div id="webgazer-view" style="display: none;">
+        <h1>Tracking Active</h1>
+        <p>You have granted consent. Notice the camera indicator in your browser.</p>
+        <div class="privacy-highlight">
+            <p><strong>Status:</strong> Your video is being processed locally to predict your gaze point.</p>
+        </div>
+        <button id="revokeBtn" class="btn btn-danger">Revoke Consent & Stop</button>
+        
+        <div style="margin-top: 20px; font-size: 24px;">
+            Gaze: <span id="gazeInfo">---</span>
+        </div>
+    </div>
+
+    <script>
+        const consentView = document.getElementById('consent-view');
+        const webgazerView = document.getElementById('webgazer-view');
+        const gazeInfo = document.getElementById('gazeInfo');
+
+        document.getElementById('consentBtn').addEventListener('click', async () => {
+            try {
+                await window.webgazer.begin();
+                consentView.style.display = 'none';
+                webgazerView.style.display = 'block';
+                
+                window.webgazer.setGazeListener((data) => {
+                    if (data) {
+                        gazeInfo.innerText = `X: ${Math.round(data.x)}, Y: ${Math.round(data.y)}`;
+                    }
+                });
+            } catch (e) {
+                alert('Camera access denied or failed: ' + e.message);
+            }
+        });
+
+        document.getElementById('revokeBtn').addEventListener('click', () => {
+            window.webgazer.end();
+            webgazerView.style.display = 'none';
+            consentView.style.display = 'block';
+            alert('Webcam access stopped and consent revoked.');
+        });
+    </script>
+</body>
+</html>

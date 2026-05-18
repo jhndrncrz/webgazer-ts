@@ -38,6 +38,10 @@ export class BrowserCompatibility {
    * Initialize polyfills for requestAnimationFrame and cancelAnimationFrame
    */
   static initializeRequestAnimationFramePolyfill(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     // RequestAnimationFrame polyfill
     if (!window.requestAnimationFrame) {
       window.requestAnimationFrame =
@@ -326,6 +330,10 @@ export class BrowserCompatibility {
    * @returns True if in development
    */
   static isDevelopmentMode(): boolean {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
     return (
       window.location.hostname === 'localhost' ||
       window.location.hostname === '127.0.0.1' ||
@@ -335,7 +343,8 @@ export class BrowserCompatibility {
   }
 }
 
-// Initialize RAF polyfill immediately
-BrowserCompatibility.initializeRequestAnimationFramePolyfill();
+if (typeof window !== 'undefined') {
+  BrowserCompatibility.initializeRequestAnimationFramePolyfill();
+}
 
 export default BrowserCompatibility;

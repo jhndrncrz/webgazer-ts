@@ -33,12 +33,23 @@ export interface CameraConstraints {
 }
 
 /**
+ * Log levels for Webgazer
+ */
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'none';
+
+/**
+ * Smoothing types for gaze prediction
+ */
+export type SmoothingType = 'average' | 'kalman' | 'ema';
+
+/**
  * Configuration data structure for Webgazer
  */
 export interface WebgazerConfigData {
   // Timing parameters
   moveTickSize: number;
   dataTimestep: number;
+  maxFPS: number; // New: Performance throttling
 
   // DOM element IDs
   videoContainerId: string;
@@ -68,11 +79,18 @@ export interface WebgazerConfigData {
 
   // Processing settings
   applyKalmanFilter: boolean;
+  smoothingType: SmoothingType; // New: Feature improvement
+  emaAlpha: number; // New: Feature improvement (for EMA smoothing)
   trackEye: TrackEyeMode;
 
   // Data persistence
   saveDataAcrossSessions: boolean;
   storingPoints: boolean;
+
+  // QoL settings
+  logLevel: LogLevel; // New: Logging improvement
+  autoPauseOnBlur: boolean; // New: QoL improvement
+  faceDetectionInterval: number; // New: Performance improvement
 }
 
 /**
@@ -92,6 +110,7 @@ export class WebgazerConfig implements WebgazerConfigData {
   // Timing parameters
   public moveTickSize: number;
   public dataTimestep: number;
+  public maxFPS: number;
 
   // DOM element IDs
   public videoContainerId: string;
@@ -121,11 +140,18 @@ export class WebgazerConfig implements WebgazerConfigData {
 
   // Processing settings
   public applyKalmanFilter: boolean;
+  public smoothingType: SmoothingType;
+  public emaAlpha: number;
   public trackEye: TrackEyeMode;
 
   // Data persistence
   public saveDataAcrossSessions: boolean;
   public storingPoints: boolean;
+
+  // QoL settings
+  public logLevel: LogLevel;
+  public autoPauseOnBlur: boolean;
+  public faceDetectionInterval: number;
 
   /**
    * Default configuration values
@@ -133,6 +159,7 @@ export class WebgazerConfig implements WebgazerConfigData {
   private static readonly DEFAULT_CONFIG: WebgazerConfigData = {
     moveTickSize: 50,
     dataTimestep: 50,
+    maxFPS: 60,
     videoContainerId: 'webgazerVideoContainer',
     videoElementId: 'webgazerVideoFeed',
     videoElementCanvasId: 'webgazerVideoCanvas',
@@ -164,9 +191,14 @@ export class WebgazerConfig implements WebgazerConfigData {
       },
     },
     applyKalmanFilter: true,
+    smoothingType: 'kalman',
+    emaAlpha: 0.3,
     trackEye: 'both',
     saveDataAcrossSessions: true,
     storingPoints: false,
+    logLevel: 'info',
+    autoPauseOnBlur: false,
+    faceDetectionInterval: 1,
   };
 
   /**
@@ -180,6 +212,7 @@ export class WebgazerConfig implements WebgazerConfigData {
     // Assign all properties
     this.moveTickSize = config.moveTickSize;
     this.dataTimestep = config.dataTimestep;
+    this.maxFPS = config.maxFPS;
     this.videoContainerId = config.videoContainerId;
     this.videoElementId = config.videoElementId;
     this.videoElementCanvasId = config.videoElementCanvasId;
@@ -197,9 +230,14 @@ export class WebgazerConfig implements WebgazerConfigData {
     this.showVideoPreview = config.showVideoPreview;
     this.cameraConstraints = config.cameraConstraints;
     this.applyKalmanFilter = config.applyKalmanFilter;
+    this.smoothingType = config.smoothingType;
+    this.emaAlpha = config.emaAlpha;
     this.trackEye = config.trackEye;
     this.saveDataAcrossSessions = config.saveDataAcrossSessions;
     this.storingPoints = config.storingPoints;
+    this.logLevel = config.logLevel;
+    this.autoPauseOnBlur = config.autoPauseOnBlur;
+    this.faceDetectionInterval = config.faceDetectionInterval;
   }
 
   /**
@@ -216,6 +254,9 @@ export class WebgazerConfig implements WebgazerConfigData {
     }
     if (this.dataTimestep <= 0) {
       errors.push('dataTimestep must be greater than 0');
+    }
+    if (this.maxFPS <= 0) {
+      errors.push('maxFPS must be greater than 0');
     }
     if (this.moveTickSize < 10) {
       warnings.push('moveTickSize below 10ms may cause performance issues');
@@ -235,6 +276,11 @@ export class WebgazerConfig implements WebgazerConfigData {
     // Validate face feedback box ratio
     if (this.faceFeedbackBoxRatio <= 0 || this.faceFeedbackBoxRatio > 1) {
       errors.push('faceFeedbackBoxRatio must be between 0 and 1');
+    }
+
+    // Validate EMA alpha
+    if (this.emaAlpha <= 0 || this.emaAlpha > 1) {
+      errors.push('emaAlpha must be between 0 and 1');
     }
 
     // Validate DOM element IDs
@@ -275,6 +321,12 @@ export class WebgazerConfig implements WebgazerConfigData {
       errors.push(`trackEye must be one of: ${validTrackEyeModes.join(', ')}`);
     }
 
+    // Validate smoothing type
+    const validSmoothingTypes: SmoothingType[] = ['average', 'kalman', 'ema'];
+    if (!validSmoothingTypes.includes(this.smoothingType)) {
+      errors.push(`smoothingType must be one of: ${validSmoothingTypes.join(', ')}`);
+    }
+
     return {
       isValid: errors.length === 0,
       errors,
@@ -290,6 +342,7 @@ export class WebgazerConfig implements WebgazerConfigData {
     
     this.moveTickSize = defaultConfig.moveTickSize;
     this.dataTimestep = defaultConfig.dataTimestep;
+    this.maxFPS = defaultConfig.maxFPS;
     this.videoContainerId = defaultConfig.videoContainerId;
     this.videoElementId = defaultConfig.videoElementId;
     this.videoElementCanvasId = defaultConfig.videoElementCanvasId;
@@ -307,9 +360,14 @@ export class WebgazerConfig implements WebgazerConfigData {
     this.showVideoPreview = defaultConfig.showVideoPreview;
     this.cameraConstraints = JSON.parse(JSON.stringify(defaultConfig.cameraConstraints));
     this.applyKalmanFilter = defaultConfig.applyKalmanFilter;
+    this.smoothingType = defaultConfig.smoothingType;
+    this.emaAlpha = defaultConfig.emaAlpha;
     this.trackEye = defaultConfig.trackEye;
     this.saveDataAcrossSessions = defaultConfig.saveDataAcrossSessions;
     this.storingPoints = defaultConfig.storingPoints;
+    this.logLevel = defaultConfig.logLevel;
+    this.autoPauseOnBlur = defaultConfig.autoPauseOnBlur;
+    this.faceDetectionInterval = defaultConfig.faceDetectionInterval;
   }
 
   /**
@@ -320,6 +378,7 @@ export class WebgazerConfig implements WebgazerConfigData {
     return {
       moveTickSize: this.moveTickSize,
       dataTimestep: this.dataTimestep,
+      maxFPS: this.maxFPS,
       videoContainerId: this.videoContainerId,
       videoElementId: this.videoElementId,
       videoElementCanvasId: this.videoElementCanvasId,
@@ -337,9 +396,14 @@ export class WebgazerConfig implements WebgazerConfigData {
       showVideoPreview: this.showVideoPreview,
       cameraConstraints: JSON.parse(JSON.stringify(this.cameraConstraints)),
       applyKalmanFilter: this.applyKalmanFilter,
+      smoothingType: this.smoothingType,
+      emaAlpha: this.emaAlpha,
       trackEye: this.trackEye,
       saveDataAcrossSessions: this.saveDataAcrossSessions,
       storingPoints: this.storingPoints,
+      logLevel: this.logLevel,
+      autoPauseOnBlur: this.autoPauseOnBlur,
+      faceDetectionInterval: this.faceDetectionInterval,
     };
   }
 
@@ -383,5 +447,18 @@ export class WebgazerConfig implements WebgazerConfigData {
    */
   public getEventTypes(): string[] {
     return ['click', 'move'];
+  }
+
+  /**
+   * Alias for cameraConstraints — matches original WebGazer's params.camConstraints.
+   * The original WebGazer uses `params.camConstraints`; this alias ensures
+   * code ported from the original continues to work.
+   */
+  public get camConstraints(): CameraConstraints {
+    return this.cameraConstraints;
+  }
+
+  public set camConstraints(value: CameraConstraints) {
+    this.cameraConstraints = value;
   }
 }

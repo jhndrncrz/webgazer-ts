@@ -1,0 +1,108 @@
+name: CI — Test, Typecheck & Build
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test & Typecheck
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - name: Setup Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck all packages
+        run: pnpm run typecheck
+
+      - name: Run tests with coverage (core)
+        run: pnpm --filter @webgazer-ts/core test:coverage
+
+      - name: Run tests with coverage (react)
+        run: pnpm --filter @webgazer-ts/react test:coverage
+
+      - name: Upload core coverage
+        if: matrix.node-version == '20'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-core
+          path: packages/core/coverage/
+          retention-days: 7
+
+      - name: Upload react coverage
+        if: matrix.node-version == '20'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-react
+          path: packages/react/coverage/
+          retention-days: 7
+
+  build:
+    name: Build Packages, Examples & Docs
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all packages
+        run: pnpm run build
+
+      - name: Build examples
+        run: pnpm run examples:build
+
+      - name: Build docs
+        run: pnpm run docs:build
+
+      - name: Upload core dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-core
+          path: packages/core/dist/
+          retention-days: 1
+
+      - name: Upload react dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-react
+          path: packages/react/dist/
+          retention-days: 1

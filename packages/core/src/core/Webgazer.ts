@@ -12,7 +12,7 @@
  * Maintains 100% backward API compatibility with original Webgazer.
  */
 
-import { WebgazerConfig, WebgazerConfigData } from './WebgazerConfig';
+import { WebgazerConfig, WebgazerConfigData, LogLevel, SmoothingType } from './WebgazerConfig';
 import type { ITracker, IRegressor, IRenderer } from './types';
 import type { 
   GazePrediction, 
@@ -21,6 +21,7 @@ import type {
   TrackingData 
 } from '../types/index';
 import { EventManager } from '../events/EventManager';
+import { EventType } from '../events/types';
 import { MouseEventHandler } from '../events/MouseEventHandler';
 import { VideoRenderer } from '../rendering/VideoRenderer';
 import { OverlayRenderer } from '../rendering/OverlayRenderer';
@@ -32,6 +33,7 @@ import { MediaDeviceManager } from '../utils/browser/MediaDeviceManager';
 import { DOMManager } from '../utils/browser/DOMManager';
 import { BrowserCompatibility } from '../utils/browser/BrowserCompatibility';
 import { DataWindow } from '../utils/data/DataWindow';
+import { boundToScreen } from '../utils/image/EyeExtractor';
 
 /**
  * Webgazer state enum
@@ -77,6 +79,7 @@ export class Webgazer {
   private tracker: ITracker | null = null;
   private regressors: IRegressor[] = [];
   private currentTrackerName: string = '';
+  private currentRegressionNames: string[] = [];
   
   // Event handling
   private eventManager: EventManager;
@@ -103,9 +106,22 @@ export class Webgazer {
   private gazeCallback: GazeCallback | null = null;
   private predictionLoop: number | null = null;
   
+  // New: Throttling and state for QoL/Performance
+  private lastFrameTime: number = 0;
+  private visibilityListener: (() => void) | null = null;
+  private lastEmaPrediction: GazePrediction | null = null;
+  private faceDetectionCounter: number = 0;
+  private lastEyeFeatures: EyeFeatures | null = null;
+  
   // Smoothing buffer for predictions (matches original webgazer.js)
   // Original: smoothingVals = new util.DataWindow(4)
   private smoothingBuffer: DataWindow<GazePrediction>;
+
+  // Circular buffer for last 50 predictions (storePoints/getStoredPoints API)
+  // Matches original: xPast50[k] / yPast50[k]
+  private xPast50: number[] = new Array(50).fill(0);
+  private yPast50: number[] = new Array(50).fill(0);
+  private storedPointsIndex: number = 0;
   
   // Video elements
   private videoElement: HTMLVideoElement | null = null;
@@ -210,10 +226,13 @@ export class Webgazer {
       this.addMouseEventListeners();
 
       // 10. Start prediction loop
-      this.state = WebgazerState.Running;
+      this.state = WebgazerState.Ready;
       this.startPredictionLoop();
 
-      console.log('Webgazer initialized successfully');
+      // 11. Setup auto-pause if enabled
+      this.setupVisibilityListener();
+
+      this.log('info', 'Webgazer components initialized, waiting for tracking data...');
       return this;
     } catch (error) {
       console.error('Webgazer initialization failed:', error);
@@ -268,11 +287,12 @@ export class Webgazer {
     // Stop mouse event handlers
     this.mouseEventHandler.stop();
 
-    // Save data if enabled
+    // Remove visibility listener if it exists
+    this.removeVisibilityListener();
+
+    // Save data if enabled (background fire-and-forget; error handling is internal)
     if (this.config.saveDataAcrossSessions) {
-      this.saveDataAcrossSessions(true).catch(error => {
-        console.error('Failed to save data on end:', error);
-      });
+      this.saveDataAcrossSessions(true);
     }
 
     // Clean up renderers first (before stopping video)
@@ -316,10 +336,10 @@ export class Webgazer {
   }
 
   /**
-   * Check if Webgazer is ready
+   * Check if Webgazer is ready (initialized and waiting or running)
    */
   public isReady(): boolean {
-    return this.state === WebgazerState.Running || this.state === WebgazerState.Paused;
+    return [WebgazerState.Running, WebgazerState.Paused, WebgazerState.Ready].includes(this.state);
   }
 
   // ============================================================================
@@ -531,125 +551,109 @@ export class Webgazer {
       return; // Already running
     }
 
-    const predict = async (): Promise<void> => {
-      if (this.state !== WebgazerState.Running) {
+    const predict = async (now: number): Promise<void> => {
+      if (this.state !== WebgazerState.Running && this.state !== WebgazerState.Ready) {
         return;
       }
 
+      // Performance: Throttling based on maxFPS
+      const frameInterval = 1000 / this.config.maxFPS;
+      const elapsed = now - this.lastFrameTime;
+
+      if (elapsed < frameInterval) {
+        this.schedulePrediction(predict);
+        return;
+      }
+
+      this.lastFrameTime = now;
+
       try {
-        // Get tracking data from tracker
-        const eyeFeatures = await this.getEyeFeatures();
+        // Performance: Optimization by skipping tracker calls
+        let eyeFeatures: EyeFeatures | null = null;
+        
+        if (this.faceDetectionCounter % this.config.faceDetectionInterval === 0) {
+          eyeFeatures = await this.getEyeFeatures();
+          this.lastEyeFeatures = eyeFeatures;
+        } else {
+          eyeFeatures = this.lastEyeFeatures;
+        }
+        
+        this.faceDetectionCounter++;
 
         if (eyeFeatures) {
-          // Create tracking data object
-          const trackingData: TrackingData = {
-            timestamp: Date.now(),
-            eyeFeatures: eyeFeatures
-          };
-
-          // Update overlay if enabled - draw face landmarks
-          if (this.overlayRenderer && this.config.showFaceOverlay && this.tracker) {
-            const positions = this.tracker.getPositions();
-            if (positions && positions.length > 0) {
-              // Convert positions to Point2D format for overlay renderer
-              const landmarks = positions.map(pos => ({ x: pos[0], y: pos[1] }));
-              this.overlayRenderer.drawLandmarks(landmarks);
-              
-              // Draw face bounding box if enabled
-              if (this.config.showFaceFeedbackBox && positions.length > 0) {
-                // Calculate bounding box from face landmarks
-                const xs = positions.map(p => p[0]);
-                const ys = positions.map(p => p[1]);
-                const minX = Math.min(...xs);
-                const maxX = Math.max(...xs);
-                const minY = Math.min(...ys);
-                const maxY = Math.max(...ys);
-                
-                this.overlayRenderer.drawFaceBox({
-                  x: minX,
-                  y: minY,
-                  width: maxX - minX,
-                  height: maxY - minY
-                });
-              }
-            }
+          // Transition to Running state on first successful tracking data
+          if (this.state === WebgazerState.Ready) {
+            this.state = WebgazerState.Running;
+            this.log('info', '✅ Webgazer is now fully operational and tracking!');
+            
+            // Emit start event (EventEmitter style)
+            this.eventManager.emit('start', { timestamp: Date.now() });
           }
 
-          // Update validation box if enabled
-          if (this.validationBox && this.config.showFaceFeedbackBox && this.tracker) {
-            const positions = this.tracker.getPositions();
-            if (positions && positions.length > 0) {
-              // Calculate face bounding box from landmarks
-              const xs = positions.map(p => p[0]);
-              const ys = positions.map(p => p[1]);
-              const minX = Math.min(...xs);
-              const maxX = Math.max(...xs);
-              const minY = Math.min(...ys);
-              const maxY = Math.max(...ys);
-              
-              // Update validation box with face position
-              this.validationBox.updateFromFaceBox({
-                x: minX,
-                y: minY,
-                width: maxX - minX,
-                height: maxY - minY
-              });
-            } else {
-              // No face detected
-              this.validationBox.updateFromFaceBox(undefined);
-            }
-          }
+          // Update overlay and validation box (rest of the logic remains same...)
+          this.updateVisualComponents();
 
           // Get predictions from regressors
           const predictions = await this.getPredictions(eyeFeatures);
 
           if (predictions.length > 0) {
             let prediction = predictions[0]; // Use first regressor's prediction
+            let smoothedPrediction: GazePrediction;
 
-            // Apply smoothing (matches original webgazer.js)
-            // Original: averages last 4 predictions for smoother tracking
-            this.smoothingBuffer.push(prediction);
-            
-            // Calculate moving average
-            let smoothedX = 0;
-            let smoothedY = 0;
-            const bufferLength = this.smoothingBuffer.length;
-            
-            for (let i = 0; i < bufferLength; i++) {
-              const pred = this.smoothingBuffer.get(i);
-              smoothedX += pred.x;
-              smoothedY += pred.y;
+            // Feature: Enhanced Smoothing Types
+            if (this.config.smoothingType === 'ema') {
+              // Exponential Moving Average
+              if (!this.lastEmaPrediction) {
+                this.lastEmaPrediction = prediction;
+              } else {
+                const alpha = this.config.emaAlpha;
+                this.lastEmaPrediction = {
+                  x: alpha * prediction.x + (1 - alpha) * this.lastEmaPrediction.x,
+                  y: alpha * prediction.y + (1 - alpha) * this.lastEmaPrediction.y
+                };
+              }
+              smoothedPrediction = { ...this.lastEmaPrediction };
+            } else {
+              // Default: Moving Average (matches original webgazer.js)
+              this.smoothingBuffer.push(prediction);
+              
+              let smoothedX = 0;
+              let smoothedY = 0;
+              const bufferLength = this.smoothingBuffer.length;
+              
+              for (let i = 0; i < bufferLength; i++) {
+                const pred = this.smoothingBuffer.get(i);
+                smoothedX += pred.x;
+                smoothedY += pred.y;
+              }
+              
+              smoothedPrediction = {
+                x: smoothedX / bufferLength,
+                y: smoothedY / bufferLength
+              };
             }
-            
-            // Use smoothed prediction
-            const smoothedPrediction: GazePrediction = {
-              x: smoothedX / bufferLength,
-              y: smoothedY / bufferLength
-            };
 
-            // Constrain to viewport (matches original webgazer.js)
+            // Constrain to viewport
             smoothedPrediction.x = Math.max(0, Math.min(smoothedPrediction.x, window.innerWidth));
             smoothedPrediction.y = Math.max(0, Math.min(smoothedPrediction.y, window.innerHeight));
 
-            // Call user callback with smoothed prediction
+            // Call user callback and update renderers
             if (this.gazeCallback) {
               this.gazeCallback(smoothedPrediction, Date.now());
             }
 
-            // Update gaze dot with smoothed prediction
             if (this.gazeDotRenderer && this.config.showGazeDot) {
               this.gazeDotRenderer.setPosition(smoothedPrediction);
             }
 
-            // Emit prediction event with smoothed prediction
-            this.eventManager.emit('gazePrediction', {
+            this.eventManager.emit(EventType.GazePrediction, {
               prediction: smoothedPrediction,
               timestamp: Date.now()
             });
           }
         }
       } catch (error) {
-        console.error('Prediction loop error:', error);
+        this.log('error', 'Prediction loop error:', error);
       }
 
       // Schedule next prediction
@@ -658,7 +662,42 @@ export class Webgazer {
 
     // Start the loop
     this.schedulePrediction(predict);
-    console.log('Prediction loop started');
+    this.log('info', 'Prediction loop started');
+  }
+
+  /**
+   * Helper to update visual components (overlay, validation box)
+   */
+  private updateVisualComponents(): void {
+    if (!this.tracker || !this.videoElement) return;
+    
+    const positions = this.tracker.getPositions();
+    if (!positions || positions.length === 0) {
+      if (this.validationBox && this.config.showFaceFeedbackBox) {
+        this.validationBox.updateFromFaceBox(undefined);
+      }
+      return;
+    }
+
+    const landmarks = positions.map(pos => ({ x: pos[0], y: pos[1] }));
+    const xs = positions.map(p => p[0]);
+    const ys = positions.map(p => p[1]);
+    const minX = Math.min(...xs);
+    const maxX = Math.max(...xs);
+    const minY = Math.min(...ys);
+    const maxY = Math.max(...ys);
+    const faceBox = { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+
+    if (this.overlayRenderer && this.config.showFaceOverlay) {
+      this.overlayRenderer.drawLandmarks(landmarks);
+      if (this.config.showFaceFeedbackBox) {
+        this.overlayRenderer.drawFaceBox(faceBox);
+      }
+    }
+
+    if (this.validationBox && this.config.showFaceFeedbackBox) {
+      this.validationBox.updateFromFaceBox(faceBox);
+    }
   }
 
   /**
@@ -675,7 +714,7 @@ export class Webgazer {
   /**
    * Schedule next prediction
    */
-  private schedulePrediction(callback: () => void): void {
+  private schedulePrediction(callback: FrameRequestCallback): void {
     this.predictionLoop = window.requestAnimationFrame(callback);
   }
 
@@ -802,22 +841,28 @@ export class Webgazer {
 
   /**
    * Set the tracker to use
+   * @param nameOrConstructor - Name of a registered tracker or a tracker constructor
    */
-  public setTracker(name: string): Webgazer {
-    const TrackerClass = Webgazer.trackerRegistry.get(name);
-    
-    if (!TrackerClass) {
-      console.error(`Tracker "${name}" not found in registry`);
-      throw new Error(`Tracker "${name}" not registered. Available trackers: ${Array.from(Webgazer.trackerRegistry.keys()).join(', ')}`);
+  public setTracker(nameOrConstructor: string | TrackerConstructor): Webgazer {
+    if (typeof nameOrConstructor === 'string') {
+      const TrackerClass = Webgazer.trackerRegistry.get(nameOrConstructor);
+
+      if (!TrackerClass) {
+        console.error(`Tracker "${nameOrConstructor}" not found in registry`);
+        throw new Error(`Tracker "${nameOrConstructor}" not registered. Available trackers: ${Array.from(Webgazer.trackerRegistry.keys()).join(', ')}`);
+      }
+
+      this.currentTrackerName = nameOrConstructor;
+      this.tracker = new TrackerClass();
+      console.log(`Tracker set to: ${nameOrConstructor}`);
+    } else {
+      this.currentTrackerName = nameOrConstructor.name || 'custom';
+      this.tracker = new nameOrConstructor();
+      console.log('Custom tracker constructor set');
     }
 
-    this.currentTrackerName = name;
-    this.tracker = new TrackerClass();
-    
-    console.log(`Tracker set to: ${name}`);
     return this;
   }
-
   /**
    * Get current tracker
    */
@@ -831,13 +876,24 @@ export class Webgazer {
 
   /**
    * Set the regression algorithm (replaces all existing regressors)
+   * @param nameOrConstructor - Name of a registered regressor or a regressor constructor
    */
-  public setRegression(name: string): Webgazer {
-    const RegressorClass = Webgazer.regressorRegistry.get(name);
-    
-    if (!RegressorClass) {
-      console.error(`Regressor "${name}" not found in registry`);
-      throw new Error(`Regressor "${name}" not registered. Available regressors: ${Array.from(Webgazer.regressorRegistry.keys()).join(', ')}`);
+  public setRegression(nameOrConstructor: string | RegressorConstructor): Webgazer {
+    let RegressorClass: RegressorConstructor | undefined;
+
+    if (typeof nameOrConstructor === 'string') {
+      RegressorClass = Webgazer.regressorRegistry.get(nameOrConstructor);
+      
+      if (!RegressorClass) {
+        console.error(`Regressor "${nameOrConstructor}" not found in registry`);
+        throw new Error(`Regressor "${nameOrConstructor}" not registered. Available regressors: ${Array.from(Webgazer.regressorRegistry.keys()).join(', ')}`);
+      }
+      this.currentRegressionNames = [nameOrConstructor];
+      console.log(`Regressor set to: ${nameOrConstructor}`);
+    } else {
+      RegressorClass = nameOrConstructor;
+      this.currentRegressionNames = [nameOrConstructor.name || 'custom'];
+      console.log('Custom regressor constructor set');
     }
 
     // Clear existing regressors
@@ -847,25 +903,34 @@ export class Webgazer {
     const regressor = new RegressorClass();
     this.regressors.push(regressor);
     
-    console.log(`Regressor set to: ${name}`);
     return this;
   }
 
   /**
    * Add a regression algorithm (keeps existing regressors)
+   * @param nameOrConstructor - Name of a registered regressor or a regressor constructor
    */
-  public addRegression(name: string): Webgazer {
-    const RegressorClass = Webgazer.regressorRegistry.get(name);
-    
-    if (!RegressorClass) {
-      console.error(`Regressor "${name}" not found in registry`);
-      throw new Error(`Regressor "${name}" not registered`);
+  public addRegression(nameOrConstructor: string | RegressorConstructor): Webgazer {
+    let RegressorClass: RegressorConstructor | undefined;
+
+    if (typeof nameOrConstructor === 'string') {
+      RegressorClass = Webgazer.regressorRegistry.get(nameOrConstructor);
+      
+      if (!RegressorClass) {
+        console.error(`Regressor "${nameOrConstructor}" not found in registry`);
+        throw new Error(`Regressor "${nameOrConstructor}" not registered`);
+      }
+      this.currentRegressionNames.push(nameOrConstructor);
+      console.log(`Regressor added: ${nameOrConstructor}`);
+    } else {
+      RegressorClass = nameOrConstructor;
+      this.currentRegressionNames.push(nameOrConstructor.name || 'custom');
+      console.log('Custom regressor constructor added');
     }
 
     const regressor = new RegressorClass();
     this.regressors.push(regressor);
     
-    console.log(`Regressor added: ${name}`);
     return this;
   }
 
@@ -900,7 +965,26 @@ export class Webgazer {
       return null;
     }
 
-    return this.regressors[regressorIndex].predict(trackingData.eyeFeatures);
+    const predictions: GazePrediction[] = [];
+
+    for (const regressor of this.regressors) {
+      const prediction = await regressor.predict(trackingData.eyeFeatures);
+      if (prediction) {
+        predictions.push(prediction);
+      }
+    }
+
+    const selectedPrediction = predictions[regressorIndex];
+    if (!selectedPrediction) {
+      return null;
+    }
+
+    return {
+      x: selectedPrediction.x,
+      y: selectedPrediction.y,
+      eyeFeatures: trackingData.eyeFeatures,
+      all: predictions,
+    };
   }
 
   /**
@@ -947,10 +1031,16 @@ export class Webgazer {
   }
 
   /**
-   * Store calibration point (for backward compatibility)
+   * Store a recent prediction point in the circular buffer (original API).
+   * Matches original: webgazer.storePoints(x, y, k) stores into xPast50[k] / yPast50[k]
+   * @param x - x coordinate
+   * @param y - y coordinate
+   * @param k - circular buffer index (0-49)
    */
-  public storePoints(x: number, y: number, eventType: 'click' | 'move' = 'click'): void {
-    this.recordScreenPosition(x, y, eventType);
+  public storePoints(x: number, y: number, k: number): void {
+    const index = k % 50;
+    this.xPast50[index] = x;
+    this.yPast50[index] = y;
   }
 
   /**
@@ -995,7 +1085,11 @@ export class Webgazer {
    * Show/hide video preview (alias for showVideo)
    */
   public showVideoPreview(show: boolean): Webgazer {
-    return this.showVideo(show);
+    this.config.showVideoPreview = show;
+    this.showVideo(show && this.config.showVideo);
+    this.showFaceOverlay(show && this.config.showFaceOverlay);
+    this.showFaceFeedbackBox(show && this.config.showFaceFeedbackBox);
+    return this;
   }
 
   /**
@@ -1106,6 +1200,13 @@ export class Webgazer {
       if (this.videoRenderer) {
         this.videoRenderer.setStream(this.mediaStream!);
       }
+
+      if (this.videoElement && this.canvasElement) {
+        this.canvasElement.width = this.videoElement.videoWidth || this.canvasElement.width;
+        this.canvasElement.height = this.videoElement.videoHeight || this.canvasElement.height;
+      }
+
+      this.tracker?.reset();
     }
   }
 
@@ -1140,21 +1241,38 @@ export class Webgazer {
   // ============================================================================
 
   /**
-   * Enable/disable data persistence across sessions
+   * Enable/disable data persistence across sessions.
+   * Synchronous (returns this for chaining), matching original WebGazer API.
+   * Actual save to storage happens asynchronously in the background when enabled.
+   * @param save - whether to save data across sessions
+   * @returns this (for chaining)
    */
-  public async saveDataAcrossSessions(save: boolean): Promise<Webgazer> {
+  public saveDataAcrossSessions(save: boolean): Webgazer {
     this.config.saveDataAcrossSessions = save;
     
-    if (save) {
-      // Save current regressor data
-      for (let i = 0; i < this.regressors.length; i++) {
-        const data = this.regressors[i].getData();
-        await this.storageManager.save(`regressor_${i}_data`, data);
-      }
-      console.log('Data saved across sessions');
+    if (save && this.regressors.length > 0) {
+      // Save current regressor data in the background (fire-and-forget)
+      void this.persistDataAcrossSessions();
     }
     
     return this;
+  }
+
+  private async persistDataAcrossSessions(): Promise<void> {
+    try {
+      if (!(await this.storageManager.isAvailable())) {
+        return;
+      }
+
+      await Promise.all(
+        this.regressors.map((reg, i) =>
+          this.storageManager.save(`regressor_${i}_data`, reg.getData())
+        )
+      );
+      console.log('Data saved across sessions');
+    } catch (error) {
+      console.error('Failed to save data across sessions:', error);
+    }
   }
 
   /**
@@ -1166,6 +1284,10 @@ export class Webgazer {
     }
 
     try {
+      if (!(await this.storageManager.isAvailable())) {
+        return;
+      }
+
       for (let i = 0; i < this.regressors.length; i++) {
         const data = await this.storageManager.load(`regressor_${i}_data`);
         if (data) {
@@ -1188,32 +1310,21 @@ export class Webgazer {
       regressor.setData({ clickData: [], trailData: [] });
     }
 
-    // Clear stored data
-    await this.storageManager.clear();
+    // Clear stored data when a backend exists
+    if (await this.storageManager.isAvailable()) {
+      await this.storageManager.clear();
+    }
     
     console.log('All data cleared');
   }
 
   /**
-   * Get stored calibration points
+   * Get the fifty most recent gaze prediction points.
+   * Matches original: webgazer.getStoredPoints() returns [xPast50, yPast50]
+   * @returns Tuple of [xCoordinates, yCoordinates], each up to 50 entries
    */
   public getStoredPoints(): [number[], number[]] {
-    if (this.regressors.length === 0) {
-      return [[], []];
-    }
-
-    const data = this.regressors[0].getData() as any;
-    const xPoints: number[] = [];
-    const yPoints: number[] = [];
-
-    if (data && data.dataClicks) {
-      for (const point of data.dataClicks) {
-        xPoints.push(point.screenX);
-        yPoints.push(point.screenY);
-      }
-    }
-
-    return [xPoints, yPoints];
+    return [this.xPast50.slice(), this.yPast50.slice()];
   }
 
   /**
@@ -1259,6 +1370,16 @@ export class Webgazer {
     return this.config;
   }
 
+  /**
+   * Get utility object (for backward compatibility)
+   */
+  public get util(): any {
+    return {
+      DataWindow: DataWindow,
+      bound: boundToScreen
+    };
+  }
+
   // ============================================================================
   // Utility Methods
   // ============================================================================
@@ -1279,6 +1400,24 @@ export class Webgazer {
     }
 
     return [0, 0, 200, 200];
+  }
+
+  /**
+   * Check the current camera permission state without requesting it.
+   * Useful for UI to show permission prompts before calling begin().
+   * @returns 'granted' | 'denied' | 'prompt' | 'unsupported'
+   */
+  public async checkCameraPermission(): Promise<'granted' | 'denied' | 'prompt' | 'unsupported'> {
+    if (typeof navigator === 'undefined' || !navigator.permissions) {
+      return 'unsupported';
+    }
+    try {
+      const result = await navigator.permissions.query({ name: 'camera' as PermissionName });
+      return result.state as 'granted' | 'denied' | 'prompt';
+    } catch {
+      // Some browsers (Firefox) don't support querying camera permissions
+      return 'unsupported';
+    }
   }
 
   /**
@@ -1321,6 +1460,241 @@ export class Webgazer {
    */
   public getCalibrationManager(): CalibrationManager | null {
     return this.calibrationManager;
+  }
+
+  // ============================================================================
+  // Original WebGazer Instance-Level Module Registration
+  // These delegate to the static registry so callers can use
+  // webgazer.addRegressionModule(...) and webgazer.addTrackerModule(...)
+  // in addition to Webgazer.addRegressionModule(...)
+  // ============================================================================
+
+  /**
+   * Register a new regression module (instance-level, matching original WebGazer API).
+   * Equivalent to the static Webgazer.addRegressionModule().
+   * @param name - name to register under (used in setRegression/addRegression)
+   * @param constructor - class constructor implementing IRegressor
+   * @returns this (for chaining)
+   */
+  public addRegressionModule(name: string, constructor: RegressorConstructor): Webgazer {
+    Webgazer.addRegressionModule(name, constructor);
+    return this;
+  }
+
+  /**
+   * Register a new tracker module (instance-level, matching original WebGazer API).
+   * Equivalent to the static Webgazer.addTrackerModule().
+   * @param name - name to register under (used in setTracker)
+   * @param constructor - class constructor implementing ITracker
+   * @returns this (for chaining)
+   */
+  public addTrackerModule(name: string, constructor: TrackerConstructor): Webgazer {
+    Webgazer.addTrackerModule(name, constructor);
+    return this;
+  }
+
+  // ============================================================================
+  // Convenience Hide Methods (matching original WebGazer paired show/hide API)
+  // ============================================================================
+
+  /**
+   * Hide the camera video preview (equivalent to showVideo(false)).
+   * @returns this (for chaining)
+   */
+  public hideVideo(): Webgazer {
+    return this.showVideo(false);
+  }
+
+  /**
+   * Hide the face overlay canvas (equivalent to showFaceOverlay(false)).
+   * @returns this (for chaining)
+   */
+  public hideFaceOverlay(): Webgazer {
+    return this.showFaceOverlay(false);
+  }
+
+  /**
+   * Hide the face feedback box (equivalent to showFaceFeedbackBox(false)).
+   * @returns this (for chaining)
+   */
+  public hideFaceFeedbackBox(): Webgazer {
+    return this.showFaceFeedbackBox(false);
+  }
+
+  /**
+   * Hide the gaze prediction dot (equivalent to showPredictionPoints(false)).
+   * @returns this (for chaining)
+   */
+  public hidePredictionPoints(): Webgazer {
+    return this.showPredictionPoints(false);
+  }
+
+  // ============================================================================
+  // New Features & QoL Methods
+  // ============================================================================
+
+  /**
+   * Set the log level
+   */
+  public setLogLevel(level: LogLevel): Webgazer {
+    this.config.logLevel = level;
+    return this;
+  }
+
+  /**
+   * Enable/disable debug mode (alias for setLogLevel('debug'))
+   */
+  public setDebugMode(enabled: boolean): Webgazer {
+    return this.setLogLevel(enabled ? 'debug' : 'info');
+  }
+
+  /**
+   * Set maximum FPS for tracking (battery saver / performance)
+   */
+  public setMaxFPS(fps: number): Webgazer {
+    this.config.maxFPS = fps;
+    return this;
+  }
+
+  /**
+   * Set prediction interval in ms (updates maxFPS)
+   */
+  public setPredictionInterval(ms: number): Webgazer {
+    return this.setMaxFPS(1000 / ms);
+  }
+
+  /**
+   * Set face detection interval (skip frames for performance)
+   * @param skip - Call tracker every X frames (1 = every frame)
+   */
+  public setFaceDetectionInterval(skip: number): Webgazer {
+    this.config.faceDetectionInterval = Math.max(1, skip);
+    return this;
+  }
+
+  /**
+   * Automatically pause tracking when the page is not visible
+   */
+  public setAutoPauseOnBlur(enabled: boolean): Webgazer {
+    this.config.autoPauseOnBlur = enabled;
+    if (enabled) {
+      this.setupVisibilityListener();
+    } else {
+      this.removeVisibilityListener();
+    }
+    return this;
+  }
+
+  /**
+   * Set smoothing type
+   */
+  public setSmoothingType(type: SmoothingType): Webgazer {
+    this.config.smoothingType = type;
+    return this;
+  }
+
+  /**
+   * Set EMA alpha (smoothing factor, 0-1)
+   */
+  public setEMAAlpha(alpha: number): Webgazer {
+    this.config.emaAlpha = alpha;
+    return this;
+  }
+
+  /**
+   * Set Kalman filter smoothing strength (legacy compatibility)
+   */
+  public setKalmanFilterStrength(strength: number): Webgazer {
+    // This is a simplified implementation for compatibility
+    this.config.applyKalmanFilter = strength > 0;
+    return this;
+  }
+
+  /**
+   * Get current configuration as plain object
+   */
+  public getConfig(): WebgazerConfigData {
+    return this.config.toJSON();
+  }
+
+  /**
+   * Get stored training data
+   */
+  public getStoredData(): any {
+    if (this.regressors.length > 0) {
+      return this.regressors[0].getData();
+    }
+    return null;
+  }
+
+  /**
+   * Add event listener (alias for addEventListener)
+   */
+  public on(eventType: EventType | string, listener: (data: any) => void): Webgazer {
+    this.eventManager.addEventListener(eventType, listener);
+    return this;
+  }
+
+  /**
+   * Remove event listener (alias for removeEventListener)
+   */
+  public off(eventType: EventType | string, listener: (data: any) => void): Webgazer {
+    this.eventManager.removeEventListener(eventType, listener);
+    return this;
+  }
+
+  /**
+   * Internal logging helper
+   */
+  private log(level: LogLevel, message: string, ...args: any[]): void {
+    const levels: LogLevel[] = ['debug', 'info', 'warn', 'error', 'none'];
+    const configLevelIdx = levels.indexOf(this.config.logLevel);
+    const messageLevelIdx = levels.indexOf(level);
+
+    if (messageLevelIdx >= configLevelIdx && configLevelIdx !== 4) {
+      const prefix = `[Webgazer:${level}]`;
+      if (level === 'error') console.error(prefix, message, ...args);
+      else if (level === 'warn') console.warn(prefix, message, ...args);
+      else if (level === 'info') console.log(prefix, message, ...args);
+      else if (level === 'debug') console.debug(prefix, message, ...args);
+    }
+  }
+
+  /**
+   * Setup visibility change listener for auto-pause
+   */
+  private setupVisibilityListener(): void {
+    if (!this.config.autoPauseOnBlur || typeof document === 'undefined') return;
+
+    if (!this.visibilityListener) {
+      this.visibilityListener = () => {
+        if (document.hidden) {
+          if (this.state === WebgazerState.Running) {
+            this.log('info', 'Page hidden, auto-pausing tracking');
+            this.pause();
+            // Mark that we were auto-paused
+            (this as any)._autoPaused = true;
+          }
+        } else {
+          if (this.state === WebgazerState.Paused && (this as any)._autoPaused) {
+            this.log('info', 'Page visible, auto-resuming tracking');
+            this.resume();
+            (this as any)._autoPaused = false;
+          }
+        }
+      };
+      document.addEventListener('visibilitychange', this.visibilityListener);
+    }
+  }
+
+  /**
+   * Remove visibility change listener
+   */
+  private removeVisibilityListener(): void {
+    if (this.visibilityListener && typeof document !== 'undefined') {
+      document.removeEventListener('visibilitychange', this.visibilityListener);
+      this.visibilityListener = null;
+    }
   }
 }
 

@@ -74,7 +74,7 @@ webgazer.begin();
 ### Browser (UMD)
 
 ```html
-<script src="node_modules/@webgazer-ts/core/dist/webgazer-ts.umd.cjs"></script>
+<script src="node_modules/@webgazer-ts/core/dist/webgazer.js"></script>
 <script>
   // Available as global 'webgazer'
   webgazer.begin();
@@ -203,130 +203,91 @@ Requires:
 - Safari 15+
 - Mobile browsers (limited)
 
-## Migration from Webgazer.js
+## 🚀 Drop-in Replacement Guide
 
-This package is 100% API compatible with Webgazer.js:
+`@webgazer-ts/core` is designed to be a seamless replacement for the original WebGazer.js.
 
-```typescript
-// This exact code works in both libraries
-webgazer
-  .setRegression('ridge')
-  .setTracker('TFFacemesh')
-  .setGazeListener((data) => console.log(data))
-  .begin();
+### 1. Script Tag Usage (CDN)
+If you previously used:
+```html
+<script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
 ```
-
-**Breaking Changes in v0.2.0:**
-- `saveDataAcrossSessions` now defaults to `false` (privacy-first)
-
-To keep old behavior:
-```typescript
-webgazer.saveDataAcrossSessions(true).begin();
+You can now use:
+```html
+<script src="https://unpkg.com/@webgazer-ts/core@latest/dist/webgazer.js"></script>
 ```
+The `window.webgazer` global is automatically initialized.
 
-See [Migration Guide](https://jhndrncrz.github.io/webgazer-ts/guide/migration) for details.
-
-## React Integration
-
-For React apps, use the React package:
-
+### 2. NPM Usage
 ```bash
-npm install @webgazer-ts/react
+npm install @webgazer-ts/core
 ```
-
-```tsx
-import { useWebgazer } from '@webgazer-ts/react';
-
-function App() {
-  const { gazeData, isRunning, start } = useWebgazer({
-    autoStart: true
-  });
-
-  return <div>Gaze: {gazeData?.x}, {gazeData?.y}</div>;
-}
-```
-
-See [@webgazer-ts/react](https://www.npmjs.com/package/@webgazer-ts/react) for full React documentation.
-
-## Examples
-
-### Basic Setup
-
 ```typescript
 import webgazer from '@webgazer-ts/core';
+// Everything works as expected!
+```
 
-await webgazer.begin();
-webgazer.showVideoPreview(true);
+### 3. API Compatibility Matrix
+| Feature | Status | Notes |
+|---------|--------|-------|
+| `webgazer.begin()` | ✅ | Returns `Promise<Webgazer>` (modern) |
+| `webgazer.params` | ✅ | Full parity with original config |
+| `webgazer.util` | ✅ | Includes `DataWindow` and `bound` |
+| `ridge`, `weightedRidge` | ✅ | Default regression models |
+| `TFFacemesh` | ✅ | Default tracker |
 
-webgazer.setGazeListener((data) => {
+## API Overview
+
+### Lifecycle
+
+```typescript
+await webgazer.begin();        // Initialize and start
+webgazer.end();                // Stop and cleanup
+webgazer.pause();              // Pause tracking
+webgazer.resume();             // Resume tracking
+```
+
+### Configuration
+
+```typescript
+webgazer
+  .setTracker('TFFacemesh')              // Face tracker
+  .setRegression('ridge')                 // Regression model
+  .saveDataAcrossSessions(false)          // Data persistence
+  .applyKalmanFilter(true)                // Smoothing
+  .showVideoPreview(true)                 // Show camera
+  .showFaceOverlay(true)                  // Show face mesh
+  .showPredictionPoints(true)             // Show gaze dot
+  .showFaceFeedbackBox(true);            // Show positioning guide
+```
+
+### Predictions
+
+```typescript
+// Listen to predictions (60 FPS)
+webgazer.setGazeListener((data, timestamp) => {
   if (data) {
-    console.log(`Looking at (${data.x}, ${data.y})`);
+    console.log(`Gaze: (${data.x}, ${data.y})`);
   }
 });
+
+// Get current prediction
+const prediction = await webgazer.getCurrentPrediction();
 ```
 
-### With Calibration
+## 🤝 Credits & Citation
 
-```typescript
-import webgazer from '@webgazer-ts/core';
+This project is a TypeScript port of the original **WebGazer.js** developed by the Brown HCI Group. All core algorithms and methodology are credited to the original authors.
 
-await webgazer.begin();
-
-// Add calibration points
-document.addEventListener('click', (e) => {
-  webgazer.recordScreenPosition(e.clientX, e.clientY, 'click');
-  console.log('Calibration points:', webgazer.getCalibrationPointCount());
-});
-```
-
-### Custom Regression
-
-```typescript
-import webgazer, { Regressor, EyeFeatures } from '@webgazer-ts/core';
-
-class MyRegressor implements Regressor {
-  predict(eyeFeatures: EyeFeatures) {
-    // Your prediction logic
-    return { x: 500, y: 300 };
-  }
-  
-  addData(eyeFeatures: EyeFeatures, screenPos: [number, number], type: string) {
-    // Your training logic
-  }
-  
-  // ... implement other required methods
-}
-
-webgazer.setRegression(new MyRegressor());
-```
-
-## Performance
-
-- **Prediction Rate:** 60 FPS (16.7ms)
-- **Initialization:** ~800ms (model loading)
-- **Accuracy:** ±100-200px (after calibration)
-- **Memory:** ~50MB typical
-- **Bundle Size:** ~15KB gzipped (core only)
-
-## Privacy
-
-- ✅ All processing happens **locally in your browser**
-- ✅ No video or images sent to any server
-- ✅ Optional localStorage (opt-in in v0.2.0+)
-- ✅ User must grant camera permission
-- ✅ Full control over data
-
-## Academic Use
-
-This library is designed for academic research. Please cite the original Webgazer.js:
+If you use this library in academic work, please cite the original paper:
 
 ```bibtex
 @inproceedings{papoutsaki2016webgazer,
-  author = {Alexandra Papoutsaki and Patsorn Sangkloy and James Laskey and Nediyana Daskalova and Jeff Huang and James Hays},
-  title = {WebGazer: Scalable Webcam Eye Tracking Using User Interactions},
-  booktitle = {Proceedings of the 25th International Joint Conference on Artificial Intelligence (IJCAI)},
-  pages = {3839--3845},
-  year = {2016}
+  author     = {Alexandra Papoutsaki and Patsorn Sangkloy and James Laskey and Nediyana Daskalova and Jeff Huang and James Hays},
+  title      = {{Webgazer}: Scalable Webcam Eye Tracking Using User Interactions},
+  booktitle  = {Proceedings of the 25th International Joint Conference on Artificial Intelligence (IJCAI)},
+  pages      = {3839--3845},
+  year       = {2016}
 }
 ```
 
@@ -334,34 +295,5 @@ This library is designed for academic research. Please cite the original Webgaze
 
 GPL-3.0-or-later
 
-For academic research use. See [LICENSE.md](../../LICENSE.md) for details.
+See [LICENSE.md](../../LICENSE.md) for details.
 
-## Credits
-
-Based on [Webgazer.js](https://webgazer.cs.brown.edu) by Brown HCI Lab.
-
-**Original Authors:**
-- Alexandra Papoutsaki
-- James Laskey
-- Jeff Huang
-
-**TypeScript Rewrite:**
-- John Adrian Cruz
-
-## Support
-
-- 📖 [Documentation](https://jhndrncrz.github.io/webgazer-ts/)
-- 💬 [GitHub Discussions](https://github.com/jhndrncrz/webgazer-ts/discussions)
-- 🐛 [Issue Tracker](https://github.com/jhndrncrz/webgazer-ts/issues)
-- 📧 [Email](mailto:webgazer@lists.cs.brown.edu)
-
-## Links
-
-- [npm Package](https://www.npmjs.com/package/@webgazer-ts/core)
-- [GitHub Repository](https://github.com/jhndrncrz/webgazer-ts)
-- [Documentation Site](https://jhndrncrz.github.io/webgazer-ts/)
-- [Original Webgazer.js](https://webgazer.cs.brown.edu)
-
----
-
-Made with ❤️ for academic research

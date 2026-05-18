@@ -53,4 +53,5 @@ export type {
   UseGazeHeatmapReturn,
   GazeRecordingEntry,
   UseGazeRecordingReturn,
+  UseGazeTrackingReturn,
 } from './hooks';

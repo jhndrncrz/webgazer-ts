@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Webgazer Drop-in Replacement Demo</title>
+  <!-- Load the UMD browser bundle just like original WebGazer.js -->
+  <script src="../../packages/core/dist/webgazer.js"></script>
+</head>
+<body style="font-family: sans-serif; padding: 20px;">
+  <h1>Webgazer Drop-in Replacement Demo</h1>
+  <p>This demo uses the <code>window.webgazer</code> global variable, exactly like the original WebGazer.js library.</p>
+  
+  <button id="startBtn" style="padding: 10px; font-size: 16px;">Start Webgazer</button>
+  <button id="stopBtn" style="padding: 10px; font-size: 16px;" disabled>Stop Webgazer</button>
+  
+  <div style="margin-top: 20px;">
+    <strong>Gaze Position:</strong> <span id="gazePos">None</span>
+  </div>
+
+  <script>
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const gazePos = document.getElementById('gazePos');
+
+    startBtn.addEventListener('click', async () => {
+      // Configure and start Webgazer using global window.webgazer
+      window.webgazer.setGazeListener((data, elapsedTime) => {
+        if (data == null) {
+          return;
+        }
+        gazePos.innerText = `X: ${Math.round(data.x)} Y: ${Math.round(data.y)}`;
+      })
+      .saveDataAcrossSessions(false)
+      .showVideoPreview(true)
+      .showPredictionPoints(true);
+
+      // We await it because the modern API is async, 
+      // though older code might not have awaited it.
+      await window.webgazer.begin();
+      
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      console.log('Webgazer started');
+    });
+
+    stopBtn.addEventListener('click', () => {
+      window.webgazer.end();
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      gazePos.innerText = 'None';
+      console.log('Webgazer stopped');
+    });
+  </script>
+</body>
+</html>

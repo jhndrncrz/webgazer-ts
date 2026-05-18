@@ -73,6 +73,8 @@ Every method from Webgazer.js v3.x is implemented:
 | `getRegression()` | ✅ | Returns regressor instance |
 | `clearData()` | ✅ | Identical behavior |
 | `getVideoElementCanvas()` | ✅ | Identical return |
+| `params` | ✅ | Webgazer configuration property |
+| `util` | ✅ | Access to utility objects like `DataWindow` and `bound` |
 | All 28 methods | ✅ | See [API docs](/api/core/) |
 
 ## Breaking Changes

@@ -1,6 +1,20 @@
 # What is Webgazer.ts?
 
-Webgazer.ts is a modern TypeScript rewrite of [Webgazer.js](https://webgazer.cs.brown.edu), a webcam eye tracking library for academic research. It provides accurate gaze prediction using only a standard webcam, with full backward compatibility and enhanced developer experience.
+Webgazer.ts is a modern TypeScript rewrite of **[WebGazer.js](https://webgazer.cs.brown.edu)** —
+a landmark webcam-based eye tracking library developed by the
+**[Brown HCI Group](https://hci.cs.brown.edu/)** at Brown University.
+
+The original WebGazer.js was introduced in a [2016 IJCAI paper](http://cs.brown.edu/people/apapouts/papers/ijcai2016webgazer.pdf)
+by Alexandra Papoutsaki, Jeff Huang, and colleagues. It demonstrated for the first time that
+ordinary webcam sessions — with no specialist hardware or dedicated lab setup — could produce
+accurate, real-time gaze predictions entirely inside the browser. Webgazer.ts is a faithful port
+of that work to TypeScript, with React support and modern build tooling added on top.
+
+::: tip Attribution
+All gaze prediction algorithms, the ridge regression approach, Kalman filter design, eye-patch
+feature extraction, and calibration strategy in this library originate from the Brown HCI Group's
+research. **[Read the original paper →](http://cs.brown.edu/people/apapouts/papers/ijcai2016webgazer.pdf)**
+:::
 
 ## Overview
 
@@ -110,7 +124,51 @@ Webgazer.ts is **privacy-first**:
 - ✅ User must grant camera permission
 - ✅ Full control over data collection and storage
 
-## Next Steps
+## 🙏 Acknowledgments
+
+Webgazer.ts stands entirely on the shoulders of the original **WebGazer.js** project.
+
+### The Research
+
+**"WebGazer: Scalable Webcam Eye Tracking Using User Interactions"**
+*IJCAI 2016, pp. 3839–3845*
+
+- **[Paper (PDF)](http://cs.brown.edu/people/apapouts/papers/ijcai2016webgazer.pdf)** — read the foundational research
+- **[Project Website](https://webgazer.cs.brown.edu)** — official demos, documentation, and contact
+- **[Official Repository](https://github.com/brownhci/WebGazer)** — the actively maintained original
+- **[All Publications](https://webgazer.cs.brown.edu/#publications)** — IJCAI 2016, CHIIR 2017, ETRA 2018
+
+### The Researchers
+
+| Person | Contribution |
+|--------|--------------|
+| **[Alexandra Papoutsaki](http://cs.brown.edu/people/apapouts/)** | Creator — originated the insight that natural browser interactions suffice for real-time gaze calibration |
+| **[Jeff Huang](https://jeffhuang.com/)** | Co-author & maintainer — PI of the [Brown HCI Group](https://hci.cs.brown.edu/) |
+| **[James Hays](https://faculty.cc.gatech.edu/~hays/)** | Co-author — computer vision and feature extraction |
+| **Patsorn Sangkloy, James Laskey, Nediyana Daskalova** | Co-authors on the IJCAI 2016 paper |
+| **Aaron Gokaslan, James Tompkin** | Core developer and research advisor respectively |
+
+### How to Cite
+
+If you use this library in academic work, cite the **original WebGazer.js paper** (not this port):
+
+```bibtex
+@inproceedings{papoutsaki2016webgazer,
+  author    = {Alexandra Papoutsaki and Patsorn Sangkloy and James Laskey
+               and Nediyana Daskalova and Jeff Huang and James Hays},
+  title     = {{WebGazer}: Scalable Webcam Eye Tracking Using User Interactions},
+  booktitle = {Proceedings of the 25th International Joint Conference
+               on Artificial Intelligence ({IJCAI})},
+  pages     = {3839--3845},
+  year      = {2016},
+  url       = {https://webgazer.cs.brown.edu}
+}
+```
+
+See [CREDITS.md](https://github.com/jhndrncrz/webgazer-ts/blob/main/CREDITS.md) for the
+complete acknowledgment including funding sources, dependency credits, and the full author list.
+
+## ⏭️ Next Steps
 
 Ready to get started?
 
@@ -118,3 +176,4 @@ Ready to get started?
 - [Core Library Usage](/guide/core/basic-usage)
 - [React Integration](/guide/react/quick-start)
 - [API Reference](/api/core/)
+- [API Compatibility Matrix](/guide/compatibility)
