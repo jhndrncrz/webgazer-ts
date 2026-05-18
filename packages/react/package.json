@@ -38,6 +38,7 @@
   "scripts": {
     "dev": "vite build --watch",
     "build": "vite build",
+    "build:types": "tsc -p tsconfig.build.json",
     "clean": "rm -rf dist",
     "test": "vitest",
     "test:ui": "vitest --ui",

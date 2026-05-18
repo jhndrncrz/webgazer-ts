@@ -11,7 +11,7 @@
     "build": "pnpm --filter @webgazer-ts/core build && pnpm --filter @webgazer-ts/react build && pnpm --filter webgazer-ts build",
     "build:core": "pnpm --filter @webgazer-ts/core build",
     "build:react": "pnpm --filter @webgazer-ts/react build",
-    "typecheck:types": "pnpm --filter @webgazer-ts/core build:types",
+    "typecheck:types": "pnpm --filter @webgazer-ts/core build:types && pnpm --filter @webgazer-ts/react build:types",
     "typecheck": "pnpm run typecheck:types && pnpm -r exec tsc --noEmit",
     "test": "pnpm --filter @webgazer-ts/core test --run && pnpm --filter @webgazer-ts/react test --run",
     "examples:build": "pnpm --filter webgazer-react-demo build",
