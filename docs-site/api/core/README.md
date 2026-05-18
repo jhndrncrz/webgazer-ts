@@ -97,7 +97,7 @@ Defined in: [calibration/types.ts:105](https://github.com/jhndrncrz/webgazer-ts/
 
 ### WebgazerState
 
-Defined in: [core/Webgazer.ts:38](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L38)
+Defined in: [core/Webgazer.ts:41](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L41)
 
 Webgazer state enum
 
@@ -107,43 +107,43 @@ Webgazer state enum
 
 > **NotInitialized**: `"not_initialized"`
 
-Defined in: [core/Webgazer.ts:39](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L39)
+Defined in: [core/Webgazer.ts:42](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L42)
 
 ##### Initializing
 
 > **Initializing**: `"initializing"`
 
-Defined in: [core/Webgazer.ts:40](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L40)
+Defined in: [core/Webgazer.ts:43](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L43)
 
 ##### Ready
 
 > **Ready**: `"ready"`
 
-Defined in: [core/Webgazer.ts:41](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L41)
+Defined in: [core/Webgazer.ts:44](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L44)
 
 ##### Running
 
 > **Running**: `"running"`
 
-Defined in: [core/Webgazer.ts:42](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L42)
+Defined in: [core/Webgazer.ts:45](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L45)
 
 ##### Paused
 
 > **Paused**: `"paused"`
 
-Defined in: [core/Webgazer.ts:43](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L43)
+Defined in: [core/Webgazer.ts:46](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L46)
 
 ##### Stopped
 
 > **Stopped**: `"stopped"`
 
-Defined in: [core/Webgazer.ts:44](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L44)
+Defined in: [core/Webgazer.ts:47](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L47)
 
 ##### Error
 
 > **Error**: `"error"`
 
-Defined in: [core/Webgazer.ts:45](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L45)
+Defined in: [core/Webgazer.ts:48](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L48)
 
 ***
 
@@ -395,7 +395,7 @@ console.log(`Velocity: (${state.state[2]}, ${state.state[3]})`);
 
 > **new KalmanFilter4D**(`config`): [`KalmanFilter4D`](#kalmanfilter4d)
 
-Defined in: [utils/filters/KalmanFilter4D.ts:96](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/KalmanFilter4D.ts#L96)
+Defined in: [utils/filters/KalmanFilter4D.ts:95](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/KalmanFilter4D.ts#L95)
 
 Create a new 4D Kalman Filter
 
@@ -417,7 +417,7 @@ Configuration options
 
 > **update**(`measurement`): \[`number`, `number`\]
 
-Defined in: [utils/filters/KalmanFilter4D.ts:181](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/KalmanFilter4D.ts#L181)
+Defined in: [utils/filters/KalmanFilter4D.ts:176](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/KalmanFilter4D.ts#L176)
 
 Update filter with new measurement
 
@@ -447,7 +447,7 @@ Filtered estimate [x, y]
 
 > **getState**(): [`KalmanFilter4DState`](#kalmanfilter4dstate)
 
-Defined in: [utils/filters/KalmanFilter4D.ts:246](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/KalmanFilter4D.ts#L246)
+Defined in: [utils/filters/KalmanFilter4D.ts:241](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/KalmanFilter4D.ts#L241)
 
 Get current filter state
 
@@ -461,7 +461,7 @@ Current state including position and velocity
 
 > **getPosition**(): \[`number`, `number`\]
 
-Defined in: [utils/filters/KalmanFilter4D.ts:260](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/KalmanFilter4D.ts#L260)
+Defined in: [utils/filters/KalmanFilter4D.ts:255](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/KalmanFilter4D.ts#L255)
 
 Get current position estimate
 
@@ -475,7 +475,7 @@ Current position [x, y]
 
 > **getVelocity**(): \[`number`, `number`\]
 
-Defined in: [utils/filters/KalmanFilter4D.ts:269](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/KalmanFilter4D.ts#L269)
+Defined in: [utils/filters/KalmanFilter4D.ts:264](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/KalmanFilter4D.ts#L264)
 
 Get current velocity estimate
 
@@ -489,7 +489,7 @@ Current velocity [vx, vy] in pixels per time unit
 
 > **predict**(`steps`): \[`number`, `number`\]
 
-Defined in: [utils/filters/KalmanFilter4D.ts:279](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/KalmanFilter4D.ts#L279)
+Defined in: [utils/filters/KalmanFilter4D.ts:274](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/KalmanFilter4D.ts#L274)
 
 Predict future position without updating filter state
 
@@ -511,7 +511,7 @@ Predicted position [x, y]
 
 > **reset**(`config?`): `void`
 
-Defined in: [utils/filters/KalmanFilter4D.ts:296](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/KalmanFilter4D.ts#L296)
+Defined in: [utils/filters/KalmanFilter4D.ts:291](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/KalmanFilter4D.ts#L291)
 
 Reset filter to initial state
 
@@ -535,7 +535,7 @@ Optional new configuration
 
 > **isInitialized**(): `boolean`
 
-Defined in: [utils/filters/KalmanFilter4D.ts:316](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/KalmanFilter4D.ts#L316)
+Defined in: [utils/filters/KalmanFilter4D.ts:311](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/KalmanFilter4D.ts#L311)
 
 Check if filter is initialized
 
@@ -1216,7 +1216,7 @@ Defined in: [calibration/types.ts:115](https://github.com/jhndrncrz/webgazer-ts/
 
 ### Webgazer
 
-Defined in: [core/Webgazer.ts:66](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L66)
+Defined in: [core/Webgazer.ts:69](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L69)
 
 Main Webgazer class - Singleton pattern
 
@@ -1228,7 +1228,7 @@ Main Webgazer class - Singleton pattern
 
 > **get** **params**(): [`WebgazerConfig`](#webgazerconfig)
 
-Defined in: [core/Webgazer.ts:1224](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1224)
+Defined in: [core/Webgazer.ts:1369](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1369)
 
 Get configuration object (for backward compatibility)
 
@@ -1236,13 +1236,27 @@ Get configuration object (for backward compatibility)
 
 [`WebgazerConfig`](#webgazerconfig)
 
+##### util
+
+###### Get Signature
+
+> **get** **util**(): `any`
+
+Defined in: [core/Webgazer.ts:1376](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1376)
+
+Get utility object (for backward compatibility)
+
+###### Returns
+
+`any`
+
 #### Methods
 
 ##### begin()
 
 > **begin**(`onFail?`): `Promise`\<[`Webgazer`](#webgazer)\>
 
-Defined in: [core/Webgazer.ts:161](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L161)
+Defined in: [core/Webgazer.ts:185](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L185)
 
 Begin eye tracking
 
@@ -1264,7 +1278,7 @@ Promise that resolves to Webgazer instance for chaining
 
 > **pause**(): [`Webgazer`](#webgazer)
 
-Defined in: [core/Webgazer.ts:225](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L225)
+Defined in: [core/Webgazer.ts:252](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L252)
 
 Pause eye tracking (keeps camera running)
 
@@ -1276,7 +1290,7 @@ Pause eye tracking (keeps camera running)
 
 > **resume**(): `Promise`\<[`Webgazer`](#webgazer)\>
 
-Defined in: [core/Webgazer.ts:238](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L238)
+Defined in: [core/Webgazer.ts:265](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L265)
 
 Resume eye tracking
 
@@ -1288,7 +1302,7 @@ Resume eye tracking
 
 > **end**(): [`Webgazer`](#webgazer)
 
-Defined in: [core/Webgazer.ts:256](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L256)
+Defined in: [core/Webgazer.ts:283](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L283)
 
 End eye tracking and clean up resources
 
@@ -1300,9 +1314,9 @@ End eye tracking and clean up resources
 
 > **isReady**(): `boolean`
 
-Defined in: [core/Webgazer.ts:310](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L310)
+Defined in: [core/Webgazer.ts:341](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L341)
 
-Check if Webgazer is ready
+Check if Webgazer is ready (initialized and waiting or running)
 
 ###### Returns
 
@@ -1310,17 +1324,19 @@ Check if Webgazer is ready
 
 ##### setTracker()
 
-> **setTracker**(`name`): [`Webgazer`](#webgazer)
+> **setTracker**(`nameOrConstructor`): [`Webgazer`](#webgazer)
 
-Defined in: [core/Webgazer.ts:770](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L770)
+Defined in: [core/Webgazer.ts:846](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L846)
 
 Set the tracker to use
 
 ###### Parameters
 
-###### name
+###### nameOrConstructor
 
-`string`
+Name of a registered tracker or a tracker constructor
+
+`string` | `TrackerConstructor`
 
 ###### Returns
 
@@ -1330,7 +1346,7 @@ Set the tracker to use
 
 > **getTracker**(): [`ITracker`](#itracker) \| `null`
 
-Defined in: [core/Webgazer.ts:788](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L788)
+Defined in: [core/Webgazer.ts:869](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L869)
 
 Get current tracker
 
@@ -1340,17 +1356,19 @@ Get current tracker
 
 ##### setRegression()
 
-> **setRegression**(`name`): [`Webgazer`](#webgazer)
+> **setRegression**(`nameOrConstructor`): [`Webgazer`](#webgazer)
 
-Defined in: [core/Webgazer.ts:799](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L799)
+Defined in: [core/Webgazer.ts:881](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L881)
 
 Set the regression algorithm (replaces all existing regressors)
 
 ###### Parameters
 
-###### name
+###### nameOrConstructor
 
-`string`
+Name of a registered regressor or a regressor constructor
+
+`string` | `RegressorConstructor`
 
 ###### Returns
 
@@ -1358,17 +1376,19 @@ Set the regression algorithm (replaces all existing regressors)
 
 ##### addRegression()
 
-> **addRegression**(`name`): [`Webgazer`](#webgazer)
+> **addRegression**(`nameOrConstructor`): [`Webgazer`](#webgazer)
 
-Defined in: [core/Webgazer.ts:821](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L821)
+Defined in: [core/Webgazer.ts:913](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L913)
 
 Add a regression algorithm (keeps existing regressors)
 
 ###### Parameters
 
-###### name
+###### nameOrConstructor
 
-`string`
+Name of a registered regressor or a regressor constructor
+
+`string` | `RegressorConstructor`
 
 ###### Returns
 
@@ -1378,7 +1398,7 @@ Add a regression algorithm (keeps existing regressors)
 
 > **getRegression**(): [`IRegressor`](#iregressor)[]
 
-Defined in: [core/Webgazer.ts:839](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L839)
+Defined in: [core/Webgazer.ts:940](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L940)
 
 Get all regressors
 
@@ -1390,7 +1410,7 @@ Get all regressors
 
 > **getCurrentPrediction**(`regressorIndex`): `Promise`\<[`GazePrediction`](#gazeprediction-1) \| `null`\>
 
-Defined in: [core/Webgazer.ts:850](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L850)
+Defined in: [core/Webgazer.ts:951](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L951)
 
 Get current gaze prediction
 
@@ -1408,7 +1428,7 @@ Get current gaze prediction
 
 > **setGazeListener**(`callback`): [`Webgazer`](#webgazer)
 
-Defined in: [core/Webgazer.ts:873](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L873)
+Defined in: [core/Webgazer.ts:993](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L993)
 
 Set gaze prediction callback
 
@@ -1426,7 +1446,7 @@ Set gaze prediction callback
 
 > **clearGazeListener**(): [`Webgazer`](#webgazer)
 
-Defined in: [core/Webgazer.ts:881](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L881)
+Defined in: [core/Webgazer.ts:1001](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1001)
 
 Clear gaze prediction callback
 
@@ -1438,7 +1458,7 @@ Clear gaze prediction callback
 
 > **recordScreenPosition**(`x`, `y`, `eventType`): [`Webgazer`](#webgazer)
 
-Defined in: [core/Webgazer.ts:893](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L893)
+Defined in: [core/Webgazer.ts:1013](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1013)
 
 Record screen position for training
 
@@ -1462,11 +1482,12 @@ Record screen position for training
 
 ##### storePoints()
 
-> **storePoints**(`x`, `y`, `eventType`): `void`
+> **storePoints**(`x`, `y`, `k`): `void`
 
-Defined in: [core/Webgazer.ts:920](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L920)
+Defined in: [core/Webgazer.ts:1040](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1040)
 
-Store calibration point (for backward compatibility)
+Store a recent prediction point in the circular buffer (original API).
+Matches original: webgazer.storePoints(x, y, k) stores into xPast50[k] / yPast50[k]
 
 ###### Parameters
 
@@ -1474,13 +1495,19 @@ Store calibration point (for backward compatibility)
 
 `number`
 
+x coordinate
+
 ###### y
 
 `number`
 
-###### eventType
+y coordinate
 
-`"click"` | `"move"`
+###### k
+
+`number`
+
+circular buffer index (0-49)
 
 ###### Returns
 
@@ -1490,7 +1517,7 @@ Store calibration point (for backward compatibility)
 
 > **addMouseEventListeners**(): [`Webgazer`](#webgazer)
 
-Defined in: [core/Webgazer.ts:927](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L927)
+Defined in: [core/Webgazer.ts:1049](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1049)
 
 Add mouse event listeners for automatic data collection
 
@@ -1502,7 +1529,7 @@ Add mouse event listeners for automatic data collection
 
 > **removeMouseEventListeners**(): [`Webgazer`](#webgazer)
 
-Defined in: [core/Webgazer.ts:949](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L949)
+Defined in: [core/Webgazer.ts:1073](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1073)
 
 Remove mouse event listeners
 
@@ -1514,7 +1541,7 @@ Remove mouse event listeners
 
 > **showVideoPreview**(`show`): [`Webgazer`](#webgazer)
 
-Defined in: [core/Webgazer.ts:963](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L963)
+Defined in: [core/Webgazer.ts:1087](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1087)
 
 Show/hide video preview (alias for showVideo)
 
@@ -1532,7 +1559,7 @@ Show/hide video preview (alias for showVideo)
 
 > **showVideo**(`show`): [`Webgazer`](#webgazer)
 
-Defined in: [core/Webgazer.ts:970](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L970)
+Defined in: [core/Webgazer.ts:1098](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1098)
 
 Show/hide video element
 
@@ -1550,7 +1577,7 @@ Show/hide video element
 
 > **showFaceOverlay**(`show`): [`Webgazer`](#webgazer)
 
-Defined in: [core/Webgazer.ts:983](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L983)
+Defined in: [core/Webgazer.ts:1111](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1111)
 
 Show/hide face overlay
 
@@ -1568,7 +1595,7 @@ Show/hide face overlay
 
 > **showFaceFeedbackBox**(`show`): [`Webgazer`](#webgazer)
 
-Defined in: [core/Webgazer.ts:996](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L996)
+Defined in: [core/Webgazer.ts:1124](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1124)
 
 Show/hide face feedback box
 
@@ -1586,7 +1613,7 @@ Show/hide face feedback box
 
 > **showPredictionPoints**(`show`): [`Webgazer`](#webgazer)
 
-Defined in: [core/Webgazer.ts:1009](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1009)
+Defined in: [core/Webgazer.ts:1137](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1137)
 
 Show/hide prediction points
 
@@ -1604,7 +1631,7 @@ Show/hide prediction points
 
 > **setVideoViewerSize**(`width`, `height`): `void`
 
-Defined in: [core/Webgazer.ts:1022](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1022)
+Defined in: [core/Webgazer.ts:1150](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1150)
 
 Set video viewer size
 
@@ -1626,7 +1653,7 @@ Set video viewer size
 
 > **stopVideo**(): [`Webgazer`](#webgazer)
 
-Defined in: [core/Webgazer.ts:1034](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1034)
+Defined in: [core/Webgazer.ts:1162](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1162)
 
 Stop video stream
 
@@ -1638,7 +1665,7 @@ Stop video stream
 
 > **setStaticVideo**(`videoLocation`): [`Webgazer`](#webgazer)
 
-Defined in: [core/Webgazer.ts:1054](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1054)
+Defined in: [core/Webgazer.ts:1182](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1182)
 
 Set static video source
 
@@ -1656,7 +1683,7 @@ Set static video source
 
 > **setCameraConstraints**(`constraints`): `Promise`\<`void`\>
 
-Defined in: [core/Webgazer.ts:1064](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1064)
+Defined in: [core/Webgazer.ts:1192](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1192)
 
 Set camera constraints
 
@@ -1674,7 +1701,7 @@ Set camera constraints
 
 > **getVideoElementCanvas**(): `HTMLCanvasElement` \| `null`
 
-Defined in: [core/Webgazer.ts:1081](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1081)
+Defined in: [core/Webgazer.ts:1216](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1216)
 
 Get video element canvas
 
@@ -1686,7 +1713,7 @@ Get video element canvas
 
 > **setVideoElementCanvas**(`canvas`): `HTMLCanvasElement`
 
-Defined in: [core/Webgazer.ts:1088](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1088)
+Defined in: [core/Webgazer.ts:1223](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1223)
 
 Set video element canvas
 
@@ -1704,7 +1731,7 @@ Set video element canvas
 
 > **getVideoPreviewToCameraResolutionRatio**(): \[`number`, `number`\]
 
-Defined in: [core/Webgazer.ts:1096](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1096)
+Defined in: [core/Webgazer.ts:1231](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1231)
 
 Get video preview to camera resolution ratio
 
@@ -1714,11 +1741,13 @@ Get video preview to camera resolution ratio
 
 ##### saveDataAcrossSessions()
 
-> **saveDataAcrossSessions**(`save`): `Promise`\<[`Webgazer`](#webgazer)\>
+> **saveDataAcrossSessions**(`save`): [`Webgazer`](#webgazer)
 
-Defined in: [core/Webgazer.ts:1111](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1111)
+Defined in: [core/Webgazer.ts:1250](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1250)
 
-Enable/disable data persistence across sessions
+Enable/disable data persistence across sessions.
+Synchronous (returns this for chaining), matching original WebGazer API.
+Actual save to storage happens asynchronously in the background when enabled.
 
 ###### Parameters
 
@@ -1726,15 +1755,19 @@ Enable/disable data persistence across sessions
 
 `boolean`
 
+whether to save data across sessions
+
 ###### Returns
 
-`Promise`\<[`Webgazer`](#webgazer)\>
+[`Webgazer`](#webgazer)
+
+this (for chaining)
 
 ##### clearData()
 
 > **clearData**(): `Promise`\<`void`\>
 
-Defined in: [core/Webgazer.ts:1150](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1150)
+Defined in: [core/Webgazer.ts:1306](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1306)
 
 Clear all stored data
 
@@ -1746,19 +1779,22 @@ Clear all stored data
 
 > **getStoredPoints**(): \[`number`[], `number`[]\]
 
-Defined in: [core/Webgazer.ts:1166](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1166)
+Defined in: [core/Webgazer.ts:1326](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1326)
 
-Get stored calibration points
+Get the fifty most recent gaze prediction points.
+Matches original: webgazer.getStoredPoints() returns [xPast50, yPast50]
 
 ###### Returns
 
 \[`number`[], `number`[]\]
 
+Tuple of [xCoordinates, yCoordinates], each up to 50 entries
+
 ##### getCalibrationDataCount()
 
 > **getCalibrationDataCount**(): `number`
 
-Defined in: [core/Webgazer.ts:1189](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1189)
+Defined in: [core/Webgazer.ts:1334](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1334)
 
 Get calibration data count
 
@@ -1772,7 +1808,7 @@ Number of calibration points recorded
 
 > **applyKalmanFilter**(`apply`): [`Webgazer`](#webgazer)
 
-Defined in: [core/Webgazer.ts:1205](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1205)
+Defined in: [core/Webgazer.ts:1350](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1350)
 
 Enable/disable Kalman filter
 
@@ -1790,7 +1826,7 @@ Enable/disable Kalman filter
 
 > **computeValidationBoxSize**(): \[`number`, `number`, `number`, `number`\]
 
-Defined in: [core/Webgazer.ts:1235](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1235)
+Defined in: [core/Webgazer.ts:1390](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1390)
 
 Compute validation box size
 
@@ -1798,11 +1834,26 @@ Compute validation box size
 
 \[`number`, `number`, `number`, `number`\]
 
+##### checkCameraPermission()
+
+> **checkCameraPermission**(): `Promise`\<`"granted"` \| `"denied"` \| `"prompt"` \| `"unsupported"`\>
+
+Defined in: [core/Webgazer.ts:1410](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1410)
+
+Check the current camera permission state without requesting it.
+Useful for UI to show permission prompts before calling begin().
+
+###### Returns
+
+`Promise`\<`"granted"` \| `"denied"` \| `"prompt"` \| `"unsupported"`\>
+
+'granted' | 'denied' | 'prompt' | 'unsupported'
+
 ##### detectCompatibility()
 
 > **detectCompatibility**(): `boolean`
 
-Defined in: [core/Webgazer.ts:1253](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1253)
+Defined in: [core/Webgazer.ts:1426](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1426)
 
 Detect browser compatibility
 
@@ -1814,7 +1865,7 @@ Detect browser compatibility
 
 > **getCompatibilityWarnings**(): `string`[]
 
-Defined in: [core/Webgazer.ts:1260](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1260)
+Defined in: [core/Webgazer.ts:1433](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1433)
 
 Get compatibility warnings
 
@@ -1826,7 +1877,7 @@ Get compatibility warnings
 
 > **logCompatibilityInfo**(): `void`
 
-Defined in: [core/Webgazer.ts:1267](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1267)
+Defined in: [core/Webgazer.ts:1440](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1440)
 
 Log browser and feature information
 
@@ -1838,7 +1889,7 @@ Log browser and feature information
 
 > **getState**(): [`WebgazerState`](#webgazerstate)
 
-Defined in: [core/Webgazer.ts:1274](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1274)
+Defined in: [core/Webgazer.ts:1447](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1447)
 
 Get current state
 
@@ -1850,7 +1901,7 @@ Get current state
 
 > **getEventManager**(): `EventManager`
 
-Defined in: [core/Webgazer.ts:1281](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1281)
+Defined in: [core/Webgazer.ts:1454](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1454)
 
 Get event manager (for advanced usage)
 
@@ -1862,7 +1913,7 @@ Get event manager (for advanced usage)
 
 > **getCalibrationManager**(): `CalibrationManager` \| `null`
 
-Defined in: [core/Webgazer.ts:1288](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1288)
+Defined in: [core/Webgazer.ts:1461](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1461)
 
 Get calibration manager (for advanced usage)
 
@@ -1870,11 +1921,357 @@ Get calibration manager (for advanced usage)
 
 `CalibrationManager` \| `null`
 
+##### addRegressionModule()
+
+> **addRegressionModule**(`name`, `constructor`): [`Webgazer`](#webgazer)
+
+Defined in: [core/Webgazer.ts:1479](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1479)
+
+Register a new regression module (instance-level, matching original WebGazer API).
+Equivalent to the static Webgazer.addRegressionModule().
+
+###### Parameters
+
+###### name
+
+`string`
+
+name to register under (used in setRegression/addRegression)
+
+###### constructor
+
+`RegressorConstructor`
+
+class constructor implementing IRegressor
+
+###### Returns
+
+[`Webgazer`](#webgazer)
+
+this (for chaining)
+
+##### addTrackerModule()
+
+> **addTrackerModule**(`name`, `constructor`): [`Webgazer`](#webgazer)
+
+Defined in: [core/Webgazer.ts:1491](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1491)
+
+Register a new tracker module (instance-level, matching original WebGazer API).
+Equivalent to the static Webgazer.addTrackerModule().
+
+###### Parameters
+
+###### name
+
+`string`
+
+name to register under (used in setTracker)
+
+###### constructor
+
+`TrackerConstructor`
+
+class constructor implementing ITracker
+
+###### Returns
+
+[`Webgazer`](#webgazer)
+
+this (for chaining)
+
+##### hideVideo()
+
+> **hideVideo**(): [`Webgazer`](#webgazer)
+
+Defined in: [core/Webgazer.ts:1504](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1504)
+
+Hide the camera video preview (equivalent to showVideo(false)).
+
+###### Returns
+
+[`Webgazer`](#webgazer)
+
+this (for chaining)
+
+##### hideFaceOverlay()
+
+> **hideFaceOverlay**(): [`Webgazer`](#webgazer)
+
+Defined in: [core/Webgazer.ts:1512](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1512)
+
+Hide the face overlay canvas (equivalent to showFaceOverlay(false)).
+
+###### Returns
+
+[`Webgazer`](#webgazer)
+
+this (for chaining)
+
+##### hideFaceFeedbackBox()
+
+> **hideFaceFeedbackBox**(): [`Webgazer`](#webgazer)
+
+Defined in: [core/Webgazer.ts:1520](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1520)
+
+Hide the face feedback box (equivalent to showFaceFeedbackBox(false)).
+
+###### Returns
+
+[`Webgazer`](#webgazer)
+
+this (for chaining)
+
+##### hidePredictionPoints()
+
+> **hidePredictionPoints**(): [`Webgazer`](#webgazer)
+
+Defined in: [core/Webgazer.ts:1528](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1528)
+
+Hide the gaze prediction dot (equivalent to showPredictionPoints(false)).
+
+###### Returns
+
+[`Webgazer`](#webgazer)
+
+this (for chaining)
+
+##### setLogLevel()
+
+> **setLogLevel**(`level`): [`Webgazer`](#webgazer)
+
+Defined in: [core/Webgazer.ts:1539](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1539)
+
+Set the log level
+
+###### Parameters
+
+###### level
+
+`LogLevel`
+
+###### Returns
+
+[`Webgazer`](#webgazer)
+
+##### setDebugMode()
+
+> **setDebugMode**(`enabled`): [`Webgazer`](#webgazer)
+
+Defined in: [core/Webgazer.ts:1547](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1547)
+
+Enable/disable debug mode (alias for setLogLevel('debug'))
+
+###### Parameters
+
+###### enabled
+
+`boolean`
+
+###### Returns
+
+[`Webgazer`](#webgazer)
+
+##### setMaxFPS()
+
+> **setMaxFPS**(`fps`): [`Webgazer`](#webgazer)
+
+Defined in: [core/Webgazer.ts:1554](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1554)
+
+Set maximum FPS for tracking (battery saver / performance)
+
+###### Parameters
+
+###### fps
+
+`number`
+
+###### Returns
+
+[`Webgazer`](#webgazer)
+
+##### setPredictionInterval()
+
+> **setPredictionInterval**(`ms`): [`Webgazer`](#webgazer)
+
+Defined in: [core/Webgazer.ts:1562](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1562)
+
+Set prediction interval in ms (updates maxFPS)
+
+###### Parameters
+
+###### ms
+
+`number`
+
+###### Returns
+
+[`Webgazer`](#webgazer)
+
+##### setFaceDetectionInterval()
+
+> **setFaceDetectionInterval**(`skip`): [`Webgazer`](#webgazer)
+
+Defined in: [core/Webgazer.ts:1570](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1570)
+
+Set face detection interval (skip frames for performance)
+
+###### Parameters
+
+###### skip
+
+`number`
+
+Call tracker every X frames (1 = every frame)
+
+###### Returns
+
+[`Webgazer`](#webgazer)
+
+##### setAutoPauseOnBlur()
+
+> **setAutoPauseOnBlur**(`enabled`): [`Webgazer`](#webgazer)
+
+Defined in: [core/Webgazer.ts:1578](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1578)
+
+Automatically pause tracking when the page is not visible
+
+###### Parameters
+
+###### enabled
+
+`boolean`
+
+###### Returns
+
+[`Webgazer`](#webgazer)
+
+##### setSmoothingType()
+
+> **setSmoothingType**(`type`): [`Webgazer`](#webgazer)
+
+Defined in: [core/Webgazer.ts:1591](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1591)
+
+Set smoothing type
+
+###### Parameters
+
+###### type
+
+`SmoothingType`
+
+###### Returns
+
+[`Webgazer`](#webgazer)
+
+##### setEMAAlpha()
+
+> **setEMAAlpha**(`alpha`): [`Webgazer`](#webgazer)
+
+Defined in: [core/Webgazer.ts:1599](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1599)
+
+Set EMA alpha (smoothing factor, 0-1)
+
+###### Parameters
+
+###### alpha
+
+`number`
+
+###### Returns
+
+[`Webgazer`](#webgazer)
+
+##### setKalmanFilterStrength()
+
+> **setKalmanFilterStrength**(`strength`): [`Webgazer`](#webgazer)
+
+Defined in: [core/Webgazer.ts:1607](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1607)
+
+Set Kalman filter smoothing strength (legacy compatibility)
+
+###### Parameters
+
+###### strength
+
+`number`
+
+###### Returns
+
+[`Webgazer`](#webgazer)
+
+##### getConfig()
+
+> **getConfig**(): `WebgazerConfigData`
+
+Defined in: [core/Webgazer.ts:1616](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1616)
+
+Get current configuration as plain object
+
+###### Returns
+
+`WebgazerConfigData`
+
+##### getStoredData()
+
+> **getStoredData**(): `any`
+
+Defined in: [core/Webgazer.ts:1623](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1623)
+
+Get stored training data
+
+###### Returns
+
+`any`
+
+##### on()
+
+> **on**(`eventType`, `listener`): [`Webgazer`](#webgazer)
+
+Defined in: [core/Webgazer.ts:1633](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1633)
+
+Add event listener (alias for addEventListener)
+
+###### Parameters
+
+###### eventType
+
+`string`
+
+###### listener
+
+(`data`) => `void`
+
+###### Returns
+
+[`Webgazer`](#webgazer)
+
+##### off()
+
+> **off**(`eventType`, `listener`): [`Webgazer`](#webgazer)
+
+Defined in: [core/Webgazer.ts:1641](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L1641)
+
+Remove event listener (alias for removeEventListener)
+
+###### Parameters
+
+###### eventType
+
+`string`
+
+###### listener
+
+(`data`) => `void`
+
+###### Returns
+
+[`Webgazer`](#webgazer)
+
 ***
 
 ### WebgazerConfig
 
-Defined in: [core/WebgazerConfig.ts:91](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L91)
+Defined in: [core/WebgazerConfig.ts:109](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L109)
 
 Webgazer configuration management class
 Handles all configuration parameters with validation and persistence
@@ -1889,7 +2286,7 @@ Handles all configuration parameters with validation and persistence
 
 > **moveTickSize**: `number`
 
-Defined in: [core/WebgazerConfig.ts:93](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L93)
+Defined in: [core/WebgazerConfig.ts:111](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L111)
 
 ###### Implementation of
 
@@ -1899,17 +2296,27 @@ Defined in: [core/WebgazerConfig.ts:93](https://github.com/jhndrncrz/webgazer-ts
 
 > **dataTimestep**: `number`
 
-Defined in: [core/WebgazerConfig.ts:94](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L94)
+Defined in: [core/WebgazerConfig.ts:112](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L112)
 
 ###### Implementation of
 
 `WebgazerConfigData.dataTimestep`
 
+##### maxFPS
+
+> **maxFPS**: `number`
+
+Defined in: [core/WebgazerConfig.ts:113](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L113)
+
+###### Implementation of
+
+`WebgazerConfigData.maxFPS`
+
 ##### videoContainerId
 
 > **videoContainerId**: `string`
 
-Defined in: [core/WebgazerConfig.ts:97](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L97)
+Defined in: [core/WebgazerConfig.ts:116](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L116)
 
 ###### Implementation of
 
@@ -1919,7 +2326,7 @@ Defined in: [core/WebgazerConfig.ts:97](https://github.com/jhndrncrz/webgazer-ts
 
 > **videoElementId**: `string`
 
-Defined in: [core/WebgazerConfig.ts:98](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L98)
+Defined in: [core/WebgazerConfig.ts:117](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L117)
 
 ###### Implementation of
 
@@ -1929,7 +2336,7 @@ Defined in: [core/WebgazerConfig.ts:98](https://github.com/jhndrncrz/webgazer-ts
 
 > **videoElementCanvasId**: `string`
 
-Defined in: [core/WebgazerConfig.ts:99](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L99)
+Defined in: [core/WebgazerConfig.ts:118](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L118)
 
 ###### Implementation of
 
@@ -1939,7 +2346,7 @@ Defined in: [core/WebgazerConfig.ts:99](https://github.com/jhndrncrz/webgazer-ts
 
 > **faceOverlayId**: `string`
 
-Defined in: [core/WebgazerConfig.ts:100](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L100)
+Defined in: [core/WebgazerConfig.ts:119](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L119)
 
 ###### Implementation of
 
@@ -1949,7 +2356,7 @@ Defined in: [core/WebgazerConfig.ts:100](https://github.com/jhndrncrz/webgazer-t
 
 > **faceFeedbackBoxId**: `string`
 
-Defined in: [core/WebgazerConfig.ts:101](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L101)
+Defined in: [core/WebgazerConfig.ts:120](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L120)
 
 ###### Implementation of
 
@@ -1959,7 +2366,7 @@ Defined in: [core/WebgazerConfig.ts:101](https://github.com/jhndrncrz/webgazer-t
 
 > **gazeDotId**: `string`
 
-Defined in: [core/WebgazerConfig.ts:102](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L102)
+Defined in: [core/WebgazerConfig.ts:121](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L121)
 
 ###### Implementation of
 
@@ -1969,7 +2376,7 @@ Defined in: [core/WebgazerConfig.ts:102](https://github.com/jhndrncrz/webgazer-t
 
 > **videoViewerWidth**: `number`
 
-Defined in: [core/WebgazerConfig.ts:105](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L105)
+Defined in: [core/WebgazerConfig.ts:124](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L124)
 
 ###### Implementation of
 
@@ -1979,7 +2386,7 @@ Defined in: [core/WebgazerConfig.ts:105](https://github.com/jhndrncrz/webgazer-t
 
 > **videoViewerHeight**: `number`
 
-Defined in: [core/WebgazerConfig.ts:106](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L106)
+Defined in: [core/WebgazerConfig.ts:125](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L125)
 
 ###### Implementation of
 
@@ -1989,7 +2396,7 @@ Defined in: [core/WebgazerConfig.ts:106](https://github.com/jhndrncrz/webgazer-t
 
 > **faceFeedbackBoxRatio**: `number`
 
-Defined in: [core/WebgazerConfig.ts:109](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L109)
+Defined in: [core/WebgazerConfig.ts:128](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L128)
 
 ###### Implementation of
 
@@ -1999,7 +2406,7 @@ Defined in: [core/WebgazerConfig.ts:109](https://github.com/jhndrncrz/webgazer-t
 
 > **showVideo**: `boolean`
 
-Defined in: [core/WebgazerConfig.ts:112](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L112)
+Defined in: [core/WebgazerConfig.ts:131](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L131)
 
 ###### Implementation of
 
@@ -2009,7 +2416,7 @@ Defined in: [core/WebgazerConfig.ts:112](https://github.com/jhndrncrz/webgazer-t
 
 > **mirrorVideo**: `boolean`
 
-Defined in: [core/WebgazerConfig.ts:113](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L113)
+Defined in: [core/WebgazerConfig.ts:132](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L132)
 
 ###### Implementation of
 
@@ -2019,7 +2426,7 @@ Defined in: [core/WebgazerConfig.ts:113](https://github.com/jhndrncrz/webgazer-t
 
 > **showFaceOverlay**: `boolean`
 
-Defined in: [core/WebgazerConfig.ts:114](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L114)
+Defined in: [core/WebgazerConfig.ts:133](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L133)
 
 ###### Implementation of
 
@@ -2029,7 +2436,7 @@ Defined in: [core/WebgazerConfig.ts:114](https://github.com/jhndrncrz/webgazer-t
 
 > **showFaceFeedbackBox**: `boolean`
 
-Defined in: [core/WebgazerConfig.ts:115](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L115)
+Defined in: [core/WebgazerConfig.ts:134](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L134)
 
 ###### Implementation of
 
@@ -2039,7 +2446,7 @@ Defined in: [core/WebgazerConfig.ts:115](https://github.com/jhndrncrz/webgazer-t
 
 > **showGazeDot**: `boolean`
 
-Defined in: [core/WebgazerConfig.ts:116](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L116)
+Defined in: [core/WebgazerConfig.ts:135](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L135)
 
 ###### Implementation of
 
@@ -2049,7 +2456,7 @@ Defined in: [core/WebgazerConfig.ts:116](https://github.com/jhndrncrz/webgazer-t
 
 > **showVideoPreview**: `boolean`
 
-Defined in: [core/WebgazerConfig.ts:117](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L117)
+Defined in: [core/WebgazerConfig.ts:136](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L136)
 
 ###### Implementation of
 
@@ -2059,7 +2466,7 @@ Defined in: [core/WebgazerConfig.ts:117](https://github.com/jhndrncrz/webgazer-t
 
 > **cameraConstraints**: `CameraConstraints`
 
-Defined in: [core/WebgazerConfig.ts:120](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L120)
+Defined in: [core/WebgazerConfig.ts:139](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L139)
 
 ###### Implementation of
 
@@ -2069,17 +2476,37 @@ Defined in: [core/WebgazerConfig.ts:120](https://github.com/jhndrncrz/webgazer-t
 
 > **applyKalmanFilter**: `boolean`
 
-Defined in: [core/WebgazerConfig.ts:123](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L123)
+Defined in: [core/WebgazerConfig.ts:142](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L142)
 
 ###### Implementation of
 
 `WebgazerConfigData.applyKalmanFilter`
 
+##### smoothingType
+
+> **smoothingType**: `SmoothingType`
+
+Defined in: [core/WebgazerConfig.ts:143](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L143)
+
+###### Implementation of
+
+`WebgazerConfigData.smoothingType`
+
+##### emaAlpha
+
+> **emaAlpha**: `number`
+
+Defined in: [core/WebgazerConfig.ts:144](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L144)
+
+###### Implementation of
+
+`WebgazerConfigData.emaAlpha`
+
 ##### trackEye
 
 > **trackEye**: `TrackEyeMode`
 
-Defined in: [core/WebgazerConfig.ts:124](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L124)
+Defined in: [core/WebgazerConfig.ts:145](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L145)
 
 ###### Implementation of
 
@@ -2089,7 +2516,7 @@ Defined in: [core/WebgazerConfig.ts:124](https://github.com/jhndrncrz/webgazer-t
 
 > **saveDataAcrossSessions**: `boolean`
 
-Defined in: [core/WebgazerConfig.ts:127](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L127)
+Defined in: [core/WebgazerConfig.ts:148](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L148)
 
 ###### Implementation of
 
@@ -2099,11 +2526,75 @@ Defined in: [core/WebgazerConfig.ts:127](https://github.com/jhndrncrz/webgazer-t
 
 > **storingPoints**: `boolean`
 
-Defined in: [core/WebgazerConfig.ts:128](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L128)
+Defined in: [core/WebgazerConfig.ts:149](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L149)
 
 ###### Implementation of
 
 `WebgazerConfigData.storingPoints`
+
+##### logLevel
+
+> **logLevel**: `LogLevel`
+
+Defined in: [core/WebgazerConfig.ts:152](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L152)
+
+###### Implementation of
+
+`WebgazerConfigData.logLevel`
+
+##### autoPauseOnBlur
+
+> **autoPauseOnBlur**: `boolean`
+
+Defined in: [core/WebgazerConfig.ts:153](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L153)
+
+###### Implementation of
+
+`WebgazerConfigData.autoPauseOnBlur`
+
+##### faceDetectionInterval
+
+> **faceDetectionInterval**: `number`
+
+Defined in: [core/WebgazerConfig.ts:154](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L154)
+
+###### Implementation of
+
+`WebgazerConfigData.faceDetectionInterval`
+
+#### Accessors
+
+##### camConstraints
+
+###### Get Signature
+
+> **get** **camConstraints**(): `CameraConstraints`
+
+Defined in: [core/WebgazerConfig.ts:457](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L457)
+
+Alias for cameraConstraints — matches original WebGazer's params.camConstraints.
+The original WebGazer uses `params.camConstraints`; this alias ensures
+code ported from the original continues to work.
+
+###### Returns
+
+`CameraConstraints`
+
+###### Set Signature
+
+> **set** **camConstraints**(`value`): `void`
+
+Defined in: [core/WebgazerConfig.ts:461](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L461)
+
+###### Parameters
+
+###### value
+
+`CameraConstraints`
+
+###### Returns
+
+`void`
 
 #### Methods
 
@@ -2111,7 +2602,7 @@ Defined in: [core/WebgazerConfig.ts:128](https://github.com/jhndrncrz/webgazer-t
 
 > **validate**(): `ValidationResult`
 
-Defined in: [core/WebgazerConfig.ts:209](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L209)
+Defined in: [core/WebgazerConfig.ts:247](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L247)
 
 Validate the current configuration
 
@@ -2125,7 +2616,7 @@ Validation result with errors and warnings
 
 > **reset**(): `void`
 
-Defined in: [core/WebgazerConfig.ts:288](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L288)
+Defined in: [core/WebgazerConfig.ts:340](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L340)
 
 Reset configuration to default values
 
@@ -2137,7 +2628,7 @@ Reset configuration to default values
 
 > **toJSON**(): `WebgazerConfigData`
 
-Defined in: [core/WebgazerConfig.ts:319](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L319)
+Defined in: [core/WebgazerConfig.ts:377](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L377)
 
 Convert configuration to JSON-serializable object
 
@@ -2151,7 +2642,7 @@ Plain object representation of configuration
 
 > **clone**(): [`WebgazerConfig`](#webgazerconfig)
 
-Defined in: [core/WebgazerConfig.ts:359](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L359)
+Defined in: [core/WebgazerConfig.ts:423](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L423)
 
 Create a deep copy of this configuration
 
@@ -2165,7 +2656,7 @@ New WebgazerConfig instance with same values
 
 > **update**(`updates`): `void`
 
-Defined in: [core/WebgazerConfig.ts:367](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L367)
+Defined in: [core/WebgazerConfig.ts:431](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L431)
 
 Update multiple configuration values at once
 
@@ -2185,7 +2676,7 @@ Partial configuration to merge
 
 > **getEventTypes**(): `string`[]
 
-Defined in: [core/WebgazerConfig.ts:384](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L384)
+Defined in: [core/WebgazerConfig.ts:448](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/WebgazerConfig.ts#L448)
 
 Get event types for mouse tracking
 Used for compatibility with original API
@@ -3000,49 +3491,42 @@ Initial error covariance
 
 ### KalmanFilter4DConfig
 
-Defined in: [utils/filters/types.ts:61](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/types.ts#L61)
+Defined in: [utils/filters/types.ts:62](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/types.ts#L62)
 
 Configuration for 4D Kalman Filter (position + velocity)
+Based on original webgazer.js implementation
 
 #### Properties
-
-##### processNoise?
-
-> `optional` **processNoise**: `number`
-
-Defined in: [utils/filters/types.ts:63](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/types.ts#L63)
-
-Process noise covariance
 
 ##### measurementNoise?
 
 > `optional` **measurementNoise**: `number`
 
-Defined in: [utils/filters/types.ts:66](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/types.ts#L66)
+Defined in: [utils/filters/types.ts:64](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/types.ts#L64)
 
-Measurement noise covariance in pixels
+Measurement noise covariance in pixels (default: 47.0 from original)
 
 ##### initialErrorCovariance?
 
 > `optional` **initialErrorCovariance**: `number`
 
-Defined in: [utils/filters/types.ts:69](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/types.ts#L69)
+Defined in: [utils/filters/types.ts:67](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/types.ts#L67)
 
-Initial error covariance
+Initial error covariance (default: 0.0001 from original)
 
 ##### deltaTime?
 
 > `optional` **deltaTime**: `number`
 
-Defined in: [utils/filters/types.ts:72](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/types.ts#L72)
+Defined in: [utils/filters/types.ts:70](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/types.ts#L70)
 
-Time delta between updates in seconds
+Time delta between updates in seconds (default: 0.1 = 100ms)
 
 ***
 
 ### KalmanFilter4DState
 
-Defined in: [utils/filters/types.ts:78](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/types.ts#L78)
+Defined in: [utils/filters/types.ts:76](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/types.ts#L76)
 
 State of 4D Kalman filter
 
@@ -3052,7 +3536,7 @@ State of 4D Kalman filter
 
 > **state**: `number`[]
 
-Defined in: [utils/filters/types.ts:80](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/types.ts#L80)
+Defined in: [utils/filters/types.ts:78](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/types.ts#L78)
 
 State vector [x, y, vx, vy]
 
@@ -3060,7 +3544,7 @@ State vector [x, y, vx, vy]
 
 > **errorCovariance**: `number`[][]
 
-Defined in: [utils/filters/types.ts:83](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/types.ts#L83)
+Defined in: [utils/filters/types.ts:81](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/types.ts#L81)
 
 Error covariance matrix (4×4)
 
@@ -3068,7 +3552,7 @@ Error covariance matrix (4×4)
 
 > **initialized**: `boolean`
 
-Defined in: [utils/filters/types.ts:86](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/types.ts#L86)
+Defined in: [utils/filters/types.ts:84](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/types.ts#L84)
 
 Whether the filter has been initialized
 
@@ -3076,7 +3560,7 @@ Whether the filter has been initialized
 
 > **lastUpdate**: `number`
 
-Defined in: [utils/filters/types.ts:89](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/types.ts#L89)
+Defined in: [utils/filters/types.ts:87](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/utils/filters/types.ts#L87)
 
 Last update timestamp
 
@@ -3106,7 +3590,7 @@ Calibration callback type
 
 > **GazeCallback** = (`prediction`, `timestamp`) => `void`
 
-Defined in: [core/Webgazer.ts:51](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L51)
+Defined in: [core/Webgazer.ts:54](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/core/Webgazer.ts#L54)
 
 Type for gaze prediction callback
 
@@ -3166,7 +3650,7 @@ Event listener callback
 
 > `const` **webgazer**: [`Webgazer`](#webgazer)
 
-Defined in: [index.ts:59](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/index.ts#L59)
+Defined in: [index.ts:62](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/core/src/index.ts#L62)
 
 Get the singleton Webgazer instance.
 All interactions with Webgazer should go through this instance.

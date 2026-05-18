@@ -348,7 +348,7 @@ Defined in: [react/src/types/index.ts:25](https://github.com/jhndrncrz/webgazer-
 
 ##### regression?
 
-> `optional` **regression**: `"ridge"` \| `"ridgeThreaded"` \| `"ridgeWeighted"`
+> `optional` **regression**: `"ridge"` \| `"weightedRidge"` \| `"threadedRidge"` \| `"ridgeWeighted"` \| `"ridgeThreaded"`
 
 Defined in: [react/src/types/index.ts:26](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/react/src/types/index.ts#L26)
 
@@ -698,6 +698,86 @@ Defined in: [react/src/hooks/useGazeRecording.ts:23](https://github.com/jhndrncr
 
 ***
 
+### UseGazeTrackingReturn
+
+Defined in: [react/src/hooks/useGazeTracking.ts:10](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/react/src/hooks/useGazeTracking.ts#L10)
+
+#### Properties
+
+##### gazeData
+
+> **gazeData**: [`GazePrediction`](#gazeprediction) \| `null`
+
+Defined in: [react/src/hooks/useGazeTracking.ts:12](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/react/src/hooks/useGazeTracking.ts#L12)
+
+Current raw gaze prediction (null if no face detected)
+
+##### x
+
+> **x**: `number` \| `null`
+
+Defined in: [react/src/hooks/useGazeTracking.ts:14](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/react/src/hooks/useGazeTracking.ts#L14)
+
+Convenience: x coordinate of the gaze, or null
+
+##### y
+
+> **y**: `number` \| `null`
+
+Defined in: [react/src/hooks/useGazeTracking.ts:16](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/react/src/hooks/useGazeTracking.ts#L16)
+
+Convenience: y coordinate of the gaze, or null
+
+##### hasGazeData
+
+> **hasGazeData**: `boolean`
+
+Defined in: [react/src/hooks/useGazeTracking.ts:18](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/react/src/hooks/useGazeTracking.ts#L18)
+
+Whether there is currently valid gaze data
+
+##### isTracking
+
+> **isTracking**: `boolean`
+
+Defined in: [react/src/hooks/useGazeTracking.ts:20](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/react/src/hooks/useGazeTracking.ts#L20)
+
+Whether the tracker is running
+
+##### calibrationCount
+
+> **calibrationCount**: `number`
+
+Defined in: [react/src/hooks/useGazeTracking.ts:22](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/react/src/hooks/useGazeTracking.ts#L22)
+
+Number of calibration points recorded
+
+##### start()
+
+> **start**: () => `Promise`\<`void`\>
+
+Defined in: [react/src/hooks/useGazeTracking.ts:24](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/react/src/hooks/useGazeTracking.ts#L24)
+
+Start eye tracking
+
+###### Returns
+
+`Promise`\<`void`\>
+
+##### stop()
+
+> **stop**: () => `Promise`\<`void`\>
+
+Defined in: [react/src/hooks/useGazeTracking.ts:26](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/react/src/hooks/useGazeTracking.ts#L26)
+
+Stop eye tracking
+
+###### Returns
+
+`Promise`\<`void`\>
+
+***
+
 ### WebgazerConfig
 
 Defined in: [react/src/types/index.ts:24](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/react/src/types/index.ts#L24)
@@ -716,7 +796,7 @@ Defined in: [react/src/types/index.ts:25](https://github.com/jhndrncrz/webgazer-
 
 ##### regression?
 
-> `optional` **regression**: `"ridge"` \| `"ridgeThreaded"` \| `"ridgeWeighted"`
+> `optional` **regression**: `"ridge"` \| `"weightedRidge"` \| `"threadedRidge"` \| `"ridgeWeighted"` \| `"ridgeThreaded"`
 
 Defined in: [react/src/types/index.ts:26](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/react/src/types/index.ts#L26)
 
@@ -796,7 +876,7 @@ Defined in: [react/src/types/index.ts:25](https://github.com/jhndrncrz/webgazer-
 
 ##### regression?
 
-> `optional` **regression**: `"ridge"` \| `"ridgeThreaded"` \| `"ridgeWeighted"`
+> `optional` **regression**: `"ridge"` \| `"weightedRidge"` \| `"threadedRidge"` \| `"ridgeWeighted"` \| `"ridgeThreaded"`
 
 Defined in: [react/src/types/index.ts:26](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/react/src/types/index.ts#L26)
 
@@ -1522,7 +1602,7 @@ Defined in: [react/src/components/WebgazerProvider.tsx:15](https://github.com/jh
 
 > **useWebgazerContext**(): `WebgazerContextValue`
 
-Defined in: [react/src/context/WebgazerContext.ts:18](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/react/src/context/WebgazerContext.ts#L18)
+Defined in: [react/src/context/WebgazerContext.ts:15](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/react/src/context/WebgazerContext.ts#L15)
 
 #### Returns
 
@@ -1616,16 +1696,16 @@ React hooks and components for Webgazer.ts eye tracking
 
 ### useGazeTracking()
 
-> **useGazeTracking**(): [`GazePrediction`](#gazeprediction) \| `null`
+> **useGazeTracking**(): [`UseGazeTrackingReturn`](#usegazetrackingreturn)
 
-Defined in: [react/src/hooks/useGazeTracking.ts:10](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/react/src/hooks/useGazeTracking.ts#L10)
+Defined in: [react/src/hooks/useGazeTracking.ts:29](https://github.com/jhndrncrz/webgazer-ts/blob/main/packages/react/src/hooks/useGazeTracking.ts#L29)
 
 @webgazer-ts/react
 React hooks and components for Webgazer.ts eye tracking
 
 #### Returns
 
-[`GazePrediction`](#gazeprediction) \| `null`
+[`UseGazeTrackingReturn`](#usegazetrackingreturn)
 
 ***
 
